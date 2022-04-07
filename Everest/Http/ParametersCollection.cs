@@ -4,9 +4,9 @@ using Everest.Utils;
 
 namespace Everest.Http
 {
-	public class QueryString : NameValueCollection
+	public class ParametersCollection : NameValueCollection
 	{
-		public QueryString(NameValueCollection collection)
+		public ParametersCollection(NameValueCollection collection)
 			: base(collection)
 		{
 			
