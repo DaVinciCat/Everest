@@ -5,7 +5,7 @@ namespace Everest.Utils
 {
 	internal static class HttpListenerRequestExtensions
 	{
-		internal static string ReadPayload(this HttpListenerRequest request)
+		internal static string GetBody(this HttpListenerRequest request)
 		{
 			if (!request.HasEntityBody)
 				return null;

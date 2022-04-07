@@ -14,9 +14,9 @@ namespace Everest.Http
 
 		public string HttpMethod => request.HttpMethod;
 
-		public bool HasPayload => request.HasEntityBody;
+		public bool HasBody => request.HasEntityBody;
 
-		public string Payload => HasPayload ? payload ??= request.ReadPayload() : null;
+		public string Body => HasBody ? payload ??= request.GetBody() : null;
 
 		public string EndPoint => request.Url?.AbsolutePath;
 
