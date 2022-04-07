@@ -38,7 +38,7 @@ namespace Everest.Routing
 				try
 				{
 					logger.LogError(ex, $"{context.Request.Id}: Invoke route action failed for: {route}");
-					ErrorHander?.Invoke(context, ex);
+					ErrorHandler?.Invoke(context, ex);
 				}
 				catch (Exception e)
 				{
@@ -51,7 +51,7 @@ namespace Everest.Routing
 			}
 		}
 
-		public Action<HttpContext, Exception> ErrorHander { get; set; } = (context, ex) =>
+		public Action<HttpContext, Exception> ErrorHandler { get; set; } = (context, ex) =>
 		{
 			context.Response.SendInternalServerError($"Failed to process request: {context.Request.HttpMethod} {context.Request.EndPoint}.\r\n{ex.Message}");
 		};
