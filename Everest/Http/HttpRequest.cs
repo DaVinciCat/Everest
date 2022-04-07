@@ -3,7 +3,6 @@ using System.Collections.Specialized;
 using System.IO;
 using System.Net;
 using System.Text;
-using Everest.Utils;
 
 namespace Everest.Http
 {
@@ -15,14 +14,12 @@ namespace Everest.Http
 
 		public bool HasEntityBody => request.HasEntityBody;
 
-		public string EntityBody => HasEntityBody ? entityBody ??= request.GetEntityBody() : null;
+		public string EntityBody => entityBody ??= GetEntityBody();
 
 		public string EndPoint => request.Url?.AbsolutePath;
 
 		public Stream InputStream => request.InputStream;
-
-		public string AcceptEncoding => acceptEncoding ??= request.GetAcceptEncoding();
-
+		
 		public Encoding ContentEncoding => request.ContentEncoding;
 
 		public NameValueCollection Headers => request.Headers;
@@ -30,17 +27,26 @@ namespace Everest.Http
 		public NameValueCollection QueryString => request.QueryString;
 
 		public QueryParameters QueryParameters { get; }
-		
+
 		private string entityBody;
 
-		private string acceptEncoding;
-		
 		private readonly HttpListenerRequest request;
 
 		public HttpRequest(HttpListenerRequest request)
 		{
 			this.request = request;
 			QueryParameters = new QueryParameters(request.QueryString);
+		}
+
+		private string GetEntityBody()
+		{
+			if (!request.HasEntityBody)
+				return null;
+
+			using (var reader = new StreamReader(request.InputStream, request.ContentEncoding))
+			{
+				return reader.ReadToEnd();
+			}
 		}
 	}
 }
