@@ -14,9 +14,9 @@ namespace Everest.Http
 
 		public string HttpMethod => request.HttpMethod;
 
-		public bool HasBody => request.HasEntityBody;
+		public bool HasEntityBody => request.HasEntityBody;
 
-		public string Body => HasBody ? payload ??= request.GetBody() : null;
+		public string EntityBody => HasEntityBody ? entityBody ??= request.GetEntityBody() : null;
 
 		public string EndPoint => request.Url?.AbsolutePath;
 
@@ -40,7 +40,7 @@ namespace Everest.Http
 
 		public bool TryGetParameterValue<T>(string parameter, out T value) => Parameters.TryGetParameterValue(parameter, out value);
 		
-		private string payload;
+		private string entityBody;
 
 		private string acceptEncoding;
 
