@@ -40,8 +40,6 @@ namespace Everest.Http
 		private string entityBody;
 
 		private string acceptEncoding;
-
-		private NameValueCollection parameters;
 		
 		private readonly HttpListenerRequest request;
 
