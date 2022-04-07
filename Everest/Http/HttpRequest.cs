@@ -3,7 +3,6 @@ using System.Collections.Specialized;
 using System.IO;
 using System.Net;
 using System.Text;
-using System.Web;
 using Everest.Utils;
 
 namespace Everest.Http
@@ -27,18 +26,16 @@ namespace Everest.Http
 		public Encoding ContentEncoding => request.ContentEncoding;
 
 		public NameValueCollection Headers => request.Headers;
+
+		public NameValueCollection QueryString => request.QueryString;
+
+		public bool HasParameter(string parameter) => QueryString[parameter] != null;
+
+		public T GetParameterValue<T>(string parameter) => QueryString.GetParameterValue<T>(parameter);
 		
-		public NameValueCollection Parameters => parameters ??= request.Url?.Query != null
-			? HttpUtility.ParseQueryString(request.Url.Query, Encoding.UTF8)
-			: new NameValueCollection();
+		public T GetParameterValue<T>(string parameter, Func<string, T> parse) => QueryString.GetParameterValue<T>(parameter, parse);
 
-		public bool HasParameter(string parameter) => Parameters[parameter] != null;
-
-		public T GetParameterValue<T>(string parameter) => Parameters.GetParameterValue<T>(parameter);
-		
-		public T GetParameterValue<T>(string parameter, Func<string, T> parse) => Parameters.GetParameterValue<T>(parameter, parse);
-
-		public bool TryGetParameterValue<T>(string parameter, out T value) => Parameters.TryGetParameterValue(parameter, out value);
+		public bool TryGetParameterValue<T>(string parameter, out T value) => QueryString.TryGetParameterValue(parameter, out value);
 		
 		private string entityBody;
 

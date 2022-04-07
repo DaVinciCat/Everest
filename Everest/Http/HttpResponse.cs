@@ -59,7 +59,7 @@ namespace Everest.Http
 			this.response = response;
 			this.compression = compression;
 
-			AppendHeader("Server", "Easy-Rest");
+			AppendHeader("Server", "Everest");
 		}
 
 		public void AddHeader(string name, string value) => response.AddHeader(name, value);
