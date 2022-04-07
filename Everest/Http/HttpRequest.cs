@@ -14,8 +14,6 @@ namespace Everest.Http
 
 		public bool HasEntityBody => request.HasEntityBody;
 
-		public string EntityBody => entityBody ??= GetEntityBody();
-
 		public string EndPoint => request.Url?.AbsolutePath;
 
 		public Stream InputStream => request.InputStream;
@@ -28,8 +26,6 @@ namespace Everest.Http
 
 		public QueryParameters QueryParameters { get; }
 
-		private string entityBody;
-
 		private readonly HttpListenerRequest request;
 
 		public HttpRequest(HttpListenerRequest request)
@@ -38,7 +34,7 @@ namespace Everest.Http
 			QueryParameters = new QueryParameters(request.QueryString);
 		}
 
-		private string GetEntityBody()
+		public string ReadEntityBody()
 		{
 			if (!request.HasEntityBody)
 				return null;
