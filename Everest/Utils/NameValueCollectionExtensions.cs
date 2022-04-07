@@ -49,23 +49,7 @@ namespace Everest.Utils
 			return true;
 		}
 
-		internal static T GetParameterValue<T>(this NameValueCollection collection, string parameter)
-		{
-			try
-			{
-				var value = collection[parameter];
-				if (value == null)
-					throw new ArgumentException("Parameter is required.");
-
-				return collection.GetValue<T>(parameter);
-			}
-			catch (Exception ex)
-			{
-				throw new InvalidOperationException($"Failed to parse parameter '{parameter}': {ex.Message}", ex);
-			}
-		}
-
-		internal static T GetParameterValue<T>(this NameValueCollection collection, string parameter, Func<string, T> parse)
+		internal static T GetValue<T>(this NameValueCollection collection, string parameter, Func<string, T> parse)
 		{
 			try
 			{
@@ -78,24 +62,6 @@ namespace Everest.Utils
 			catch (Exception ex)
 			{
 				throw new Exception($"Failed to parse parameter '{parameter}': {ex.Message}", ex);
-			}
-		}
-
-		internal static bool TryGetParameterValue<T>(this NameValueCollection collection, string parameter, out T value)
-		{
-			value = default(T);
-
-			try
-			{
-				var strValue = collection[parameter];
-				if (strValue == null)
-					return false;
-
-				return collection.TryGetValue(parameter, out value);
-			}
-			catch (Exception ex)
-			{
-				throw new InvalidOperationException($"Failed to parse parameter '{parameter}': {ex.Message}", ex);
 			}
 		}
 	}

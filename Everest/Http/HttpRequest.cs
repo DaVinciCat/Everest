@@ -29,13 +29,7 @@ namespace Everest.Http
 
 		public NameValueCollection QueryString => request.QueryString;
 
-		public bool HasParameter(string parameter) => QueryString[parameter] != null;
-
-		public T GetParameterValue<T>(string parameter) => QueryString.GetParameterValue<T>(parameter);
-		
-		public T GetParameterValue<T>(string parameter, Func<string, T> parse) => QueryString.GetParameterValue<T>(parameter, parse);
-
-		public bool TryGetParameterValue<T>(string parameter, out T value) => QueryString.TryGetParameterValue(parameter, out value);
+		public QueryParameters QueryParameters { get; }
 		
 		private string entityBody;
 
@@ -46,6 +40,7 @@ namespace Everest.Http
 		public HttpRequest(HttpListenerRequest request)
 		{
 			this.request = request;
+			QueryParameters = new QueryParameters(request.QueryString);
 		}
 	}
 }
