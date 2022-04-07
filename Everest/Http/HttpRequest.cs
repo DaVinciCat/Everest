@@ -22,16 +22,14 @@ namespace Everest.Http
 
 		public NameValueCollection Headers => request.Headers;
 
-		public NameValueCollection QueryString => request.QueryString;
-
-		public QueryParameters QueryParameters { get; }
+		public QueryString QueryString { get; }
 
 		private readonly HttpListenerRequest request;
 
 		public HttpRequest(HttpListenerRequest request)
 		{
 			this.request = request;
-			QueryParameters = new QueryParameters(request.QueryString);
+			QueryString = new QueryString(request.QueryString);
 		}
 
 		public string ReadEntityBody()
