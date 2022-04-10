@@ -12,7 +12,7 @@ namespace Everest.Routing
 		public  Dictionary<string, BuildRouteSegment> Builders { get; } = new()
 		{
 			{@"^[a-z\d]+$", (name, next) => new StringRouteSegment(name, next)},
-			{ @"(?<=:)(\w+)", (name, next) => new ParamRouteSegment(name, next)},
+			{@"(?<=:)(\w+)", (name, next) => new ParamRouteSegment(name, next)},
 			{@"[a-z\d]+(?=\*)", (name, next) => new SplatRouteSegment(name, next)},
 		};
 

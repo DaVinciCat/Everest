@@ -12,7 +12,7 @@ namespace Everest.Routing
 			var split = url.SplitUrl();
 			var iterator = new Iterator<string>(split);
 
-			return segment.Match(iterator, segment, parameters) && !iterator.HasNext();
+			return segment.Match(iterator, parameters) && !iterator.HasNext();
 		}
 	}
 }
