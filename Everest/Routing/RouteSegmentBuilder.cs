@@ -1,0 +1,52 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using Everest.Utils;
+
+namespace Everest.Routing
+{
+	public delegate RouteSegment RouteSegmentBuildAction(string name, RouteSegment next);
+	
+	public class RouteSegmentBuilder
+	{
+		public  Dictionary<string, RouteSegmentBuildAction> Builders { get; } = new Dictionary<string, RouteSegmentBuildAction>()
+		{
+			{@"^[a-z\d]+$", (name, next) => new StringRouteSegment(name, next)},
+			{@"(?<=:)[a-z\d]+", (name, next) => new ParamRouteSegment(name, next)},
+			{@"[a-z\d]+(?=\*)", (name, next) => new SplatRouteSegment(name, next)},
+		};
+
+		public RouteSegment Build(string pattern)
+		{
+			if (string.IsNullOrEmpty(pattern))
+				throw new ArgumentNullException(nameof(pattern), "Route pattern is reqired.");
+
+			var split = pattern.SplitUrl();
+			var iterator = new Iterator<string>(split);
+			if (iterator.MoveNext())
+				return BuildImpl();
+
+			throw new ArgumentException($"Invalid route pattern: {pattern}.", nameof(pattern));
+
+			RouteSegment BuildImpl()
+			{
+				var current = iterator.Current;
+				if (current != null)
+				{
+					foreach (var regex in Builders.Keys)
+					{
+						var match = Regex.Match(current, regex);
+						if (match.Success)
+						{
+							return Builders[regex](match.Groups[0].Value, iterator.MoveNext() ? BuildImpl() : null);
+						}
+					}
+
+					throw new ArgumentException($"Unsupported route segment: '{current}'.");
+				}
+
+				throw new ArgumentException($"Invalid route pattern: {pattern}.", nameof(pattern));
+			}
+		}
+	}
+}

@@ -6,12 +6,17 @@ namespace Everest.Http
 {
 	public class ParametersCollection : NameValueCollection
 	{
+		public ParametersCollection()
+		{
+
+		}
+
 		public ParametersCollection(NameValueCollection collection)
 			: base(collection)
 		{
 			
 		}
-
+		
 		public bool HasParameters() => Count > 0;
 
 		public bool HasParameter(string parameter) => this[parameter] != null;

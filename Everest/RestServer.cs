@@ -17,9 +17,9 @@ namespace Everest
 
 		public bool IsListening => listener.IsListening;
 
-		public RouteCollection Routes => router.Routes;
+		public RouteCollection Routes => Router.Routes;
 
-		private readonly Router router;
+		public Router Router { get; }
 
 		private readonly HttpListener listener;
 
@@ -29,7 +29,7 @@ namespace Everest
 		
 		public RestServer(Router router, ILogger<RestServer> logger)
 		{
-			this.router = router;
+			this.Router = router;
 			this.logger = logger;
 			listener = new HttpListener();
 			listenerThread = new Thread(ListenAsync);
@@ -120,7 +120,7 @@ namespace Everest
 
 		private void ProcessRequestAsync(HttpListenerContext context)
 		{
-			router.Route(new HttpContext(context));
+			Router.Route(new HttpContext(context));
 		}
 
 		public void Dispose()

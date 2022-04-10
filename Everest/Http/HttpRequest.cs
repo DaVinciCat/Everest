@@ -24,12 +24,15 @@ namespace Everest.Http
 
 		public ParametersCollection QueryParameters { get; }
 
+		public ParametersCollection PathParameters { get; }
+
 		private readonly HttpListenerRequest request;
 
 		public HttpRequest(HttpListenerRequest request)
 		{
 			this.request = request;
 			QueryParameters = new ParametersCollection(request.QueryString);
+			PathParameters = new ParametersCollection();
 		}
 
 		public string ReadEntityBody()

@@ -6,23 +6,50 @@ namespace Everest.Routing
 {
 	public class RouteCollection
 	{
-		private readonly Dictionary<Route, Action<HttpContext>> routedActions = new Dictionary<Route, Action<HttpContext>>();
+		private readonly Dictionary<string, Dictionary<RouteSegment, Action<HttpContext>>> routeActions = new Dictionary<string, Dictionary<RouteSegment, Action<HttpContext>>>();
 
-		public bool AddRoute(string httpMethod, string path, Action<HttpContext> action)
+		private readonly RouteSegmentBuilder builder;
+
+		private readonly RouteSegmentMatcher matcher;
+
+		public RouteCollection(RouteSegmentBuilder builder, RouteSegmentMatcher matcher)
 		{
-			var route = new Route(httpMethod, path);
-			if (!routedActions.TryGetValue(route, out _))
+			this.builder = builder;
+			this.matcher = matcher;
+		}
+
+		public void AddRoute(string httpMethod, string pattern, Action<HttpContext> action)
+		{
+			if (!routeActions.TryGetValue(httpMethod, out var routes))
 			{
-				routedActions.Add(route, action);
-				return true;
+				routes = new Dictionary<RouteSegment, Action<HttpContext>>();
+				routeActions.Add(httpMethod, routes);
+			}
+
+			var segment = builder.Build(pattern);
+			routes.Add(segment, action);
+		}
+
+		public bool TryGetRoute(HttpContext context, out Action<HttpContext> action)
+		{
+			action = null;
+
+			var httpMethod = context.Request.HttpMethod;
+			var url = context.Request.EndPoint;
+
+			if (!routeActions.TryGetValue(httpMethod, out var routes))
+				return false;
+
+			foreach (var route in routes)
+			{
+				if (matcher.Match(route.Key, url, context.Request.PathParameters))
+				{
+					action = route.Value;
+					return true;
+				}
 			}
 
 			return false;
-		}
-
-		public bool TryGetRoute(Route route, out Action<HttpContext> action)
-		{
-			return routedActions.TryGetValue(route, out action);
 		}
 	}
 }
