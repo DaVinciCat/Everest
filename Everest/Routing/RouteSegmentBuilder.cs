@@ -23,29 +23,28 @@ namespace Everest.Routing
 
 			var split = pattern.SplitUrl();
 			var iterator = new Iterator<string>(split);
-			if (iterator.MoveNext())
-				return BuildImpl();
-
-			throw new ArgumentException($"Invalid route pattern: {pattern}.", nameof(pattern));
+	
+			return BuildImpl();
 
 			RouteSegment BuildImpl()
 			{
-				var current = iterator.Current;
-				if (current != null)
-				{
-					foreach (var regex in Builders.Keys)
-					{
-						var match = Regex.Match(current, regex);
-						if (match.Success)
-						{
-							return Builders[regex](match.Groups[0].Value, iterator.MoveNext() ? BuildImpl() : null);
-						}
-					}
+				if (!iterator.MoveNext())
+					throw new ArgumentException($"Invalid route pattern: {pattern}.", nameof(pattern));
 
-					throw new ArgumentException($"Unsupported route segment: '{current}'.");
+				var current = iterator.Current;
+				if (current == null)
+					throw new ArgumentException("Segment required");
+
+				foreach (var regex in Builders.Keys)
+				{
+					var match = Regex.Match(current, regex);
+					if (match.Success)
+					{
+						return Builders[regex](match.Groups[0].Value, iterator.HasNext() ? BuildImpl() : null);
+					}
 				}
 
-				throw new ArgumentException($"Invalid route pattern: {pattern}.", nameof(pattern));
+				throw new ArgumentException($"Unsupported route segment: '{current}'.");
 			}
 		}
 	}

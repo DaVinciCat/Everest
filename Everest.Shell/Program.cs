@@ -33,7 +33,7 @@ namespace Everest.Shell
 				{
 					context.Response.SendJson(new { Message = "Home Sweet Home", From = "Everest", Success = true });
 				});
-				
+
 				rest.Start("localhost", 8080);
 
 				Console.WriteLine("GET localhost:8080/home");
