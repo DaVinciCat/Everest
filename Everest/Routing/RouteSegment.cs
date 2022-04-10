@@ -36,8 +36,7 @@ namespace Everest.Routing
 				return false;
 			}
 
-			var current = iterator.Current;
-			var result = Name == current;
+			var result = Name == iterator.Current;
 
 			if (result && HasNextSegment)
 			{

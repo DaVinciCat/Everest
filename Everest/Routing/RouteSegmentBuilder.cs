@@ -33,7 +33,7 @@ namespace Everest.Routing
 
 				var current = iterator.Current;
 				if (current == null)
-					throw new ArgumentException("Segment required");
+					throw new ArgumentException("Segment required.");
 
 				foreach (var regex in Builders.Keys)
 				{
