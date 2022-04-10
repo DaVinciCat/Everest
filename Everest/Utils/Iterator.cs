@@ -35,12 +35,12 @@ namespace Everest.Utils
 		public bool MoveNext()
 		{
 			position++;
-			return (position < Items.Length);
+			return position < Items.Length;
 		}
 
 		public bool HasNext()
 		{
-			return (position + 1 < Items.Length);
+			return position < Items.Length - 1;
 		}
 
 		public void Reset()

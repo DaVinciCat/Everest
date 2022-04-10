@@ -9,7 +9,7 @@ namespace Everest.Http
 	{
 		public int CompressionMinLength { get; set; } = 2048;
 
-		private readonly Dictionary<string, Func<byte[], byte[]>> encodingActions = new Dictionary<string, Func<byte[], byte[]>>()
+		private readonly Dictionary<string, Func<byte[], byte[]>> encodingActions = new()
 		{
 			{ "gzip", Gzip },
 			{ "deflate", Deflate }

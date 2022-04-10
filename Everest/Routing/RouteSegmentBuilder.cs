@@ -5,11 +5,11 @@ using Everest.Utils;
 
 namespace Everest.Routing
 {
-	public delegate RouteSegment RouteSegmentBuildAction(string name, RouteSegment next);
+	public delegate RouteSegment BuildRouteSegment(string name, RouteSegment next);
 	
 	public class RouteSegmentBuilder
 	{
-		public  Dictionary<string, RouteSegmentBuildAction> Builders { get; } = new Dictionary<string, RouteSegmentBuildAction>()
+		public  Dictionary<string, BuildRouteSegment> Builders { get; } = new()
 		{
 			{@"^[a-z\d]+$", (name, next) => new StringRouteSegment(name, next)},
 			{@"(?<=:)[a-z\d]+", (name, next) => new ParamRouteSegment(name, next)},

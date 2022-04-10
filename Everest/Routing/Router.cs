@@ -8,9 +8,9 @@ namespace Everest.Routing
 	{
 		public RouteCollection Routes { get; }
 
-		public RouteSegmentBuilder RouteBuilder { get; } = new RouteSegmentBuilder();
+		public RouteSegmentBuilder RouteBuilder { get; } = new();
 
-		public RouteSegmentMatcher RouteMatcher { get; } = new RouteSegmentMatcher();
+		public RouteSegmentMatcher RouteMatcher { get; } = new();
 
 		private readonly ILogger<Router> logger;
 

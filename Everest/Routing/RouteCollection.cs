@@ -6,7 +6,7 @@ namespace Everest.Routing
 {
 	public class RouteCollection
 	{
-		private readonly Dictionary<string, Dictionary<RouteSegment, Action<HttpContext>>> routeActions = new Dictionary<string, Dictionary<RouteSegment, Action<HttpContext>>>();
+		private readonly Dictionary<string, Dictionary<RouteSegment, Action<HttpContext>>> routeActions = new();
 
 		private readonly RouteSegmentBuilder builder;
 
@@ -40,11 +40,11 @@ namespace Everest.Routing
 			if (!routeActions.TryGetValue(httpMethod, out var routes))
 				return false;
 
-			foreach (var route in routes)
+			foreach (var (key, value) in routes)
 			{
-				if (matcher.Match(route.Key, url, context.Request.PathParameters))
+				if (matcher.Match(key, url, context.Request.PathParameters))
 				{
-					action = route.Value;
+					action = value;
 					return true;
 				}
 			}

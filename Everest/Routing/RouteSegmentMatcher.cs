@@ -14,7 +14,6 @@ namespace Everest.Routing
 
 			return segment.Match(iterator, segment, parameters) && !iterator.HasNext();
 		}
-
 	}
 }
 
