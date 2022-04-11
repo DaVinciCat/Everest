@@ -95,5 +95,35 @@ namespace Everest.Tests
 			Assert.True(parameters["id"] != null);
 			Assert.True(parameters["id"] == "1");
 		}
+
+		[Fact]
+		public void False_StarFooId_BazBar1()
+		{
+			const string pattern = "/a*/foo/:id";
+			const string url = "/baz/bar/1";
+
+			var builder = new RouteSegmentBuilder();
+			var parser = new RouteSegmentParser();
+			var segment = builder.Build(pattern);
+			var parameters = new NameValueCollection();
+
+			Assert.False(parser.TryParse(segment, url, parameters));
+		}
+
+		[Fact]
+		public void True_FooBarStar_FooBarWeeHee()
+		{
+			const string pattern = "/foo/bar/b*";
+			const string url = "/foo/bar/wee/hee";
+
+			var builder = new RouteSegmentBuilder();
+			var parser = new RouteSegmentParser();
+			var segment = builder.Build(pattern);
+			var parameters = new NameValueCollection();
+			
+			Assert.True(parser.TryParse(segment, url, parameters));
+			Assert.True(parameters["b"] != null);
+			Assert.True(parameters["b"] == "wee/hee");
+		}
 	}
 }

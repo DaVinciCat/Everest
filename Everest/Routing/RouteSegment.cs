@@ -84,14 +84,17 @@ namespace Everest.Routing
 
 		public override bool TryParse(Iterator<string> iterator, NameValueCollection parameters)
 		{
-			if (!HasNextSegment)
-			{
-				while (iterator.MoveNext()) { }
-				return true;
-			}
-			
 			var values = new List<string>();
 			var result = true;
+
+			if (!HasNextSegment)
+			{
+				while (iterator.MoveNext())
+				{
+					values.Add(iterator.Current);
+				}
+			}
+			
 			while (iterator.HasNext())
 			{
 				result = NextSegment.TryParse(iterator, parameters);
