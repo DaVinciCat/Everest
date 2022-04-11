@@ -18,7 +18,7 @@ namespace Everest.Routing
 			NextSegment = next;
 		}
 
-		public abstract bool Match(Iterator<string> iterator, NameValueCollection parameters);
+		public abstract bool TryParse(Iterator<string> iterator, NameValueCollection parameters);
 	}
 
 	public class StringRouteSegment : RouteSegment
@@ -29,7 +29,7 @@ namespace Everest.Routing
 
 		}
 		
-		public override bool Match(Iterator<string> iterator, NameValueCollection parameters) 
+		public override bool TryParse(Iterator<string> iterator, NameValueCollection parameters) 
 		{
 			if (!iterator.MoveNext())
 			{
@@ -40,7 +40,7 @@ namespace Everest.Routing
 
 			if (result && HasNextSegment)
 			{
-				return NextSegment.Match(iterator, parameters);
+				return NextSegment.TryParse(iterator, parameters);
 			}
 
 			return result;
@@ -54,7 +54,7 @@ namespace Everest.Routing
 		{
 		}
 
-		public override bool Match(Iterator<string> iterator, NameValueCollection parameters)
+		public override bool TryParse(Iterator<string> iterator, NameValueCollection parameters)
 		{
 			if (!iterator.MoveNext())
 			{
@@ -65,7 +65,7 @@ namespace Everest.Routing
 
 			if (HasNextSegment)
 			{
-				return NextSegment.Match(iterator, parameters);
+				return NextSegment.TryParse(iterator, parameters);
 			}
 
 			return true;
@@ -82,7 +82,7 @@ namespace Everest.Routing
 
 		}
 
-		public override bool Match(Iterator<string> iterator, NameValueCollection parameters)
+		public override bool TryParse(Iterator<string> iterator, NameValueCollection parameters)
 		{
 			if (!HasNextSegment)
 			{
@@ -94,7 +94,7 @@ namespace Everest.Routing
 			var result = true;
 			while (iterator.HasNext())
 			{
-				result = NextSegment.Match(iterator, parameters);
+				result = NextSegment.TryParse(iterator, parameters);
 				if (result)
 					break;
 

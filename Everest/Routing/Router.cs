@@ -10,13 +10,13 @@ namespace Everest.Routing
 
 		public RouteSegmentBuilder RouteBuilder { get; } = new();
 
-		public RouteSegmentMatcher RouteMatcher { get; } = new();
+		public RouteSegmentParser RouteParser { get; } = new();
 
 		private readonly ILogger<Router> logger;
 
 		public Router(ILogger<Router> logger)
 		{
-			this.Routes = new RouteCollection(RouteBuilder, RouteMatcher);
+			this.Routes = new RouteCollection(RouteBuilder, RouteParser);
 			this.logger = logger;
 		}
 		

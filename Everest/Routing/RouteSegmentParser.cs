@@ -3,16 +3,16 @@ using Everest.Utils;
 
 namespace Everest.Routing
 {
-	public class RouteSegmentMatcher
+	public class RouteSegmentParser
 	{
-		public bool Match(RouteSegment segment, string url, NameValueCollection parameters = null)
+		public bool TryParse(RouteSegment segment, string url, NameValueCollection parameters = null)
 		{
 			parameters ??= new NameValueCollection();
 
 			var split = url.SplitUrl();
 			var iterator = new Iterator<string>(split);
 
-			return segment.Match(iterator, parameters) && !iterator.HasNext();
+			return segment.TryParse(iterator, parameters) && !iterator.HasNext();
 		}
 	}
 }

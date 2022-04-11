@@ -10,12 +10,12 @@ namespace Everest.Routing
 
 		private readonly RouteSegmentBuilder builder;
 
-		private readonly RouteSegmentMatcher matcher;
+		private readonly RouteSegmentParser parser;
 
-		public RouteCollection(RouteSegmentBuilder builder, RouteSegmentMatcher matcher)
+		public RouteCollection(RouteSegmentBuilder builder, RouteSegmentParser parser)
 		{
 			this.builder = builder;
-			this.matcher = matcher;
+			this.parser = parser;
 		}
 
 		public void AddRoute(string httpMethod, string pattern, Action<HttpContext> action)
@@ -42,7 +42,7 @@ namespace Everest.Routing
 
 			foreach (var (key, value) in routes)
 			{
-				if (matcher.Match(key, url, context.Request.PathParameters))
+				if (parser.TryParse(key, url, context.Request.PathParameters))
 				{
 					action = value;
 					return true;
