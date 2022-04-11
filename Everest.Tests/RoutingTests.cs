@@ -46,7 +46,7 @@ namespace Everest.Tests
 		}
 
 		[Fact]
-		public void True_FooBarId_FooBar1_Pattern()
+		public void True_FooBarId_FooBar1()
 		{
 			const string pattern = "/foo/bar/:id";
 			const string url = "/foo/bar/1";
@@ -57,6 +57,41 @@ namespace Everest.Tests
 			var parameters = new NameValueCollection();
 
 			Assert.True(parser.TryParse(segment, url, parameters));
+			Assert.True(parameters["id"] != null);
+			Assert.True(parameters["id"] == "1");
+		}
+
+		[Fact]
+		public void True_StarFoo_BazBarFoo()
+		{
+			const string pattern = "/a*/foo";
+			const string url = "/baz/bar/foo";
+
+			var builder = new RouteSegmentBuilder();
+			var parser = new RouteSegmentParser();
+			var segment = builder.Build(pattern);
+			var parameters = new NameValueCollection();
+
+			Assert.True(parser.TryParse(segment, url, parameters));
+			Assert.True(parameters["a"] != null);
+			Assert.True(parameters["a"] == "baz/bar");
+		}
+
+		[Fact]
+		public void True_StarFooId_BazBarFoo1()
+		{
+			const string pattern = "/a*/foo/:id";
+			const string url = "/baz/bar/foo/1";
+
+			var builder = new RouteSegmentBuilder();
+			var parser = new RouteSegmentParser();
+			var segment = builder.Build(pattern);
+			var parameters = new NameValueCollection();
+
+			Assert.True(parser.TryParse(segment, url, parameters));
+			Assert.True(parameters["a"] != null);
+			Assert.True(parameters["a"] == "baz/bar");
+
 			Assert.True(parameters["id"] != null);
 			Assert.True(parameters["id"] == "1");
 		}
