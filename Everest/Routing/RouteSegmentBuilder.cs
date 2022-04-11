@@ -13,7 +13,7 @@ namespace Everest.Routing
 		{
 			{@"^[a-z\d]+$", (name, next) => new StringRouteSegment(name, next)},
 			{@"(?<=:)(\w+)", (name, next) => new ParamRouteSegment(name, next)},
-			{@"[a-z\d]+(?=\*)", (name, next) => new SplatRouteSegment(name, next)},
+			{@"[a-z\d]+(?=\*)", (name, next) => new SplatParamRouteSegment(name, next)},
 		};
 
 		public RouteSegment Build(string pattern)

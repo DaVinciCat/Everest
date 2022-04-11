@@ -72,11 +72,11 @@ namespace Everest.Routing
 		}
 	}
 
-	public class SplatRouteSegment : RouteSegment
+	public class SplatParamRouteSegment : RouteSegment
 	{
 		public static char Separator { get; set; } = '/';
 
-		public SplatRouteSegment(string name, RouteSegment next)
+		public SplatParamRouteSegment(string name, RouteSegment next)
 			: base(name, next)
 		{
 
@@ -100,10 +100,10 @@ namespace Everest.Routing
 				result = NextSegment.TryParse(iterator, parameters);
 				if (result)
 					break;
-
+					
 				values.Add(iterator.Current);
 			}
-
+			
 			parameters.Add(Name, string.Join(Separator, values));
 			return result;
 		}

@@ -7,6 +7,19 @@ namespace Everest.Tests
 	public class RoutingTests
 	{
 		[Fact]
+		public void False_FooBar_Slash()
+		{
+			const string pattern = "/foo/bar";
+			const string url = "/";
+
+			var builder = new RouteSegmentBuilder();
+			var parser = new RouteSegmentParser();
+			var segment = builder.Build(pattern);
+
+			Assert.False(parser.TryParse(segment, url, new NameValueCollection()));
+		}
+
+		[Fact]
 		public void True_FooBar_FooBar()
 		{
 			const string pattern = "/foo/bar";
@@ -124,6 +137,52 @@ namespace Everest.Tests
 			Assert.True(parser.TryParse(segment, url, parameters));
 			Assert.True(parameters["b"] != null);
 			Assert.True(parameters["b"] == "wee/hee");
+		}
+
+		[Fact]
+		public void True_FooBarStarBazId_FooBarWeeHeeBaz1()
+		{
+			const string pattern = "/foo/bar/b*/baz/:id";
+			const string url = "/foo/bar/wee/hee/baz/1";
+
+			var builder = new RouteSegmentBuilder();
+			var parser = new RouteSegmentParser();
+			var segment = builder.Build(pattern);
+			var parameters = new NameValueCollection();
+
+			Assert.True(parser.TryParse(segment, url, parameters));
+			Assert.True(parameters["b"] != null);
+			Assert.True(parameters["b"] == "wee/hee");
+
+			Assert.True(parameters["id"] != null);
+			Assert.True(parameters["id"] == "1");
+		}
+
+		[Fact]
+		public void False_FooBarStarId_FooBarWeeHee1()
+		{
+			const string pattern = "/foo/bar/b*/:id";
+			const string url = "/foo/bar/wee/hee/1";
+
+			var builder = new RouteSegmentBuilder();
+			var parser = new RouteSegmentParser();
+			var segment = builder.Build(pattern);
+			var parameters = new NameValueCollection();
+
+			Assert.False(parser.TryParse(segment, url, parameters));
+		}
+
+		[Fact]
+		public void True_FooBar_FooBarQueryId()
+		{
+			const string pattern = "/foo/bar";
+			const string url = "/foo/bar?id=1";
+
+			var builder = new RouteSegmentBuilder();
+			var parser = new RouteSegmentParser();
+			var segment = builder.Build(pattern);
+
+			Assert.True(parser.TryParse(segment, url, new NameValueCollection()));
 		}
 	}
 }

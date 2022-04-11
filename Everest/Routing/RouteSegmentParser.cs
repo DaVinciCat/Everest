@@ -9,7 +9,7 @@ namespace Everest.Routing
 		{
 			parameters ??= new NameValueCollection();
 
-			var split = url.SplitUrl();
+			var split = url.GetLeftPart().SplitUrl();
 			var iterator = new Iterator<string>(split);
 
 			return segment.TryParse(iterator, parameters) && !iterator.HasNext();
