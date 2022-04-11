@@ -9,8 +9,8 @@ namespace Everest.Routing
 		{
 			parameters ??= new NameValueCollection();
 
-			var split = url.GetLeftPart().SplitUrl();
-			var iterator = new Iterator<string>(split);
+			var segments = url.TrimStart('/').TrimEnd('/').Split('?')[0].Split("/");
+			var iterator = new Iterator<string>(segments);
 
 			return segment.TryParse(iterator, parameters) && !iterator.HasNext();
 		}

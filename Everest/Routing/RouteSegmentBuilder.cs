@@ -12,8 +12,7 @@ namespace Everest.Routing
 		public  Dictionary<string, BuildRouteSegment> Builders { get; } = new()
 		{
 			{@"^[a-z\d]+$", (name, next) => new StringRouteSegment(name, next)},
-			{@"(?<=:)(\w+)", (name, next) => new ParamRouteSegment(name, next)},
-			{@"[a-z\d]+(?=\*)", (name, next) => new SplatParamRouteSegment(name, next)},
+			{@"(?<=:)(\w+)", (name, next) => new ParamRouteSegment(name, next)}
 		};
 
 		public RouteSegment Build(string pattern)
@@ -21,8 +20,8 @@ namespace Everest.Routing
 			if (string.IsNullOrEmpty(pattern))
 				throw new ArgumentNullException(nameof(pattern), "Route pattern is reqired.");
 
-			var split = pattern.SplitUrl();
-			var iterator = new Iterator<string>(split);
+			var segments = pattern.TrimStart('/').TrimEnd('/').Split("/");
+			var iterator = new Iterator<string>(segments);
 	
 			return BuildImpl();
 

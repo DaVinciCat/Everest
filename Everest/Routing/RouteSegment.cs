@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Collections.Specialized;
+﻿using System.Collections.Specialized;
 using Everest.Utils;
 
 namespace Everest.Routing
@@ -69,43 +68,6 @@ namespace Everest.Routing
 			}
 
 			return true;
-		}
-	}
-
-	public class SplatParamRouteSegment : RouteSegment
-	{
-		public static char Separator { get; set; } = '/';
-
-		public SplatParamRouteSegment(string name, RouteSegment next)
-			: base(name, next)
-		{
-
-		}
-
-		public override bool TryParse(Iterator<string> iterator, NameValueCollection parameters)
-		{
-			var values = new List<string>();
-			var result = true;
-
-			if (!HasNextSegment)
-			{
-				while (iterator.MoveNext())
-				{
-					values.Add(iterator.Current);
-				}
-			}
-			
-			while (iterator.HasNext())
-			{
-				result = NextSegment.TryParse(iterator, parameters);
-				if (result)
-					break;
-					
-				values.Add(iterator.Current);
-			}
-			
-			parameters.Add(Name, string.Join(Separator, values));
-			return result;
 		}
 	}
 }
