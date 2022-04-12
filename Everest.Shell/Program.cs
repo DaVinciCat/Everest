@@ -23,7 +23,7 @@ namespace Everest.Shell
 
 			using (var rest = RestServerBuilder.Build(loggerFactory))
 			{
-				rest.Routes.AddRoute("GET", "/home/:id", context =>
+				rest.Routes.AddRoute("GET", "/home/{id}", context =>
 				{
 					var id = context.Request.PathParameters.GetParameterValue<int>("id");
 					context.Response.SendJson(new { Message = "Home Sweet Home", From = "Everest", Param = id, Success = true });

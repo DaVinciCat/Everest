@@ -61,7 +61,7 @@ namespace Everest.Tests
 		[Fact]
 		public void True_FooBarId_FooBar1()
 		{
-			const string pattern = "/foo/bar/:id";
+			const string pattern = "/foo/bar/{id}";
 			const string url = "/foo/bar/1";
 
 			var builder = new RouteSegmentBuilder();
