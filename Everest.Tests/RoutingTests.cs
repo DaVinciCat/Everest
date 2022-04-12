@@ -75,6 +75,39 @@ namespace Everest.Tests
 		}
 
 		[Fact]
+		public void True_FooId1BarId2_Foo1Bar2()
+		{
+			const string pattern = "/foo/{id1}/bar/{id2}";
+			const string url = "/foo/1/bar/2";
+
+			var builder = new RouteSegmentBuilder();
+			var parser = new RouteSegmentParser();
+			var segment = builder.Build(pattern);
+			var parameters = new NameValueCollection();
+
+			Assert.True(parser.TryParse(segment, url, parameters));
+			Assert.True(parameters["id1"] != null);
+			Assert.True(parameters["id1"] == "1");
+
+			Assert.True(parameters["id2"] != null);
+			Assert.True(parameters["id2"] == "2");
+		}
+
+		[Fact]
+		public void False_FooId1BarId2_Foo1()
+		{
+			const string pattern = "/foo/{id1}/bar/{id2}";
+			const string url = "/foo/1";
+
+			var builder = new RouteSegmentBuilder();
+			var parser = new RouteSegmentParser();
+			var segment = builder.Build(pattern);
+			var parameters = new NameValueCollection();
+
+			Assert.False(parser.TryParse(segment, url, parameters));
+		}
+
+		[Fact]
 		public void True_FooBar_FooBarQueryId()
 		{
 			const string pattern = "/foo/bar";
