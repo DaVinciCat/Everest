@@ -8,13 +8,15 @@ namespace Everest.Http
 {
 	public class HttpRequest
 	{
-		public Guid Id => request.RequestTraceIdentifier;
+		public Guid Id => request.RequestTraceIdentifier;	
 
 		public string HttpMethod => request.HttpMethod;
 
 		public bool HasEntityBody => request.HasEntityBody;
 
 		public string EndPoint => request.Url?.AbsolutePath;
+
+		public string Description => $"{HttpMethod} {EndPoint}";
 
 		public Stream InputStream => request.InputStream;
 		

@@ -22,32 +22,31 @@ namespace Everest.Routing
 		
 		public void Route(HttpContext context)
 		{
-			var description = $"{context.Request.HttpMethod} {context.Request.EndPoint}";
-
 			try
 			{
-				logger.LogTrace($"{context.Request.Id}: Find route for: {description}");
-				if (!Routes.TryGetRoute(context, out var action))
+				logger.LogTrace($"{context.Request.Id}: Find route for: '{context.Request.Description}'");
+				if (!Routes.TryGetRouteAction(context, out var routeAction))
 				{
-					logger.LogWarning($"{context.Request.Id}: Route not found for: {description}");
-					context.Response.SendNotFound($"Requested route not found: {description}.");
+					logger.LogWarning($"{context.Request.Id}: Route not found for: '{context.Request.Description}'");
+					context.Response.SendNotFound($"Requested route not found: '{context.Request.Description}'.");
 					return;
 				}
 
-				logger.LogTrace($"{context.Request.Id}: Invoke route action for: {description}");
-				action.Invoke(context);
-				logger.LogTrace($"{context.Request.Id}: Invoke route action done for: {description}");
+				logger.LogTrace($"{context.Request.Id}: Route '{routeAction}' found for: '{context.Request.Description}' ");
+				logger.LogTrace($"{context.Request.Id}: Invoke route action for: '{context.Request.Description}'");
+				routeAction.Action.Invoke(context);
+				logger.LogTrace($"{context.Request.Id}: Invoke route action done for: '{context.Request.Description}'");
 			}
 			catch (Exception ex)
 			{
 				try
 				{
-					logger.LogError(ex, $"{context.Request.Id}: Invoke route action failed for: {description}");
+					logger.LogError(ex, $"{context.Request.Id}: Invoke route action failed for: '{context.Request.Description}'");
 					ErrorHandler?.Invoke(context, ex);
 				}
 				catch (Exception e)
 				{
-					logger.LogError(e, $"{context.Request.Id}: Error handling failed for: {description}");
+					logger.LogError(e, $"{context.Request.Id}: Error handling failed for: '{context.Request.Description}'");
 				}
 			}
 			finally
@@ -58,7 +57,7 @@ namespace Everest.Routing
 
 		public Action<HttpContext, Exception> ErrorHandler { get; set; } = (context, ex) =>
 		{
-			context.Response.SendInternalServerError($"Failed to process request: {context.Request.HttpMethod} {context.Request.EndPoint}.\r\n{ex.Message}");
+			context.Response.SendInternalServerError($"Failed to process request: '{context.Request.Description}'.\r\n{ex.Message}");
 		};
 	}
 }

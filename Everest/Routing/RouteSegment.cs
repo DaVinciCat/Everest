@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using Everest.Utils;
 
@@ -8,6 +9,23 @@ namespace Everest.Routing
 	{
 		public string Content { get; }
 
+		public string Pattern
+		{
+			get
+			{
+				var segments = new List<string>();
+				Traverse(this);
+				return string.Join("/", segments);
+
+				void Traverse(RouteSegment segment)
+				{
+					segments.Add(segment.Content);
+					if (segment.HasNextSegment)
+						Traverse(segment.NextSegment);
+				}
+			}
+		}
+			
 		public RouteSegment NextSegment { get; }
 
 		public bool HasNextSegment => NextSegment != null;

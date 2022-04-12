@@ -30,9 +30,9 @@ namespace Everest.Routing
 			routes.Add(segment, action);
 		}
 
-		public bool TryGetRoute(HttpContext context, out Action<HttpContext> action)
+		public bool TryGetRouteAction(HttpContext context, out RouteAction routeAction)
 		{
-			action = null;
+			routeAction = null;
 
 			var httpMethod = context.Request.HttpMethod;
 			var url = context.Request.EndPoint;
@@ -44,7 +44,7 @@ namespace Everest.Routing
 			{
 				if (parser.TryParse(key, url, context.Request.PathParameters))
 				{
-					action = value;
+					routeAction = new RouteAction(httpMethod, key, value);
 					return true;
 				}
 			}
