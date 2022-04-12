@@ -9,7 +9,7 @@ namespace Everest.Routing
 	{
 		public string Content { get; }
 
-		public string Pattern
+		public string Description
 		{
 			get
 			{
@@ -25,6 +25,8 @@ namespace Everest.Routing
 				}
 			}
 		}
+
+		public bool IsOptional { get; }
 			
 		public RouteSegment NextSegment { get; }
 
