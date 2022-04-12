@@ -15,7 +15,7 @@ namespace Everest.Routing
 			{
 				var segments = new List<string>();
 				Traverse(this);
-				return string.Join("/", segments);
+				return $"/{string.Join("/", segments)}";
 
 				void Traverse(RouteSegment segment)
 				{
