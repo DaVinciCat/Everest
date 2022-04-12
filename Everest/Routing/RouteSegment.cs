@@ -1,19 +1,20 @@
-﻿using System.Collections.Specialized;
+﻿using System;
+using System.Collections.Specialized;
 using Everest.Utils;
 
 namespace Everest.Routing
 {
 	public abstract class RouteSegment
 	{
-		public string Name { get; }
+		public string Content { get; }
 
 		public RouteSegment NextSegment { get; }
 
 		public bool HasNextSegment => NextSegment != null;
 
-		protected RouteSegment(string name, RouteSegment next)
+		protected RouteSegment(string content, RouteSegment next)
 		{
-			Name = name;
+			Content = content;
 			NextSegment = next;
 		}
 
@@ -22,8 +23,8 @@ namespace Everest.Routing
 
 	public class StringRouteSegment : RouteSegment
 	{
-		public StringRouteSegment(string name, RouteSegment next) 
-			: base(name, next)
+		public StringRouteSegment(string content, RouteSegment next) 
+			: base(content, next)
 		{
 
 		}
@@ -35,7 +36,7 @@ namespace Everest.Routing
 				return false;
 			}
 
-			var result = Name == iterator.Current;
+			var result = Content == iterator.Current;
 
 			if (result && HasNextSegment)
 			{
@@ -48,9 +49,15 @@ namespace Everest.Routing
 
 	public class ParamRouteSegment : RouteSegment
 	{
-		public ParamRouteSegment(string name, RouteSegment next) 
-			: base(name, next)
+		public string Name { get; }
+		
+		public ParamRouteSegment(string content, string name, RouteSegment next) 
+			: base(content, next)
 		{
+			if (string.IsNullOrEmpty(name))
+				throw new ArgumentException("Parameter name is required");
+
+			Name = name; 
 		}
 
 		public override bool TryParse(Iterator<string> iterator, NameValueCollection parameters)
