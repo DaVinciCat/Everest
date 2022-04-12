@@ -11,7 +11,7 @@ namespace Everest.Routing
 
 		public Action<HttpContext> Action { get; }
 
-		public string Description => $"{HttpMethod} {Segment.Description}";
+		public string Description => $"{HttpMethod} {Segment.FullPath}";
 
 		public RouteAction(string httpMethod, RouteSegment segment, Action<HttpContext> action)
 		{

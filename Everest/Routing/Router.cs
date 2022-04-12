@@ -32,7 +32,7 @@ namespace Everest.Routing
 					return;
 				}
 
-				logger.LogTrace($"{context.Request.Id}: Route '{routeAction}' found for: '{context.Request.Description}' ");
+				logger.LogTrace($"{context.Request.Id}: Route from: '{context.Request.Description}' to: '{routeAction.Description}' ");
 				logger.LogTrace($"{context.Request.Id}: Invoke route action for: '{context.Request.Description}'");
 				routeAction.Action.Invoke(context);
 				logger.LogTrace($"{context.Request.Id}: Invoke route action done for: '{context.Request.Description}'");

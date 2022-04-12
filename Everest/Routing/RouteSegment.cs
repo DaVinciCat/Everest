@@ -7,9 +7,9 @@ namespace Everest.Routing
 {
 	public abstract class RouteSegment
 	{
-		public string Content { get; }
+		public string Path { get; }
 
-		public string Description
+		public string FullPath
 		{
 			get
 			{
@@ -19,22 +19,20 @@ namespace Everest.Routing
 
 				void Traverse(RouteSegment segment)
 				{
-					segments.Add(segment.Content);
+					segments.Add(segment.Path);
 					if (segment.HasNextSegment)
 						Traverse(segment.NextSegment);
 				}
 			}
 		}
-
-		public bool IsOptional { get; }
 			
 		public RouteSegment NextSegment { get; }
 
 		public bool HasNextSegment => NextSegment != null;
 
-		protected RouteSegment(string content, RouteSegment next)
+		protected RouteSegment(string path, RouteSegment next)
 		{
-			Content = content;
+			Path = path;
 			NextSegment = next;
 		}
 
@@ -43,8 +41,8 @@ namespace Everest.Routing
 
 	public class StringRouteSegment : RouteSegment
 	{
-		public StringRouteSegment(string content, RouteSegment next) 
-			: base(content, next)
+		public StringRouteSegment(string path, RouteSegment next) 
+			: base(path, next)
 		{
 
 		}
@@ -56,7 +54,7 @@ namespace Everest.Routing
 				return false;
 			}
 
-			var result = Content == iterator.Current;
+			var result = Path == iterator.Current;
 
 			if (result && HasNextSegment)
 			{
@@ -71,8 +69,8 @@ namespace Everest.Routing
 	{
 		public string Name { get; }
 		
-		public ParamRouteSegment(string content, string name, RouteSegment next) 
-			: base(content, next)
+		public ParamRouteSegment(string path, string name, RouteSegment next) 
+			: base(path, next)
 		{
 			if (string.IsNullOrEmpty(name))
 				throw new ArgumentException("Parameter name is required");
