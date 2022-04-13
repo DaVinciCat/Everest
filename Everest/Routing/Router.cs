@@ -34,7 +34,7 @@ namespace Everest.Routing
 
 				logger.LogTrace($"{context.Request.Id}: Route from: '{context.Request.Description}' to: '{routeAction.Description}' ");
 				logger.LogTrace($"{context.Request.Id}: Invoke route action for: '{context.Request.Description}'");
-				routeAction.Action.Invoke(context);
+				routeAction.Invoke(context);
 				logger.LogTrace($"{context.Request.Id}: Invoke route action done for: '{context.Request.Description}'");
 			}
 			catch (Exception ex)

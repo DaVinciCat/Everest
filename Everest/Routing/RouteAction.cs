@@ -8,16 +8,22 @@ namespace Everest.Routing
 		public string HttpMethod { get; }
 
 		public RouteSegment Segment { get; }
-
-		public Action<HttpContext> Action { get; }
-
+		
 		public string Description => $"{HttpMethod} {Segment.GetPath()}";
+
+		private readonly Action<HttpContext> action;
 
 		public RouteAction(string httpMethod, RouteSegment segment, Action<HttpContext> action)
 		{
 			HttpMethod = httpMethod;
 			Segment = segment;
-			Action = action;
+
+			this.action = action;
+		}
+
+		public void Invoke(HttpContext context)
+		{
+			action.Invoke(context);
 		}
 	}
 }
