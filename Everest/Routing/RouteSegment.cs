@@ -79,6 +79,37 @@ namespace Everest.Routing
 		}
 	}
 
+	public class IntParamRouteSegment : ParamRouteSegment
+	{
+		private readonly Func<string, bool> isInt;
+
+		public IntParamRouteSegment(string value, string name, Func<string, bool> isInt, RouteSegment next) 
+			: base(value, name, next)
+		{
+			this.isInt = isInt;
+		}
+
+		public override bool TryParse(Iterator<string> iterator, NameValueCollection parameters)
+		{
+			if (!iterator.MoveNext())
+			{
+				return false;
+			}
+
+			if (!isInt(iterator.Current))
+				return false;
+
+			parameters.Add(Name, iterator.Current);
+
+			if (HasNextSegment)
+			{
+				return NextSegment.TryParse(iterator, parameters);
+			}
+
+			return true;
+		}
+	}
+
 	public static class RouteSegmentExtensions
 	{
 		public static string GetPath(this RouteSegment segment)

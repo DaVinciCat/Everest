@@ -119,5 +119,49 @@ namespace Everest.Tests
 
 			Assert.True(parser.TryParse(segment, url, new NameValueCollection()));
 		}
+
+		[Fact]
+		public void True_FooBarIdInt_FooBar1()
+		{
+			const string pattern = "/foo/bar/{id:int}";
+			const string url = "/foo/bar/1";
+
+			var builder = new RouteSegmentBuilder();
+			var parser = new RouteSegmentParser();
+			var segment = builder.Build(pattern);
+			var parameters = new NameValueCollection();
+
+			Assert.True(parser.TryParse(segment, url, parameters));
+			Assert.True(parameters["id"] != null);
+			Assert.True(parameters["id"] == "1");
+		}
+
+		[Fact]
+		public void False_FooBarIdInt_FooBar1dot10()
+		{
+			const string pattern = "/foo/bar/{id:int}";
+			const string url = "/foo/bar/1.10";
+
+			var builder = new RouteSegmentBuilder();
+			var parser = new RouteSegmentParser();
+			var segment = builder.Build(pattern);
+			var parameters = new NameValueCollection();
+
+			Assert.False(parser.TryParse(segment, url, parameters));
+		}
+
+		[Fact]
+		public void False_FooBarIdInt_FooBarAbc()
+		{
+			const string pattern = "/foo/bar/{id:int}";
+			const string url = "/foo/bar/abc";
+
+			var builder = new RouteSegmentBuilder();
+			var parser = new RouteSegmentParser();
+			var segment = builder.Build(pattern);
+			var parameters = new NameValueCollection();
+
+			Assert.False(parser.TryParse(segment, url, parameters));
+		}
 	}
 }

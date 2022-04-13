@@ -12,7 +12,8 @@ namespace Everest.Routing
 		public  Dictionary<string, BuildRouteSegment> Builders { get; } = new()
 		{
 			{@"^[a-z\d]+$", (value, next) => new StringRouteSegment(value, next)},
-			{@"({\w+})", (value, next) => new ParamRouteSegment(value, ParseParameterName(value), next)}
+			{@"({\w+})", (value, next) => new ParamRouteSegment(value, ExtractParameterName(value), next)},
+			{@"({\w+:int})", (value, next) => new IntParamRouteSegment(value, ExtractIntParameterName(value), value => IsInt(value), next )}
 		};
 
 		public RouteSegment Build(string pattern)
@@ -47,9 +48,27 @@ namespace Everest.Routing
 			}
 		}
 
-		private static string ParseParameterName(string value)
+		private static string ExtractParameterName(string value)
 		{
-			return Regex.Replace(value, "[{}]+", "");
+			var match = Regex.Match(value, "[^{}].+?(?=}|:)");
+			if (!match.Success)
+				throw new ArgumentException($"Invalid parameter name {value}");
+			
+			return match.Groups[0].Value;
+		}
+
+		private static string ExtractIntParameterName(string value)
+		{
+			var match = Regex.Match(value, "[^{}].+?(?=:int)");
+			if (!match.Success)
+				throw new ArgumentException($"Invalid parameter name {value}");
+
+			return match.Groups[0].Value;
+		}
+
+		private static bool IsInt(string value)
+		{
+			return Regex.IsMatch(value, "^-?[0-9]*$");
 		}
 	}
 }
