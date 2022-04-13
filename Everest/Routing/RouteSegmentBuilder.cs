@@ -13,7 +13,8 @@ namespace Everest.Routing
 		{
 			{@"^[a-z\d]+$", (value, next) => new StringRouteSegment(value, next)},
 			{@"({\w+})", (value, next) => new ParamRouteSegment(value, ExtractParameterName(value), next)},
-			{@"({\w+:int})", (value, next) => new IntParamRouteSegment(value, ExtractIntParameterName(value), value => IsInt(value), next )}
+			{@"({\w+:int})", (value, next) => new IntParamRouteSegment(value, ExtractIntParameterName(value), value => IsInt(value), next )},
+			{@"({\w+:guid})", (value, next) => new GuidParamRouteSegment(value, ExtractGuidParameterName(value), value => IsGuid(value), next) }
 		};
 
 		public RouteSegment Build(string pattern)
@@ -52,7 +53,7 @@ namespace Everest.Routing
 		{
 			var match = Regex.Match(value, "[^{}].+?(?=}|:)");
 			if (!match.Success)
-				throw new ArgumentException($"Invalid parameter name {value}");
+				throw new ArgumentException($"Invalid parameter pattern {value}");
 			
 			return match.Groups[0].Value;
 		}
@@ -61,7 +62,16 @@ namespace Everest.Routing
 		{
 			var match = Regex.Match(value, "[^{}].+?(?=:int)");
 			if (!match.Success)
-				throw new ArgumentException($"Invalid parameter name {value}");
+				throw new ArgumentException($"Invalid int parameter pattern {value}");
+
+			return match.Groups[0].Value;
+		}
+
+		private static string ExtractGuidParameterName(string value)
+		{
+			var match = Regex.Match(value, "[^{}].+?(?=:guid)");
+			if (!match.Success)
+				throw new ArgumentException($"Invalid guid parameter pattern {value}");
 
 			return match.Groups[0].Value;
 		}
@@ -69,6 +79,11 @@ namespace Everest.Routing
 		private static bool IsInt(string value)
 		{
 			return Regex.IsMatch(value, "^-?[0-9]*$");
+		}
+
+		private static bool IsGuid(string value)
+		{
+			return Regex.IsMatch(value, "^([0-9A-Fa-f]{8}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{12})$");
 		}
 	}
 }

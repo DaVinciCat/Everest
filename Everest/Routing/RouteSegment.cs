@@ -110,6 +110,37 @@ namespace Everest.Routing
 		}
 	}
 
+	public class GuidParamRouteSegment : ParamRouteSegment
+	{
+		private readonly Func<string, bool> isGuid;
+
+		public GuidParamRouteSegment(string value, string name, Func<string, bool> isGuid, RouteSegment next)
+			: base(value, name, next)
+		{
+			this.isGuid = isGuid;
+		}
+
+		public override bool TryParse(Iterator<string> iterator, NameValueCollection parameters)
+		{
+			if (!iterator.MoveNext())
+			{
+				return false;
+			}
+
+			if (!isGuid(iterator.Current))
+				return false;
+
+			parameters.Add(Name, iterator.Current);
+
+			if (HasNextSegment)
+			{
+				return NextSegment.TryParse(iterator, parameters);
+			}
+
+			return true;
+		}
+	}
+
 	public static class RouteSegmentExtensions
 	{
 		public static string GetPath(this RouteSegment segment)

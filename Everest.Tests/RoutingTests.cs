@@ -163,5 +163,35 @@ namespace Everest.Tests
 
 			Assert.False(parser.TryParse(segment, url, parameters));
 		}
+
+		[Fact]
+		public void True_FooBarIdGuid_FooBarGuid()
+		{
+			const string pattern = "/foo/bar/{id:guid}";
+			const string url = "/foo/bar/D01E3FC6-2A16-43A0-AABB-CC9B67A494FD";
+
+			var builder = new RouteSegmentBuilder();
+			var parser = new RouteSegmentParser();
+			var segment = builder.Build(pattern);
+			var parameters = new NameValueCollection();
+
+			Assert.True(parser.TryParse(segment, url, parameters));
+			Assert.True(parameters["id"] != null);
+			Assert.True(parameters["id"] == "D01E3FC6-2A16-43A0-AABB-CC9B67A494FD");
+		}
+
+		[Fact]
+		public void False_FooBarIdGuid_FooBarNonGuid()
+		{
+			const string pattern = "/foo/bar/{id:guid}";
+			const string url = "/foo/bar/D01E3FC6-2A16-43A0-AABB-CC9B67A494FD-ERROR";
+
+			var builder = new RouteSegmentBuilder();
+			var parser = new RouteSegmentParser();
+			var segment = builder.Build(pattern);
+			var parameters = new NameValueCollection();
+
+			Assert.False(parser.TryParse(segment, url, parameters));
+		}
 	}
 }
