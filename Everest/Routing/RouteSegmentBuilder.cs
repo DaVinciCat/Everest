@@ -5,14 +5,14 @@ using Everest.Utils;
 
 namespace Everest.Routing
 {
-	public delegate RouteSegment BuildRouteSegment(string path, RouteSegment next);
+	public delegate RouteSegment BuildRouteSegment(string value, RouteSegment next);
 	
 	public class RouteSegmentBuilder
 	{
 		public  Dictionary<string, BuildRouteSegment> Builders { get; } = new()
 		{
-			{@"^[a-z\d]+$", (path, next) => new StringRouteSegment(path, next)},
-			{@"({\w+})", (path, next) => new ParamRouteSegment(path, Regex.Replace(path, "[{}]+", ""), next)}
+			{@"^[a-z\d]+$", (value, next) => new StringRouteSegment(value, next)},
+			{@"({\w+})", (value, next) => new ParamRouteSegment(value, ParseParameterName(value), next)}
 		};
 
 		public RouteSegment Build(string pattern)
@@ -45,6 +45,11 @@ namespace Everest.Routing
 
 				throw new ArgumentException($"Unsupported route segment: '{segment}'.");
 			}
+		}
+
+		private static string ParseParameterName(string value)
+		{
+			return Regex.Replace(value, "[{}]+", "");
 		}
 	}
 }

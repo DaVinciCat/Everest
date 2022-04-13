@@ -7,32 +7,15 @@ namespace Everest.Routing
 {
 	public abstract class RouteSegment
 	{
-		public string Path { get; }
-
-		public string FullPath
-		{
-			get
-			{
-				var segments = new List<string>();
-				Traverse(this);
-				return $"/{string.Join("/", segments)}";
-
-				void Traverse(RouteSegment segment)
-				{
-					segments.Add(segment.Path);
-					if (segment.HasNextSegment)
-						Traverse(segment.NextSegment);
-				}
-			}
-		}
-			
+		public string Value { get; }
+		
 		public RouteSegment NextSegment { get; }
 
 		public bool HasNextSegment => NextSegment != null;
 
-		protected RouteSegment(string path, RouteSegment next)
+		protected RouteSegment(string value, RouteSegment next)
 		{
-			Path = path;
+			Value = value;
 			NextSegment = next;
 		}
 
@@ -41,8 +24,8 @@ namespace Everest.Routing
 
 	public class StringRouteSegment : RouteSegment
 	{
-		public StringRouteSegment(string path, RouteSegment next) 
-			: base(path, next)
+		public StringRouteSegment(string value, RouteSegment next) 
+			: base(value, next)
 		{
 
 		}
@@ -54,7 +37,7 @@ namespace Everest.Routing
 				return false;
 			}
 
-			var result = Path == iterator.Current;
+			var result = Value == iterator.Current;
 
 			if (result && HasNextSegment)
 			{
@@ -69,8 +52,8 @@ namespace Everest.Routing
 	{
 		public string Name { get; }
 		
-		public ParamRouteSegment(string path, string name, RouteSegment next) 
-			: base(path, next)
+		public ParamRouteSegment(string value, string name, RouteSegment next) 
+			: base(value, next)
 		{
 			if (string.IsNullOrEmpty(name))
 				throw new ArgumentException("Parameter name is required");
@@ -93,6 +76,23 @@ namespace Everest.Routing
 			}
 
 			return true;
+		}
+	}
+
+	public static class RouteSegmentExtensions
+	{
+		public static string GetPath(this RouteSegment segment)
+		{
+			var segments = new List<string>();
+			Traverse(segment);
+			return $"/{string.Join("/", segments)}";
+
+			void Traverse(RouteSegment next)
+			{
+				segments.Add(next.Value);
+				if (next.HasNextSegment)
+					Traverse(next.NextSegment);
+			}
 		}
 	}
 }
