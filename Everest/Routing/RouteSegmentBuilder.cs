@@ -13,14 +13,14 @@ namespace Everest.Routing
 		{
 			{@"^[a-z\d]+$", (value, next) => new StringRouteSegment(value, next)},
 			{@"({\w+})", (value, next) => new ParamRouteSegment(value, ExtractParameterName(value), next)},
-			{@"({\w+:int})", (value, next) => new IntParamRouteSegment(value, ExtractIntParameterName(value), value => IsInt(value), next )},
-			{@"({\w+:guid})", (value, next) => new GuidParamRouteSegment(value, ExtractGuidParameterName(value), value => IsGuid(value), next) }
+			{@"({\w+:int})", (value, next) => new IntParamRouteSegment(value, ExtractIntParameterName(value), IsInt, next )},
+			{@"({\w+:guid})", (value, next) => new GuidParamRouteSegment(value, ExtractGuidParameterName(value), IsGuid, next) }
 		};
 
 		public RouteSegment Build(string pattern)
 		{
 			if (string.IsNullOrEmpty(pattern))
-				throw new ArgumentNullException(nameof(pattern), "Route pattern is reqired.");
+				throw new ArgumentNullException(nameof(pattern), "Route pattern is required.");
 
 			var segments = pattern.TrimStart('/').TrimEnd('/').Split("/");
 			var iterator = new Iterator<string>(segments);
@@ -45,7 +45,7 @@ namespace Everest.Routing
 					}
 				}
 
-				throw new ArgumentException($"Unsupported route segment: '{segment}'.");
+				throw new ArgumentException($"Unsupported route segment: {segment}.");
 			}
 		}
 

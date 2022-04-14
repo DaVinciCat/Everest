@@ -24,29 +24,28 @@ namespace Everest.Routing
 		{
 			try
 			{
-				logger.LogTrace($"{context.Request.Id}: Find route for: '{context.Request.Description}'");
+				logger.LogTrace($"{context.Request.Id} - Routing request for: {context.Request.Description}");
 				if (!Routes.TryGetRouteAction(context, out var routeAction))
 				{
-					logger.LogWarning($"{context.Request.Id}: Route not found for: '{context.Request.Description}'");
-					context.Response.SendNotFound($"Requested route not found: '{context.Request.Description}'.");
+					logger.LogWarning($"{context.Request.Id} - Route not found");
+					context.Response.SendNotFound($"Requested route not found: {context.Request.Description}.");
 					return;
 				}
 
-				logger.LogTrace($"{context.Request.Id}: Route from: '{context.Request.Description}' to: '{routeAction.Description}' ");
-				logger.LogTrace($"{context.Request.Id}: Invoke route action for: '{context.Request.Description}'");
+				logger.LogTrace($"{context.Request.Id} - Routing from: {context.Request.Description}	to: {routeAction.Description}");
 				routeAction.Invoke(context);
-				logger.LogTrace($"{context.Request.Id}: Invoke route action done for: '{context.Request.Description}'");
+				logger.LogTrace($"{context.Request.Id} - Routing complete");
 			}
 			catch (Exception ex)
 			{
 				try
 				{
-					logger.LogError(ex, $"{context.Request.Id}: Invoke route action failed for: '{context.Request.Description}'");
+					logger.LogError(ex, $"{context.Request.Id} - Routing failed");
 					ErrorHandler?.Invoke(context, ex);
 				}
 				catch (Exception e)
 				{
-					logger.LogError(e, $"{context.Request.Id}: Error handling failed for: '{context.Request.Description}'");
+					logger.LogError(e, $"{context.Request.Id} - Routing error handling failed");
 				}
 			}
 			finally
@@ -57,7 +56,7 @@ namespace Everest.Routing
 
 		public Action<HttpContext, Exception> ErrorHandler { get; set; } = (context, ex) =>
 		{
-			context.Response.SendInternalServerError($"Failed to process request: '{context.Request.Description}'.\r\n{ex.Message}");
+			context.Response.SendInternalServerError($"Failed to process request: {context.Request.Description}.\r\n{ex.Message}");
 		};
 	}
 }
