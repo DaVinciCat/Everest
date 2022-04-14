@@ -12,9 +12,9 @@ namespace Everest.Routing
 		public  Dictionary<string, BuildRouteSegment> Builders { get; } = new()
 		{
 			{@"^[a-z\d]+$", (value, next) => new StringRouteSegment(value, next)},
-			{@"({\w+})", (value, next) => new ParamRouteSegment(value, ExtractParameterName(value), next)},
-			{@"({\w+:int})", (value, next) => new IntParamRouteSegment(value, ExtractIntParameterName(value), IsInt, next )},
-			{@"({\w+:guid})", (value, next) => new GuidParamRouteSegment(value, ExtractGuidParameterName(value), IsGuid, next) }
+			{@"({\w+})", (value, next) => new ParamRouteSegment(value, ExtractParamName(value), next)},
+			{@"({\w+:int})", (value, next) => new IntParamRouteSegment(value, ExtractIntParamName(value), IsInt, next )},
+			{@"({\w+:guid})", (value, next) => new GuidParamRouteSegment(value, ExtractGuidParamName(value), IsGuid, next) }
 		};
 
 		public RouteSegment Build(string pattern)
@@ -49,7 +49,7 @@ namespace Everest.Routing
 			}
 		}
 
-		private static string ExtractParameterName(string value)
+		private static string ExtractParamName(string value)
 		{
 			var match = Regex.Match(value, "[^{}].+?(?=}|:)");
 			if (!match.Success)
@@ -58,7 +58,7 @@ namespace Everest.Routing
 			return match.Groups[0].Value;
 		}
 
-		private static string ExtractIntParameterName(string value)
+		private static string ExtractIntParamName(string value)
 		{
 			var match = Regex.Match(value, "[^{}].+?(?=:int)");
 			if (!match.Success)
@@ -67,7 +67,7 @@ namespace Everest.Routing
 			return match.Groups[0].Value;
 		}
 
-		private static string ExtractGuidParameterName(string value)
+		private static string ExtractGuidParamName(string value)
 		{
 			var match = Regex.Match(value, "[^{}].+?(?=:guid)");
 			if (!match.Success)
