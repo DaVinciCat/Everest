@@ -55,7 +55,7 @@ namespace Everest.Utils
 			{
 				var value = collection[parameter];
 				if (value == null)
-					throw new ArgumentException("Parameter is required.");
+					throw new ArgumentException("Parametereter is required.");
 
 				return parse(value);
 			}

@@ -48,15 +48,15 @@ namespace Everest.Routing
 		}
 	}
 
-	public class ParamRouteSegment : RouteSegment
+	public class ParameterRouteSegment : RouteSegment
 	{
 		public string Name { get; }
 		
-		public ParamRouteSegment(string value, string name, RouteSegment next) 
+		public ParameterRouteSegment(string value, string name, RouteSegment next) 
 			: base(value, next)
 		{
 			if (string.IsNullOrEmpty(name))
-				throw new ArgumentException("Parameter name is required.");
+				throw new ArgumentException("Parametereter name is required.");
 
 			Name = name; 
 		}
@@ -79,11 +79,11 @@ namespace Everest.Routing
 		}
 	}
 
-	public class IntParamRouteSegment : ParamRouteSegment
+	public class IntParameterRouteSegment : ParameterRouteSegment
 	{
 		private readonly Func<string, bool> isInt;
 
-		public IntParamRouteSegment(string value, string name, Func<string, bool> isInt, RouteSegment next) 
+		public IntParameterRouteSegment(string value, string name, Func<string, bool> isInt, RouteSegment next) 
 			: base(value, name, next)
 		{
 			this.isInt = isInt;
@@ -110,11 +110,11 @@ namespace Everest.Routing
 		}
 	}
 
-	public class GuidParamRouteSegment : ParamRouteSegment
+	public class GuidParameterRouteSegment : ParameterRouteSegment
 	{
 		private readonly Func<string, bool> isGuid;
 
-		public GuidParamRouteSegment(string value, string name, Func<string, bool> isGuid, RouteSegment next)
+		public GuidParameterRouteSegment(string value, string name, Func<string, bool> isGuid, RouteSegment next)
 			: base(value, name, next)
 		{
 			this.isGuid = isGuid;

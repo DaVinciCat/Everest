@@ -17,28 +17,28 @@ namespace Everest.Http
 			
 		}
 		
-		public bool HasParams() => Count > 0;
+		public bool HasParameters() => Count > 0;
 
-		public bool HasParam(string parameter) => this[parameter] != null;
+		public bool HasParameter(string parameter) => this[parameter] != null;
 
-		public T GetParamValue<T>(string parameter)
+		public T GetParameterValue<T>(string parameter)
 		{
-			return HasParam(parameter)
+			return HasParameter(parameter)
 				? this.GetValue<T>(parameter)
 				: throw new ArgumentException($"Parameter is required: {parameter}.");
 		}
 
-		public T GetParamValue<T>(string parameter, Func<string, T> parse)
+		public T GetParameterValue<T>(string parameter, Func<string, T> parse)
 		{
-			return HasParam(parameter)
+			return HasParameter(parameter)
 				? this.GetValue(parameter, parse)
 				: throw new ArgumentException($"Parameter is required: {parameter}.");
 		}
 
-		public bool TryGetParamValue<T>(string parameter, out T value)
+		public bool TryGetParameterValue<T>(string parameter, out T value)
 		{
 			value = default;
-			return HasParam(parameter) && this.TryGetValue(parameter, out value);
+			return HasParameter(parameter) && this.TryGetValue(parameter, out value);
 		}
 	}
 }
