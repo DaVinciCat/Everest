@@ -53,7 +53,7 @@ namespace Everest.Routing
 		{
 			var match = Regex.Match(value, "[^{}].+?(?=}|:)");
 			if (!match.Success)
-				throw new ArgumentException($"Invalid parameter pattern {value}");
+				throw new ArgumentException($"Invalid parameter pattern {value}.");
 			
 			return match.Groups[0].Value;
 		}
@@ -62,7 +62,7 @@ namespace Everest.Routing
 		{
 			var match = Regex.Match(value, "[^{}].+?(?=:int)");
 			if (!match.Success)
-				throw new ArgumentException($"Invalid int parameter pattern {value}");
+				throw new ArgumentException($"Invalid int parameter pattern {value}.");
 
 			return match.Groups[0].Value;
 		}

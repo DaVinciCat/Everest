@@ -56,7 +56,7 @@ namespace Everest.Routing
 			: base(value, next)
 		{
 			if (string.IsNullOrEmpty(name))
-				throw new ArgumentException("Parameter name is required");
+				throw new ArgumentException("Parameter name is required.");
 
 			Name = name; 
 		}
