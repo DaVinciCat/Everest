@@ -25,7 +25,7 @@ namespace Everest.Shell
 			{
 				rest.Routes.AddRoute("GET", "/home/{id}", context =>
 				{
-					var id = context.Request.PathParameters.GetParameterValue<int>("id");
+					var id = context.Request.PathParameters.GetParamValue<int>("id");
 					context.Response.SendJson(new { Message = "Home Sweet Home", From = "Everest", Param = id, Success = true });
 				});
 
