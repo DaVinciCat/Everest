@@ -49,19 +49,20 @@ namespace Everest.Utils
 			return true;
 		}
 
-		internal static T GetValue<T>(this NameValueCollection collection, string parameter, Func<string, T> parse)
+		internal static T GetValue<T>(this NameValueCollection collection, string key, Func<string, T> parse)
 		{
+			var value = collection[key];
+
 			try
 			{
-				var value = collection[parameter];
 				if (value == null)
-					throw new ArgumentException("Parametereter is required.");
+					throw new ArgumentException("key is required.");
 
 				return parse(value);
 			}
 			catch (Exception ex)
 			{
-				throw new Exception($"Failed to parse parameter {parameter}: {ex.Message}", ex);
+				throw new Exception($"Failed to parse {value}: {ex.Message}", ex);
 			}
 		}
 	}
