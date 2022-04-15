@@ -62,7 +62,7 @@ namespace Everest.Utils
 			}
 			catch (Exception ex)
 			{
-				throw new Exception($"Failed to parse {value}: {ex.Message}", ex);
+				throw new Exception($"Failed to parse value: {value}: {ex.Message}", ex);
 			}
 		}
 	}
