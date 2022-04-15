@@ -100,7 +100,7 @@ namespace Everest
 				try
 				{
 					var context = await listener.GetContextAsync();
-					ThreadPool.QueueUserWorkItem(ProcessRequestAsync, context);
+					ThreadPool.QueueUserWorkItem(ProcessRequestAsync, new HttpContext(context), false);
 				}
 				catch (HttpListenerException ex) when (ex.ErrorCode == 995 && (IsStopping || !IsListening))
 				{
@@ -113,14 +113,9 @@ namespace Everest
 			}
 		}
 
-		private void ProcessRequestAsync(object state)
+		private void ProcessRequestAsync(HttpContext context)
 		{
-			ProcessRequestAsync(state as HttpListenerContext);
-		}
-
-		private void ProcessRequestAsync(HttpListenerContext context)
-		{
-			Router.Route(new HttpContext(context));
+			Router.Route(context);
 		}
 
 		public void Dispose()
