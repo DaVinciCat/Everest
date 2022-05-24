@@ -39,12 +39,12 @@ namespace Everest.Routing
 				if (segment == null)
 					throw new ArgumentException("Segment required.");
 
-				foreach (var regex in Builders.Keys)
+				foreach (var key in Builders.Keys)
 				{
-					var match = Regex.Match(segment, regex);
+					var match = Regex.Match(segment, key);
 					if (match.Success)
 					{
-						return Builders[regex](match.Groups[0].Value, iterator.HasNext() ? BuildImpl() : null);
+						return Builders[key](match.Groups[0].Value, iterator.HasNext() ? BuildImpl() : null);
 					}
 				}
 
