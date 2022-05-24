@@ -17,9 +17,9 @@ namespace Everest
 
 		public bool IsListening => listener.IsListening;
 
-		public RouteCollection Routes => Router.Routes;
-
 		public Router Router { get; }
+
+		public RouteCollection Routes => Router.Routes;	
 
 		private readonly HttpListener listener;
 

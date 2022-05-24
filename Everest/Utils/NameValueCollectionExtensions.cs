@@ -21,7 +21,7 @@ namespace Everest.Utils
 			var converter = TypeDescriptor.GetConverter(typeof(T));
 
 			if (!converter.CanConvertFrom(typeof(string))) 
-				throw new ArgumentException($"Can not convert {strValue} to {typeof(T)}.");
+				throw new ArgumentException($"Cannot convert {strValue} to {typeof(T)}.");
 
 			return (T)converter.ConvertFrom(strValue);
 		}

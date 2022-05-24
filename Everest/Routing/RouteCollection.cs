@@ -20,14 +20,14 @@ namespace Everest.Routing
 
 		public void AddRoute(string httpMethod, string pattern, Action<HttpContext> action)
 		{
-			if (!routeActions.TryGetValue(httpMethod, out var routes))
+			if (!routeActions.TryGetValue(httpMethod, out var actions))
 			{
-				routes = new Dictionary<RouteSegment, Action<HttpContext>>();
-				routeActions.Add(httpMethod, routes);
+				actions = new Dictionary<RouteSegment, Action<HttpContext>>();
+				routeActions.Add(httpMethod, actions);
 			}
 
 			var segment = builder.Build(pattern);
-			routes.Add(segment, action);
+			actions.Add(segment, action);
 		}
 
 		public bool TryGetRouteAction(HttpContext context, out RouteAction routeAction)
