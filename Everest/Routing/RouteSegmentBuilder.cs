@@ -20,12 +20,12 @@ namespace Everest.Routing
 			{ BoolParameterRouteSegment.Pattern, (value, next) => new BoolParameterRouteSegment(value, next) }
 		};
 
-		public RouteSegment Build(string pattern)
+		public RouteSegment Build(string routePattern)
 		{
-			if (string.IsNullOrEmpty(pattern))
-				throw new ArgumentNullException(nameof(pattern), "Route pattern required.");
+			if (string.IsNullOrEmpty(routePattern))
+				throw new ArgumentNullException(nameof(routePattern), "Route pattern required.");
 
-			var segments = pattern.TrimStart('/').TrimEnd('/').Split("/");
+			var segments = routePattern.TrimStart('/').TrimEnd('/').Split("/");
 			var iterator = new Iterator<string>(segments);
 
 			return BuildImpl();
@@ -33,18 +33,18 @@ namespace Everest.Routing
 			RouteSegment BuildImpl()
 			{
 				if (!iterator.MoveNext())
-					throw new ArgumentException($"Invalid route pattern: {pattern}.", nameof(pattern));
+					throw new ArgumentException($"Invalid route pattern: {routePattern}.", nameof(routePattern));
 
 				var segment = iterator.Current;
 				if (segment == null)
 					throw new ArgumentException("Segment required.");
 
-				foreach (var key in Builders.Keys)
+				foreach (var pattern in Builders.Keys)
 				{
-					var match = Regex.Match(segment, key);
+					var match = Regex.Match(segment, pattern);
 					if (match.Success)
 					{
-						return Builders[key](match.Groups[0].Value, iterator.HasNext() ? BuildImpl() : null);
+						return Builders[pattern](match.Groups[0].Value, iterator.HasNext() ? BuildImpl() : null);
 					}
 				}
 
