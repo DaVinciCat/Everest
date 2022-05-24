@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Text.RegularExpressions;
 using Everest.Utils;
 
 namespace Everest.Routing
@@ -24,6 +25,8 @@ namespace Everest.Routing
 
 	public class StringRouteSegment : RouteSegment
 	{
+		public static string Pattern => @"^[a-z\d]+$";
+
 		public StringRouteSegment(string value, RouteSegment next) 
 			: base(value, next)
 		{
@@ -50,15 +53,21 @@ namespace Everest.Routing
 
 	public class ParameterRouteSegment : RouteSegment
 	{
+		public static string Pattern => @"({\w+})";
+
 		public string Name { get; }
 		
-		public ParameterRouteSegment(string value, string name, RouteSegment next) 
+		public ParameterRouteSegment(string value, RouteSegment next) 
 			: base(value, next)
 		{
-			if (string.IsNullOrEmpty(name))
-				throw new ArgumentException("Parametereter name is required.");
+			if (string.IsNullOrEmpty(value))
+				throw new ArgumentException("Parameter name is required.");
 
-			Name = name; 
+			var match = Regex.Match(value, "[^{}]+?(?=}|:)");
+			if (!match.Success)
+				throw new ArgumentException($"Invalid parameter pattern {value}.");
+
+			Name = match.Groups[0].Value;
 		}
 
 		public override bool TryParse(Iterator<string> iterator, NameValueCollection parameters)
@@ -79,14 +88,20 @@ namespace Everest.Routing
 		}
 	}
 
-	public class IntParameterRouteSegment : ParameterRouteSegment
+	public class IntParameterRouteSegment : RouteSegment
 	{
-		private readonly Func<string, bool> isInt;
+		public static string Pattern => @"({\w+:int})";
 
-		public IntParameterRouteSegment(string value, string name, Func<string, bool> isInt, RouteSegment next) 
-			: base(value, name, next)
+		public string Name { get; }
+
+		public IntParameterRouteSegment(string value, RouteSegment next)
+			: base(value, next)
 		{
-			this.isInt = isInt;
+			var match = Regex.Match(value, "[^{}]+?(?=:int)");
+			if (!match.Success)
+				throw new ArgumentException($"Invalid int parameter pattern {value}.");
+
+			Name = match.Groups[0].Value;
 		}
 
 		public override bool TryParse(Iterator<string> iterator, NameValueCollection parameters)
@@ -96,7 +111,7 @@ namespace Everest.Routing
 				return false;
 			}
 
-			if (!isInt(iterator.Current))
+			if (!Regex.IsMatch(iterator.Current, "^-?[0-9]*$"))
 				return false;
 
 			parameters.Add(Name, iterator.Current);
@@ -110,14 +125,20 @@ namespace Everest.Routing
 		}
 	}
 
-	public class GuidParameterRouteSegment : ParameterRouteSegment
+	public class FloatParameterRouteSegment : RouteSegment
 	{
-		private readonly Func<string, bool> isGuid;
+		public static string Pattern => @"({\w+:float})";
 
-		public GuidParameterRouteSegment(string value, string name, Func<string, bool> isGuid, RouteSegment next)
-			: base(value, name, next)
+		public string Name { get; }
+
+		public FloatParameterRouteSegment(string value, RouteSegment next)
+			: base(value, next)
 		{
-			this.isGuid = isGuid;
+			var match = Regex.Match(value, "[^{}]+?(?=:float)");
+			if (!match.Success)
+				throw new ArgumentException($"Invalid float parameter pattern {value}.");
+
+			Name = match.Groups[0].Value;
 		}
 
 		public override bool TryParse(Iterator<string> iterator, NameValueCollection parameters)
@@ -127,7 +148,118 @@ namespace Everest.Routing
 				return false;
 			}
 
-			if (!isGuid(iterator.Current))
+			if (!Regex.IsMatch(iterator.Current, "[+-]?([0-9]*[.])?[0-9]+"))
+				return false;
+
+			parameters.Add(Name, iterator.Current);
+
+			if (HasNextSegment)
+			{
+				return NextSegment.TryParse(iterator, parameters);
+			}
+
+			return true;
+		}
+	}
+
+	public class GuidParameterRouteSegment : RouteSegment
+	{
+		public static string Pattern => @"({\w+:guid})";
+
+		public string Name { get; }
+
+		public GuidParameterRouteSegment(string value, RouteSegment next)
+			: base(value, next)
+		{
+			var match = Regex.Match(value, "[^{}]+?(?=:guid)");
+			if (!match.Success)
+				throw new ArgumentException($"Invalid guid parameter pattern {value}.");
+
+			Name = match.Groups[0].Value;
+		}
+
+		public override bool TryParse(Iterator<string> iterator, NameValueCollection parameters)
+		{
+			if (!iterator.MoveNext())
+			{
+				return false;
+			}
+
+			if (!Regex.IsMatch(iterator.Current, "^([0-9A-Fa-f]{8}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{12})$"))
+				return false;
+
+			parameters.Add(Name, iterator.Current);
+
+			if (HasNextSegment)
+			{
+				return NextSegment.TryParse(iterator, parameters);
+			}
+
+			return true;
+		}
+	}
+
+	public class DateTimeParameterRouteSegment : RouteSegment
+	{
+		public static string Pattern => @"({\w+:datetime})";
+
+		public string Name { get; }
+
+		public DateTimeParameterRouteSegment(string value, RouteSegment next)
+			: base(value, next)
+		{
+			var match = Regex.Match(value, "[^{}]+?(?=:datetime)");
+			if (!match.Success)
+				throw new ArgumentException($"Invalid datetime parameter pattern {value}.");
+
+			Name = match.Groups[0].Value;
+		}
+
+		public override bool TryParse(Iterator<string> iterator, NameValueCollection parameters)
+		{
+			if (!iterator.MoveNext())
+			{
+				return false;
+			}
+
+			if (!Regex.IsMatch(iterator.Current, @"\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d(?:\.\d+)?Z?"))
+				return false;
+
+			parameters.Add(Name, iterator.Current);
+
+			if (HasNextSegment)
+			{
+				return NextSegment.TryParse(iterator, parameters);
+			}
+
+			return true;
+		}
+	}
+
+	public class BoolParameterRouteSegment : RouteSegment
+	{
+		public static string Pattern => @"({\w+:bool})";
+
+		public string Name { get; }
+
+		public BoolParameterRouteSegment(string value, RouteSegment next)
+			: base(value, next)
+		{
+			var match = Regex.Match(value, "[^{}]+?(?=:bool)");
+			if (!match.Success)
+				throw new ArgumentException($"Invalid bool parameter pattern {value}.");
+
+			Name = match.Groups[0].Value;
+		}
+
+		public override bool TryParse(Iterator<string> iterator, NameValueCollection parameters)
+		{
+			if (!iterator.MoveNext())
+			{
+				return false;
+			}
+
+			if (!Regex.IsMatch(iterator.Current, "^(?i:true|false)$"))
 				return false;
 
 			parameters.Add(Name, iterator.Current);
@@ -146,14 +278,14 @@ namespace Everest.Routing
 		public static string GetPath(this RouteSegment segment)
 		{
 			var segments = new List<string>();
-			Traverse(segment);
+			GetPathImpl(segment);
 			return $"/{string.Join("/", segments)}";
 
-			void Traverse(RouteSegment next)
+			void GetPathImpl(RouteSegment next)
 			{
 				segments.Add(next.Value);
 				if (next.HasNextSegment)
-					Traverse(next.NextSegment);
+					GetPathImpl(next.NextSegment);
 			}
 		}
 	}

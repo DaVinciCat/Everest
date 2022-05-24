@@ -6,25 +6,28 @@ using Everest.Utils;
 namespace Everest.Routing
 {
 	public delegate RouteSegment BuildRouteSegment(string value, RouteSegment next);
-	
+
 	public class RouteSegmentBuilder
 	{
-		public  Dictionary<string, BuildRouteSegment> Builders { get; } = new()
+		public Dictionary<string, BuildRouteSegment> Builders { get; } = new()
 		{
-			{@"^[a-z\d]+$", (value, next) => new StringRouteSegment(value, next)},
-			{@"({\w+})", (value, next) => new ParameterRouteSegment(value, ExtractParameterName(value), next)},
-			{@"({\w+:int})", (value, next) => new IntParameterRouteSegment(value, ExtractIntParameterName(value), IsInt, next )},
-			{@"({\w+:guid})", (value, next) => new GuidParameterRouteSegment(value, ExtractGuidParameterName(value), IsGuid, next) }
+			{ StringRouteSegment.Pattern, (value, next) => new StringRouteSegment(value, next) },
+			{ ParameterRouteSegment.Pattern, (value, next) => new ParameterRouteSegment(value, next) },
+			{ IntParameterRouteSegment.Pattern, (value, next) => new IntParameterRouteSegment(value, next) },
+			{ FloatParameterRouteSegment.Pattern, (value, next) => new FloatParameterRouteSegment(value, next) },
+			{ GuidParameterRouteSegment.Pattern, (value, next) => new GuidParameterRouteSegment(value, next) },
+			{ DateTimeParameterRouteSegment.Pattern, (value, next) => new DateTimeParameterRouteSegment(value, next) },
+			{ BoolParameterRouteSegment.Pattern, (value, next) => new BoolParameterRouteSegment(value, next) }
 		};
 
 		public RouteSegment Build(string pattern)
 		{
 			if (string.IsNullOrEmpty(pattern))
-				throw new ArgumentNullException(nameof(pattern), "Route pattern is required.");
+				throw new ArgumentNullException(nameof(pattern), "Route pattern required.");
 
 			var segments = pattern.TrimStart('/').TrimEnd('/').Split("/");
 			var iterator = new Iterator<string>(segments);
-	
+
 			return BuildImpl();
 
 			RouteSegment BuildImpl()
@@ -47,43 +50,6 @@ namespace Everest.Routing
 
 				throw new ArgumentException($"Unsupported route segment: {segment}.");
 			}
-		}
-
-		private static string ExtractParameterName(string value)
-		{
-			var match = Regex.Match(value, "[^{}].+?(?=}|:)");
-			if (!match.Success)
-				throw new ArgumentException($"Invalid parameter pattern {value}.");
-			
-			return match.Groups[0].Value;
-		}
-
-		private static string ExtractIntParameterName(string value)
-		{
-			var match = Regex.Match(value, "[^{}].+?(?=:int)");
-			if (!match.Success)
-				throw new ArgumentException($"Invalid int parameter pattern {value}.");
-
-			return match.Groups[0].Value;
-		}
-
-		private static string ExtractGuidParameterName(string value)
-		{
-			var match = Regex.Match(value, "[^{}].+?(?=:guid)");
-			if (!match.Success)
-				throw new ArgumentException($"Invalid guid parameter pattern {value}");
-
-			return match.Groups[0].Value;
-		}
-
-		private static bool IsInt(string value)
-		{
-			return Regex.IsMatch(value, "^-?[0-9]*$");
-		}
-
-		private static bool IsGuid(string value)
-		{
-			return Regex.IsMatch(value, "^([0-9A-Fa-f]{8}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{12})$");
 		}
 	}
 }

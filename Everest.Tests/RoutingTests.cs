@@ -193,5 +193,99 @@ namespace Everest.Tests
 
 			Assert.False(parser.TryParse(segment, url, parameters));
 		}
+
+		[Fact]
+		public void True_FooBarIdFloat_FooBar1()
+		{
+			const string pattern = "/foo/bar/{id:float}";
+			const string url = "/foo/bar/1";
+
+			var builder = new RouteSegmentBuilder();
+			var parser = new RouteSegmentParser();
+			var segment = builder.Build(pattern);
+			var parameters = new NameValueCollection();
+
+			Assert.True(parser.TryParse(segment, url, parameters));
+			Assert.True(parameters["id"] != null);
+			Assert.True(parameters["id"] == "1");
+		}
+
+		[Fact]
+		public void True_FooBarIdFloat_FooBar1dot10()
+		{
+			const string pattern = "/foo/bar/{id:float}";
+			const string url = "/foo/bar/1.10";
+
+			var builder = new RouteSegmentBuilder();
+			var parser = new RouteSegmentParser();
+			var segment = builder.Build(pattern);
+			var parameters = new NameValueCollection();
+
+			Assert.True(parser.TryParse(segment, url, parameters));
+			Assert.True(parameters["id"] != null);
+			Assert.True(parameters["id"] == "1.10");
+		}
+
+		[Fact]
+		public void False_FooBarIdFloat_FooBarAbc()
+		{
+			const string pattern = "/foo/bar/{id:float}";
+			const string url = "/foo/bar/abc";
+
+			var builder = new RouteSegmentBuilder();
+			var parser = new RouteSegmentParser();
+			var segment = builder.Build(pattern);
+			var parameters = new NameValueCollection();
+
+			Assert.False(parser.TryParse(segment, url, parameters));
+		}
+
+		[Fact]
+		public void True_FooBarDtDateTime_FooBarDateTime()
+		{
+			const string pattern = "/foo/bar/{dt:datetime}";
+			const string url = "/foo/bar/2018-01-04T05:52:20.698";
+
+			var builder = new RouteSegmentBuilder();
+			var parser = new RouteSegmentParser();
+			var segment = builder.Build(pattern);
+			var parameters = new NameValueCollection();
+
+			Assert.True(parser.TryParse(segment, url, parameters));
+			Assert.True(parameters["dt"] != null);
+			Assert.True(parameters["dt"] == "2018-01-04T05:52:20.698");
+		}
+
+		[Fact]
+		public void True_FooBarBBool_FooBarTrue()
+		{
+			const string pattern = "/foo/bar/{b:bool}";
+			const string url = "/foo/bar/true";
+
+			var builder = new RouteSegmentBuilder();
+			var parser = new RouteSegmentParser();
+			var segment = builder.Build(pattern);
+			var parameters = new NameValueCollection();
+
+			Assert.True(parser.TryParse(segment, url, parameters));
+			Assert.True(parameters["b"] != null);
+			Assert.True(parameters["b"] == "true");
+		}
+
+		[Fact]
+		public void True_FooBarBBool_FooBarFalse()
+		{
+			const string pattern = "/foo/bar/{b:bool}";
+			const string url = "/foo/bar/false";
+
+			var builder = new RouteSegmentBuilder();
+			var parser = new RouteSegmentParser();
+			var segment = builder.Build(pattern);
+			var parameters = new NameValueCollection();
+
+			Assert.True(parser.TryParse(segment, url, parameters));
+			Assert.True(parameters["b"] != null);
+			Assert.True(parameters["b"] == "false");
+		}
 	}
 }
