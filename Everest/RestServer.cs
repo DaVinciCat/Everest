@@ -19,17 +19,19 @@ namespace Everest
 
 		public Router Router { get; }
 
-		public RouteCollection Routes => Router.Routes;	
-
+		public RouteScanner RouteScanner { get; }
+		
 		private readonly HttpListener listener;
 
 		private readonly Thread listenerThread;
 		
 		private readonly ILogger<RestServer> logger;
 		
-		public RestServer(Router router, ILogger<RestServer> logger)
-		{
-			this.Router = router;
+		public RestServer(Router router, RouteScanner routeScanner, ILogger<RestServer> logger)
+		{ 
+			Router = router;
+			RouteScanner = routeScanner;
+
 			this.logger = logger;
 			listener = new HttpListener();
 			listenerThread = new Thread(ListenAsync);
@@ -47,9 +49,9 @@ namespace Everest
 
 			try
 			{
-				var preffix = $@"http://{host}:{port}/";
-				logger.LogTrace($"Starting server at {preffix}");
-				listener.Prefixes.Add(preffix);
+				var prefix = $@"http://{host}:{port}/";
+				logger.LogTrace($"Starting server at {prefix}");
+				listener.Prefixes.Add(prefix);
 				listener.Start();
 				listenerThread.Start();
 				logger.LogTrace("Server is started");

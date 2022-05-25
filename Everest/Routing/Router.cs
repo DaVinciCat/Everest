@@ -6,17 +6,13 @@ namespace Everest.Routing
 {
 	public class Router
 	{
-		public RouteCollection Routes { get; }
-
-		public RouteSegmentBuilder RouteBuilder { get; } = new();
-
-		public RouteSegmentParser RouteParser { get; } = new();
+		public RouteTable Routes { get; }
 
 		private readonly ILogger<Router> logger;
 
-		public Router(ILogger<Router> logger)
+		public Router(RouteTable routes, ILogger<Router> logger)
 		{
-			this.Routes = new RouteCollection(RouteBuilder, RouteParser);
+			Routes = routes;
 			this.logger = logger;
 		}
 		
@@ -25,15 +21,15 @@ namespace Everest.Routing
 			try
 			{
 				logger.LogTrace($"{context.Request.Id} - Routing request for: {context.Request.Description}");
-				if (!Routes.TryGetRouteAction(context, out var routeAction))
+				if (!Routes.ResolveRoute(context, out var route))
 				{
 					logger.LogWarning($"{context.Request.Id} - Route not found");
 					context.Response.SendNotFound($"Requested route not found: {context.Request.Description}.");
 					return;
 				}
 
-				logger.LogTrace($"{context.Request.Id} - Routing from: {context.Request.Description}	to: {routeAction.Description}");
-				routeAction.Invoke(context);
+				logger.LogTrace($"{context.Request.Id} - Routing from: {context.Request.Description}	to: {route.Description}");
+				route.Invoke(context);
 				logger.LogTrace($"{context.Request.Id} - Routing complete");
 			}
 			catch (Exception ex)

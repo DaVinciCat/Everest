@@ -1,9 +1,22 @@
 ﻿using System;
+using System.Reflection;
+using Everest.Http;
+using Everest.Routing;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
 
 namespace Everest.Shell
 {
+	[RestResource("/api")]
+	public static class Rest
+	{
+		[RestRoute("GET", "/home")]
+		public static void Home(HttpContext context)
+		{
+			context.Response.SendJson(new { Message = "Home Sweet Home", From = "Everest", Success = true });
+		}
+	}
+
 	class Program
 	{
 		static void Main()
@@ -23,17 +36,12 @@ namespace Everest.Shell
 
 			using (var rest = RestServerBuilder.Build(loggerFactory))
 			{
-				rest.Routes.AddRoute("GET", "/home/{id}", context =>
-				{
-					var id = context.Request.PathParameters.GetParameterValue<int>("id");
-					context.Response.SendJson(new { Message = "Home Sweet Home", From = "Everest", Parameter = id, Success = true });
-				});
-
-				rest.Routes.AddRoute("GET", "/home", context =>
+				rest.RegisterRoute("GET", "/home", context =>
 				{
 					context.Response.SendJson(new { Message = "Home Sweet Home", From = "Everest", Success = true });
-				});
+				}); 
 
+				rest.ScanRoutes(Assembly.GetCallingAssembly());
 				rest.Start("localhost", 8080);
 
 				Console.WriteLine("GET localhost:8080/home");
@@ -43,6 +51,3 @@ namespace Everest.Shell
 		}
 	}
 }
-
-
-

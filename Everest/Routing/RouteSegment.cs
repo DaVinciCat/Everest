@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Text.RegularExpressions;
 using Everest.Utils;
@@ -111,7 +110,7 @@ namespace Everest.Routing
 				return false;
 			}
 
-			if (!Regex.IsMatch(iterator.Current, "^-?[0-9]*$"))
+			if (iterator.Current != null && !Regex.IsMatch(iterator.Current, "^-?[0-9]*$"))
 				return false;
 
 			parameters.Add(Name, iterator.Current);
@@ -148,7 +147,7 @@ namespace Everest.Routing
 				return false;
 			}
 
-			if (!Regex.IsMatch(iterator.Current, "[+-]?([0-9]*[.])?[0-9]+"))
+			if (iterator.Current != null && !Regex.IsMatch(iterator.Current, "[+-]?([0-9]*[.])?[0-9]+"))
 				return false;
 
 			parameters.Add(Name, iterator.Current);
@@ -185,7 +184,7 @@ namespace Everest.Routing
 				return false;
 			}
 
-			if (!Regex.IsMatch(iterator.Current, "^([0-9A-Fa-f]{8}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{12})$"))
+			if (iterator.Current != null && !Regex.IsMatch(iterator.Current, "^([0-9A-Fa-f]{8}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{12})$"))
 				return false;
 
 			parameters.Add(Name, iterator.Current);
@@ -222,7 +221,7 @@ namespace Everest.Routing
 				return false;
 			}
 
-			if (!Regex.IsMatch(iterator.Current, @"\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d(?:\.\d+)?Z?"))
+			if (iterator.Current != null && !Regex.IsMatch(iterator.Current, @"\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d(?:\.\d+)?Z?"))
 				return false;
 
 			parameters.Add(Name, iterator.Current);
@@ -259,7 +258,7 @@ namespace Everest.Routing
 				return false;
 			}
 
-			if (!Regex.IsMatch(iterator.Current, "^(?i:true|false)$"))
+			if (iterator.Current != null && !Regex.IsMatch(iterator.Current, "^(?i:true|false)$"))
 				return false;
 
 			parameters.Add(Name, iterator.Current);
@@ -270,23 +269,6 @@ namespace Everest.Routing
 			}
 
 			return true;
-		}
-	}
-
-	public static class RouteSegmentExtensions
-	{
-		public static string GetPath(this RouteSegment segment)
-		{
-			var segments = new List<string>();
-			GetPathImpl(segment);
-			return $"/{string.Join("/", segments)}";
-
-			void GetPathImpl(RouteSegment next)
-			{
-				segments.Add(next.Value);
-				if (next.HasNextSegment)
-					GetPathImpl(next.NextSegment);
-			}
 		}
 	}
 }
