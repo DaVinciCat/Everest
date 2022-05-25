@@ -3,6 +3,7 @@ using Everest.Routing;
 using System;
 using System.Net;
 using System.Threading;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Everest
@@ -17,10 +18,14 @@ namespace Everest
 
 		public bool IsListening => listener.IsListening;
 
-		public Router Router { get; }
+		public Router Router { get; set; }
 
-		public RouteScanner RouteScanner { get; }
-		
+		public RouteScanner RouteScanner { get; set; }
+
+		public IServiceProvider ServiceProvider { get; set; }
+
+		public IServiceCollection Services { get; set; } = new ServiceCollection();
+
 		private readonly HttpListener listener;
 
 		private readonly Thread listenerThread;
@@ -29,12 +34,12 @@ namespace Everest
 		
 		public RestServer(Router router, RouteScanner routeScanner, ILogger<RestServer> logger)
 		{ 
-			Router = router;
+			Router = router; 
 			RouteScanner = routeScanner;
 
-			this.logger = logger;
+			this.logger = logger; 
 			listener = new HttpListener();
-			listenerThread = new Thread(ListenAsync);
+			listenerThread = new Thread(ListenAsync); 
 		}
 
 		public void Start(string host, int port)
@@ -102,7 +107,16 @@ namespace Everest
 				try
 				{
 					var context = await listener.GetContextAsync();
-					ThreadPool.QueueUserWorkItem(ProcessRequestAsync, new HttpContext(context), false);
+				
+					if (ServiceProvider == null)
+						ServiceProvider = Services.BuildServiceProvider();
+
+					var httpContext = new HttpContext(context)
+					{
+						Services = ServiceProvider.CreateScope().ServiceProvider
+					};
+
+					ThreadPool.QueueUserWorkItem(ProcessRequestAsync, httpContext, false);
 				}
 				catch (HttpListenerException ex) when (ex.ErrorCode == 995 && (IsStopping || !IsListening))
 				{
