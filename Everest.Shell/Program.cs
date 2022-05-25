@@ -50,8 +50,8 @@ namespace Everest.Shell
 
 			using (var rest = RestServerBuilder.Build(loggerFactory))
 			{
-				//Register routes manually
-				//rest.RegisterRoute("GET", "/welcome", context =>
+				//If you want to register routes manually
+				//rest.RegisterRoute("GET", "api/welcome", context =>
 				//{
 				//	context.Response.SendJson(new { Message = "Hello!", From = "Everest", Success = true });
 				//});
