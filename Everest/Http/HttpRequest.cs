@@ -26,7 +26,7 @@ namespace Everest.Http
 
 		public ParametersCollection QueryParameters { get; }
 
-		public ParametersCollection PathParameters { get; }
+		public ParametersCollection PathParameters { get; internal set; }
 
 		private readonly HttpListenerRequest request;
 

@@ -4,28 +4,24 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Everest.Log;
 
 namespace Everest.Routing
 {
 	public class RouteScanner
 	{
-		private readonly ILogger<RouteScanner> logger;
-
-		public RouteScanner(ILogger<RouteScanner> logger)
-		{
-			this.logger = logger;			
-		}
-
+		public ILogger<RouteScanner> Logger { get; set; } = DefaultLogger.CreateLogger<RouteScanner>();
+		
 		public IEnumerable<Route> Scan(Assembly assembly)
 		{
 			var count = 0;
 
-			logger.LogTrace($"Scanning assembly {assembly} for routes");
+			Logger.LogTrace($"Scanning assembly {assembly} for routes");
 			foreach (var type in GetRestResourceTypes(assembly))
 			{
 				var routePrefix = GetAttributes<RestResourceAttribute>(type).FirstOrDefault()?.RoutePrefix;
-				
-				logger.LogTrace($"Scanning type {type} for routes");
+
+				Logger.LogTrace($"Scanning type {type} for routes");
 				foreach (var method in GetRestRouteMethods(type))
 				{
 					var attribute = GetAttributes<RestRouteAttribute>(method).FirstOrDefault();
@@ -33,7 +29,7 @@ namespace Everest.Routing
 					{
 						var action = (Action<HttpContext>)method.CreateDelegate(typeof(Action<HttpContext>));
 						var route = new Route(attribute.HttpMethod, $"{routePrefix}{attribute.RoutePattern}", action);
-						logger.LogTrace($"Route found	- {route.Description} at {type}.{method.Name}()");
+						Logger.LogTrace($"Route found	- {route.Description} at {type}.{method.Name}()");
 						count++;
 
 						yield return route;
@@ -41,8 +37,8 @@ namespace Everest.Routing
 				}
 			}
 
-			logger.LogTrace($"Scan of assembly {assembly} complete");
-			logger.LogTrace($"Total routes found: {count}");
+			Logger.LogTrace($"Scan of assembly {assembly} complete");
+			Logger.LogTrace($"Total routes found: {count}");
 		}
 
 		private static IEnumerable<Type> GetRestResourceTypes(Assembly assembly)

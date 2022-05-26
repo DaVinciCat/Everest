@@ -9,15 +9,12 @@ namespace Everest
 	{
 		public static void RegisterRoute(this RestServer server, string httpMethod, string pattern, Action<HttpContext> action)
 		{
-			server.Router.Routes.RegisterRoute(httpMethod, pattern, action);
+			server.Router.RegisterRoute(httpMethod, pattern, action);
 		}
 
 		public static void ScanRoutes(this RestServer server, Assembly assembly)
 		{
-			foreach (var route in server.RouteScanner.Scan(assembly))
-			{
-				server.Router.Routes.RegisterRoute(route);	
-			}
+			server.Router.ScanRoutes(assembly);
 		}
 
 		public static void RegisterTransientService<TService>(this RestServer server, Func<TService> factory)

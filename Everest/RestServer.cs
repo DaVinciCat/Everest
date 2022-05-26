@@ -3,6 +3,7 @@ using Everest.Routing;
 using System;
 using System.Net;
 using System.Threading;
+using Everest.Log;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -10,6 +11,8 @@ namespace Everest
 {
 	public class RestServer: IDisposable
 	{
+		public ILogger<RestServer> Logger { get; set; } = DefaultLogger.CreateLogger<RestServer>();
+
 		public bool IsDisposed { get; private set; }
 
 		public bool IsStopping { get; private set; }
@@ -18,10 +21,8 @@ namespace Everest
 
 		public bool IsListening => listener.IsListening;
 
-		public Router Router { get; set; }
-
-		public RouteScanner RouteScanner { get; set; }
-
+		public Router Router { get; set; } = new();
+		
 		public IServiceProvider ServiceProvider { get; set; }
 
 		public IServiceCollection Services { get; set; } = new ServiceCollection();
@@ -30,14 +31,8 @@ namespace Everest
 
 		private readonly Thread listenerThread;
 		
-		private readonly ILogger<RestServer> logger;
-		
-		public RestServer(Router router, RouteScanner routeScanner, ILogger<RestServer> logger)
+		public RestServer()
 		{ 
-			Router = router; 
-			RouteScanner = routeScanner;
-
-			this.logger = logger; 
 			listener = new HttpListener();
 			listenerThread = new Thread(ListenAsync); 
 		}
@@ -55,15 +50,15 @@ namespace Everest
 			try
 			{
 				var prefix = $@"http://{host}:{port}/";
-				logger.LogTrace($"Starting server at {prefix}");
+				Logger.LogTrace($"Starting server at {prefix}");
 				listener.Prefixes.Add(prefix);
 				listener.Start();
 				listenerThread.Start();
-				logger.LogTrace("Server is started");
+				Logger.LogTrace("Server is started");
 			}
 			catch (Exception ex)
 			{
-				logger.LogCritical(ex, "Failed while starting server");
+				Logger.LogCritical(ex, "Failed while starting server");
 				throw;
 			}
 			finally
@@ -83,15 +78,15 @@ namespace Everest
 			try
 			{
 				IsStopping = true;
-				logger.LogTrace("Stopping server");
+				Logger.LogTrace("Stopping server");
 				listener.Stop();
 				listener.Close();
 				listenerThread.Join();
-				logger.LogTrace("Server is stopped");
+				Logger.LogTrace("Server is stopped");
 			}
 			catch (Exception ex)
 			{
-				logger.LogCritical(ex, "Failed while stopping server");
+				Logger.LogCritical(ex, "Failed while stopping server");
 				throw;
 			}
 			finally
@@ -120,11 +115,11 @@ namespace Everest
 				}
 				catch (HttpListenerException ex) when (ex.ErrorCode == 995 && (IsStopping || !IsListening))
 				{
-					logger.LogWarning(ex, $"{ex.ErrorCode}");
+					Logger.LogWarning(ex, $"{ex.ErrorCode}");
 				}
 				catch (Exception ex)
 				{
-					logger.LogCritical(ex, "Failed to process incoming request");
+					Logger.LogCritical(ex, "Failed to process incoming request");
 				}
 			}
 		}

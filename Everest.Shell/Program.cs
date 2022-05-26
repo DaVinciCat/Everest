@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using Everest.Http;
+using Everest.Log;
 using Everest.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -48,10 +49,12 @@ namespace Everest.Shell
 				builder.SetMinimumLevel(LogLevel.Trace);
 			});
 
-			using (var rest = RestServerBuilder.Build(loggerFactory))
+			DefaultLogger.LoggerFactory = loggerFactory;
+
+			using (var rest = new RestServer())
 			{
 				//If you want to register routes manually
-				//rest.RegisterRoute("GET", "api/welcome", context =>
+				//rest.RegisterRoute("GET", "/welcome", context =>
 				//{
 				//	context.Response.SendJson(new { Message = "Hello!", From = "Everest", Success = true });
 				//});
