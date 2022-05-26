@@ -71,7 +71,7 @@ namespace Everest.Http
 		public void SendOk(string content)
 		{
 			RemoveHeader("Content-Type");
-			AppendHeader("Content-Type", "text; charset=utf-8");
+			AppendHeader("Content-Type", "text/plain; charset=utf-8");
 			Send(content, HttpStatusCode.OK);
 		}
 
@@ -79,7 +79,7 @@ namespace Everest.Http
 		{
 			KeepAlive = false;
 			RemoveHeader("Content-Type");
-			AppendHeader("Content-Type", "text; charset=utf-8");
+			AppendHeader("Content-Type", "text/plain; charset=utf-8");
 			Send(content, HttpStatusCode.InternalServerError);
 		}
 
@@ -87,7 +87,7 @@ namespace Everest.Http
 		{
 			KeepAlive = false;
 			RemoveHeader("Content-Type");
-			AppendHeader("Content-Type", "text; charset=utf-8");
+			AppendHeader("Content-Type", "text/plain; charset=utf-8");
 			Send(content, HttpStatusCode.BadRequest);
 		}
 
@@ -95,7 +95,7 @@ namespace Everest.Http
 		{
 			KeepAlive = false;
 			RemoveHeader("Content-Type");
-			AppendHeader("Content-Type", "text; charset=utf-8");
+			AppendHeader("Content-Type", "text/plain; charset=utf-8");
 			Send(content, HttpStatusCode.NotFound);
 		}
 
