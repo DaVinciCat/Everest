@@ -2,7 +2,7 @@
 
 namespace Everest.Annotations
 {
-	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+	[AttributeUsage(AttributeTargets.Class)]
 	public class RestResourceAttribute : Attribute
 	{
 		public string RoutePrefix { get; }

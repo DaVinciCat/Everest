@@ -25,7 +25,7 @@ namespace Everest.Routing
 			if (string.IsNullOrEmpty(routePattern))
 				throw new ArgumentNullException(nameof(routePattern), "Route pattern required.");
 
-			var segments = routePattern.TrimStart('/').TrimEnd('/').Split("/");
+			var segments = routePattern.TrimStart('/').TrimEnd('/').Split('/');
 			var iterator = new Iterator<string>(segments);
 
 			return BuildImpl();

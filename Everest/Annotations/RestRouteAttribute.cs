@@ -2,7 +2,7 @@
 
 namespace Everest.Annotations
 {
-	[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
+	[AttributeUsage(AttributeTargets.Method)]
 	public class RestRouteAttribute : Attribute
 	{
 		public string HttpMethod { get; }
