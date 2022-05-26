@@ -1,5 +1,6 @@
 ﻿using System;
-namespace Everest.Routing
+
+namespace Everest.Annotations
 {
 	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
 	public class RestResourceAttribute : Attribute
