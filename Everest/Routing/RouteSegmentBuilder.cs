@@ -11,7 +11,7 @@ namespace Everest.Routing
 	{
 		public Dictionary<string, BuildRouteSegment> Builders { get; } = new()
 		{
-			{ StringRouteSegment.Pattern, (value, next) => new StringRouteSegment(value, next) },
+			{ AlphaNumericRouteSegment.Pattern, (value, next) => new AlphaNumericRouteSegment(value, next) },
 			{ ParameterRouteSegment.Pattern, (value, next) => new ParameterRouteSegment(value, next) },
 			{ IntParameterRouteSegment.Pattern, (value, next) => new IntParameterRouteSegment(value, next) },
 			{ FloatParameterRouteSegment.Pattern, (value, next) => new FloatParameterRouteSegment(value, next) },

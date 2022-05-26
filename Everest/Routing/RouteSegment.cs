@@ -22,11 +22,11 @@ namespace Everest.Routing
 		public abstract bool TryParse(Iterator<string> iterator, NameValueCollection parameters);
 	}
 
-	public class StringRouteSegment : RouteSegment
+	public class AlphaNumericRouteSegment : RouteSegment
 	{
-		public static string Pattern => @"^[a-z\d]+$";
+		public static string Pattern => @"^[a-zA-Z0-9_]*$";
 
-		public StringRouteSegment(string value, RouteSegment next) 
+		public AlphaNumericRouteSegment(string value, RouteSegment next) 
 			: base(value, next)
 		{
 
