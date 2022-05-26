@@ -18,7 +18,7 @@ namespace Everest.Shell
 			var service = context.GetGreetingsService();
 			var greetings = service.Greet();
 
-			context.Response.SendJson(new { Message = greetings, From = "Everest", Success = true });
+			//context.Response.SendJson(new { Message = greetings, From = "Everest", Success = true });
 		}
 
 		[RestRoute("GET", "/welcome/{me}")]
@@ -49,18 +49,18 @@ namespace Everest.Shell
 				builder.SetMinimumLevel(LogLevel.Trace);
 			});
 
-			DefaultLogger.LoggerFactory = loggerFactory;
+			//DefaultLogger.LoggerFactory = loggerFactory;
 
 			using (var rest = new RestServer())
 			{
 				//If you want to register routes manually
-				//rest.RegisterRoute("GET", "/welcome", context =>
-				//{
-				//	context.Response.SendJson(new { Message = "Hello!", From = "Everest", Success = true });
-				//});
+				rest.RegisterRoute("GET", "api/welcome", context =>
+				{
+					//context.Response.SendJson(new { Message = "Hello!", From = "Everest", Success = true });
+				});
 
 				rest.RegisterTransientService(() => new GreetingsService());
-				rest.ScanRoutes(Assembly.GetCallingAssembly());
+				//rest.ScanRoutes(Assembly.GetCallingAssembly());
 				rest.Start("localhost", 8080);
 
 				Console.WriteLine("GET localhost:8080/api/welcome");

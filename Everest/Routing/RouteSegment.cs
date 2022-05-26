@@ -39,7 +39,7 @@ namespace Everest.Routing
 				return false;
 			}
 
-			var result = Value == iterator.Current;
+			var result = string.CompareOrdinal(Value, iterator.Current) == 0;
 
 			if (result && HasNextSegment)
 			{
