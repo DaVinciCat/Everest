@@ -25,14 +25,14 @@ namespace Everest.Http
 		{
 			return HasParameter(parameter)
 				? this.GetValue<T>(parameter)
-				: throw new ArgumentException($"Parameter is required: {parameter}.");
+				: throw new ArgumentException($"Parameter required: {parameter}.");
 		}
 
 		public T GetParameterValue<T>(string parameter, Func<string, T> parse)
 		{
 			return HasParameter(parameter)
 				? this.GetValue(parameter, parse)
-				: throw new ArgumentException($"Parameter is required: {parameter}.");
+				: throw new ArgumentException($"Parameter required: {parameter}.");
 		}
 
 		public bool TryGetParameterValue<T>(string parameter, out T value)

@@ -60,7 +60,7 @@ namespace Everest.Routing
 			: base(value, next)
 		{
 			if (string.IsNullOrEmpty(value))
-				throw new ArgumentException("Parameter name is required.");
+				throw new ArgumentException("Parameter name required.");
 
 			var match = Regex.Match(value, "[^{}]+?(?=}|:)");
 			if (!match.Success)

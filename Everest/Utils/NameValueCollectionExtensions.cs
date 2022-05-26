@@ -9,13 +9,13 @@ namespace Everest.Utils
 		internal static T GetValue<T>(this NameValueCollection collection, string key)
 		{
 			if (collection == null) 
-				throw new ArgumentNullException(nameof(collection), "Collection is required.");
+				throw new ArgumentNullException(nameof(collection), "Collection required.");
 
 			if (key == null) 
-				throw new ArgumentNullException(nameof(key), "Key is required.");
+				throw new ArgumentNullException(nameof(key), "Key required.");
 
 			if (collection[key] == null) 
-				throw new ArgumentException($"Key is required: {key}.");
+				throw new ArgumentException($"Key required: {key}.");
 
 			var strValue = collection[key];
 			var converter = TypeDescriptor.GetConverter(typeof(T));
@@ -31,10 +31,10 @@ namespace Everest.Utils
 			value = default(T);
 
 			if (collection == null)
-				throw new ArgumentNullException(nameof(collection), "Collection is required.");
+				throw new ArgumentNullException(nameof(collection), "Collection required.");
 
 			if (key == null)
-				throw new ArgumentNullException(nameof(key), "Key is required.");
+				throw new ArgumentNullException(nameof(key), "Key required.");
 
 			if (collection[key] == null)
 				return false;
@@ -56,7 +56,7 @@ namespace Everest.Utils
 			try
 			{
 				if (value == null)
-					throw new ArgumentException("key is required.");
+					throw new ArgumentException("key required.");
 
 				return parse(value);
 			}
