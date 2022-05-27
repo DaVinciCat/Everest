@@ -28,7 +28,7 @@ namespace Everest.Routing
 					var attribute = GetAttributes<RestRouteAttribute>(method).FirstOrDefault();
 					if (attribute != null)
 					{
-						var action = (Action<HttpContext>)method.CreateDelegate(typeof(Action<HttpContext>));
+						var action = (Action<HttpContext>)method.CreateDelegate(typeof(Action<HttpContext>), null);
 						var route = new Route(attribute.HttpMethod, $"{routePrefix}/{attribute.RoutePattern}", action);
 						Logger.LogTrace($"Route found	- {route.Description} at {type}.{method.Name}()");
 						count++;
