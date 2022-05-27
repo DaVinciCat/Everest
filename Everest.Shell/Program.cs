@@ -9,10 +9,10 @@ using Microsoft.Extensions.Logging.Console;
 
 namespace Everest.Shell
 {
-	[RestResource("/api")]
+	[RestResource("api")]
 	public static class Rest
 	{
-		[RestRoute("GET", "/welcome")]
+		[RestRoute("GET", "welcome")]
 		public static void Welcome(HttpContext context)
 		{
 			var service = context.GetGreetingsService();
@@ -21,7 +21,7 @@ namespace Everest.Shell
 			context.Response.SendJson(new { Message = greetings, From = "Everest", Success = true });
 		}
 
-		[HttpGet("/welcome/{me}")]
+		[HttpGet("welcome/{me}")]
 		public static void WelcomeMe(HttpContext context)
 		{
 			var me = context.Request.PathParameters.GetParameterValue<string>("me");
@@ -54,7 +54,7 @@ namespace Everest.Shell
 			using (var rest = new RestServer())
 			{
 				//If you want to register routes manually
-				//rest.RegisterRoute("GET", "/welcome", context =>
+				//rest.RegisterRoute("GET", "welcome", context =>
 				//{
 				//	context.Response.SendJson(new { Message = "Hello!", From = "Everest", Success = true });
 				//});
