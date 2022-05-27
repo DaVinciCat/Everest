@@ -21,7 +21,7 @@ namespace Everest.Shell
 			context.Response.SendJson(new { Message = greetings, From = "Everest", Success = true });
 		}
 
-		[RestRoute("GET", "/welcome/{me}")]
+		[HttpGet("/welcome/{me}")]
 		public static void WelcomeMe(HttpContext context)
 		{
 			var me = context.Request.PathParameters.GetParameterValue<string>("me");

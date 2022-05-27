@@ -15,4 +15,44 @@ namespace Everest.Annotations
 			RoutePattern = routePattern;
 		}
 	}
+
+	[AttributeUsage(AttributeTargets.Method)]
+	public class HttpGetAttribute : RestRouteAttribute
+	{
+		public HttpGetAttribute(string routePattern) 
+			: base("GET",  routePattern)
+		{
+
+		}
+	}
+
+	[AttributeUsage(AttributeTargets.Method)]
+	public class HttpPostAttribute : RestRouteAttribute
+	{
+		public HttpPostAttribute(string routePattern)
+			: base("POST", routePattern)
+		{
+
+		}
+	}
+
+	[AttributeUsage(AttributeTargets.Method)]
+	public class HttpPutAttribute : RestRouteAttribute
+	{
+		public HttpPutAttribute(string routePattern)
+			: base("PUT", routePattern)
+		{
+
+		}
+	}
+
+	[AttributeUsage(AttributeTargets.Method)]
+	public class HttpDeleteAttribute : RestRouteAttribute
+	{
+		public HttpDeleteAttribute(string routePattern)
+			: base("DELETE", routePattern)
+		{
+
+		}
+	}
 }
