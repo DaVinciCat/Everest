@@ -7,9 +7,9 @@ namespace Everest
 {
 	public static class RestServerExtensions
 	{
-		public static void RegisterRoute(this RestServer server, string httpMethod, string pattern, Action<HttpContext> action)
+		public static void RegisterRoute(this RestServer server, string httpMethod, string routePattern, Action<HttpContext> action)
 		{
-			server.Router.RegisterRoute(httpMethod, pattern, action);
+			server.Router.RegisterRoute(httpMethod, routePattern, action);
 		}
 
 		public static void ScanRoutes(this RestServer server, Assembly assembly)

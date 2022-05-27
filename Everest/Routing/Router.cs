@@ -60,9 +60,9 @@ namespace Everest.Routing
 			}
 		}
 
-		public void RegisterRoute(string httpMethod, string pattern, Action<HttpContext> action)
+		public void RegisterRoute(string httpMethod, string routePattern, Action<HttpContext> action)
 		{
-			RegisterRoute(new Route(httpMethod, pattern, action));
+			RegisterRoute(new Route(httpMethod, routePattern, action));
 		}
 
 		public void RegisterRoute(Route route)
