@@ -4,9 +4,9 @@ using System.ComponentModel;
 
 namespace Everest.Utils
 {
-	internal static class NameValueCollectionExtensions
+	public static class NameValueCollectionExtensions
 	{
-		internal static T GetValue<T>(this NameValueCollection collection, string key)
+		public static T GetValue<T>(this NameValueCollection collection, string key)
 		{
 			if (collection == null) 
 				throw new ArgumentNullException(nameof(collection), "Collection required.");
@@ -26,7 +26,7 @@ namespace Everest.Utils
 			return (T)converter.ConvertFrom(strValue);
 		}
 
-		internal static bool TryGetValue<T>(this NameValueCollection collection, string key, out T value)
+		public static bool TryGetValue<T>(this NameValueCollection collection, string key, out T value)
 		{
 			value = default(T);
 
@@ -49,7 +49,7 @@ namespace Everest.Utils
 			return true;
 		}
 
-		internal static T GetValue<T>(this NameValueCollection collection, string key, Func<string, T> parse)
+		public static T GetValue<T>(this NameValueCollection collection, string key, Func<string, T> parse)
 		{
 			var value = collection[key];
 

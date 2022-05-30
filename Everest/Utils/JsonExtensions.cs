@@ -2,7 +2,7 @@
 
 namespace Everest.Utils
 {
-	internal static class JsonExtensions
+	public static class JsonExtensions
 	{
 		internal static string ToJson<T>(this T content)
 		{

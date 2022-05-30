@@ -3,7 +3,7 @@ using System.IO.Compression;
 
 namespace Everest.Utils
 {
-	internal static class CompressionExtensions
+	public static class CompressionExtensions
 	{
 		public static byte[] Gzip(this byte[] buffer, CompressionLevel level = CompressionLevel.Optimal)
 		{
