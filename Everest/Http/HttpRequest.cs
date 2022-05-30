@@ -24,17 +24,17 @@ namespace Everest.Http
 
 		public NameValueCollection Headers => request.Headers;
 
-		public ParametersCollection QueryParameters { get; }
+		public ParameterCollection QueryParameters { get; }
 
-		public ParametersCollection PathParameters { get; internal set; }
+		public ParameterCollection PathParameters { get; internal set; }
 
 		private readonly HttpListenerRequest request;
 
 		public HttpRequest(HttpListenerRequest request)
 		{
 			this.request = request;
-			QueryParameters = new ParametersCollection(request.QueryString);
-			PathParameters = new ParametersCollection();
+			QueryParameters = new ParameterCollection(request.QueryString);
+			PathParameters = new ParameterCollection();
 		}
 
 		public string ReadEntityBody()

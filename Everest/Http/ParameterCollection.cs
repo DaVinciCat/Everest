@@ -4,14 +4,14 @@ using Everest.Utils;
 
 namespace Everest.Http
 {
-	public class ParametersCollection : NameValueCollection
+	public class ParameterCollection : NameValueCollection
 	{
-		public ParametersCollection()
+		public ParameterCollection()
 		{
 
 		}
 
-		public ParametersCollection(NameValueCollection collection)
+		public ParameterCollection(NameValueCollection collection)
 			: base(collection)
 		{
 			

@@ -105,7 +105,7 @@ namespace Everest.Routing
 				var parameters = new NameValueCollection();
 				if (RouteParser.TryParse(key, url, parameters))
 				{
-					context.Request.PathParameters = new ParametersCollection(parameters);
+					context.Request.PathParameters = new ParameterCollection(parameters);
 					route = value;
 					return true;
 				}
