@@ -24,7 +24,7 @@ namespace Everest.Routing
 
 	public class AlphaNumericRouteSegment : RouteSegment
 	{
-		public static string Pattern => @"^[a-zA-Z0-9_]*$";
+		public static string Pattern => @"^[a-zA-Z0-9_-]*$";
 
 		public AlphaNumericRouteSegment(string value, RouteSegment next) 
 			: base(value, next)

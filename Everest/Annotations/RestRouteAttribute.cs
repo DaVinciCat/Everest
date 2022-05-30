@@ -55,4 +55,34 @@ namespace Everest.Annotations
 
 		}
 	}
+
+	[AttributeUsage(AttributeTargets.Method)]
+	public class HttpHeadAttribute : RestRouteAttribute
+	{
+		public HttpHeadAttribute(string routePattern)
+			: base("HEAD", routePattern)
+		{
+
+		}
+	}
+
+	[AttributeUsage(AttributeTargets.Method)]
+	public class HttpPatchAttribute : RestRouteAttribute
+	{
+		public HttpPatchAttribute(string routePattern)
+			: base("PATCH", routePattern)
+		{
+
+		}
+	}
+
+	[AttributeUsage(AttributeTargets.Method)]
+	public class HttpOptionsAttribute : RestRouteAttribute
+	{
+		public HttpOptionsAttribute(string routePattern)
+			: base("OPTIONS", routePattern)
+		{
+
+		}
+	}
 }
