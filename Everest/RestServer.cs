@@ -3,15 +3,14 @@ using Everest.Routing;
 using System;
 using System.Net;
 using System.Threading;
-using Everest.Log;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Everest
 {
-	public class RestServer: IDisposable
+	public class RestServer : IDisposable
 	{
-		public ILogger<RestServer> Logger { get; set; } = DefaultLogger.CreateLogger<RestServer>();
+		public ILogger<RestServer> Logger { get; set; }
 
 		public bool IsDisposed { get; private set; }
 
@@ -21,20 +20,24 @@ namespace Everest
 
 		public bool IsListening => listener.IsListening;
 
-		public Router Router { get; set; } = new();
-		
+		public Router Router { get; }
+
 		public IServiceProvider ServiceProvider { get; private set; }
 
-		public IServiceCollection Services { get; set; } = new ServiceCollection();
+		public IServiceCollection Services { get; }
 
 		private readonly HttpListener listener;
 
 		private readonly Thread listenerThread;
-		
-		public RestServer()
-		{ 
+
+		public RestServer(Router router, IServiceCollection services, ILogger<RestServer> logger)
+		{
+			Router = router;
+			Services = services;
+			Logger = logger;
+
 			listener = new HttpListener();
-			listenerThread = new Thread(ListenAsync); 
+			listenerThread = new Thread(ListenAsync);
 		}
 
 		public void Start(string host, int port)
@@ -102,7 +105,7 @@ namespace Everest
 				try
 				{
 					var context = await listener.GetContextAsync();
-				
+
 					if (ServiceProvider == null)
 						ServiceProvider = Services.BuildServiceProvider();
 

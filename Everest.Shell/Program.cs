@@ -2,14 +2,13 @@
 using System.Reflection;
 using Everest.Annotations;
 using Everest.Http;
-using Everest.Log;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
 
 namespace Everest.Shell
 {
-	[RestResource("api")]
+	[RestResource("api/1.0")]
 	public static class Rest
 	{
 		[RestRoute("GET", "welcome")]
@@ -18,7 +17,7 @@ namespace Everest.Shell
 			var service = context.GetGreetingsService();
 			var greetings = service.Greet();
 
-			context.Response.SendJson(new { Message = greetings, From = "Everest", Success = true });
+			context.Response.SendJson(new { Message = greetings, From = "Everest", Success = true }); 
 		}
 
 		[HttpGet("welcome/{me}")]
@@ -48,10 +47,8 @@ namespace Everest.Shell
 
 				builder.SetMinimumLevel(LogLevel.Trace);
 			});
-
-			DefaultLogger.LoggerFactory = loggerFactory;
-
-			using (var rest = new RestServer())
+			
+			using (var rest = RestServerBuilder.Build(loggerFactory))
 			{
 				//If you want to register routes manually
 				//rest.RegisterRoute("GET", "welcome", context =>
@@ -63,8 +60,8 @@ namespace Everest.Shell
 				rest.ScanRoutes(Assembly.GetCallingAssembly());
 				rest.Start("localhost", 8080);
 
-				Console.WriteLine("GET localhost:8080/api/welcome");
-				Console.WriteLine("GET localhost:8080/api/welcome/{me}");
+				Console.WriteLine("GET localhost:8080/api/1.0/welcome");
+				Console.WriteLine("GET localhost:8080/api/1.0/welcome/{me}");
 				Console.WriteLine("Press any key to exit");
 				Console.ReadKey();
 			}

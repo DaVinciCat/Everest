@@ -5,14 +5,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Everest.Annotations;
-using Everest.Log;
 
 namespace Everest.Routing
 {
 	public class RouteScanner
 	{
-		public ILogger<RouteScanner> Logger { get; set; } = DefaultLogger.CreateLogger<RouteScanner>();
-		
+		public ILogger<RouteScanner> Logger { get; }
+
+		public RouteScanner(ILogger<RouteScanner> logger)
+		{
+			Logger = logger;
+		}
+
 		public IEnumerable<Route> Scan(Assembly assembly)
 		{
 			var count = 0;

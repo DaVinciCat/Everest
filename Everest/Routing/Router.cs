@@ -4,20 +4,19 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Reflection;
-using Everest.Log;
 using Microsoft.Extensions.Logging;
 
 namespace Everest.Routing
 {
 	public class Router
 	{
-		public ILogger<Router> Logger { get; set; } = DefaultLogger.CreateLogger<Router>();
+		public ILogger<Router> Logger { get; }
 		
-		public RouteSegmentBuilder RouteBuilder { get; set; } = new();
+		public RouteSegmentBuilder RouteBuilder { get; } 
 
-		public RouteSegmentParser RouteParser { get; set; } = new();
+		public RouteSegmentParser RouteParser { get; }
 
-		public RouteScanner RouteScanner { get; set; } = new();
+		public RouteScanner RouteScanner { get; }
 		
 		private readonly Dictionary<string, Dictionary<RouteSegment, Route>> methods = new();
 		
@@ -25,6 +24,14 @@ namespace Everest.Routing
 		{
 			context.Response.SendInternalServerError($"Failed to process request: {context.Request.Description}.\r\n{ex.Message}");
 		};
+
+		public Router(RouteSegmentBuilder builder, RouteSegmentParser parser, RouteScanner scanner, ILogger<Router> logger)
+		{
+			RouteBuilder = builder;
+			RouteParser = parser;
+			RouteScanner = scanner;
+			Logger = logger;
+		}
 
 		public void Route(HttpContext context)
 		{
