@@ -10,7 +10,7 @@ namespace Everest
 {
 	public class RestServer : IDisposable
 	{
-		public ILogger<RestServer> Logger { get; set; }
+		public ILogger<RestServer> Logger { get; }
 
 		public bool IsDisposed { get; private set; }
 
