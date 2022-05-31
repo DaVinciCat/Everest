@@ -23,7 +23,7 @@ namespace Everest
 
 		public Router Router { get; set; } = new();
 		
-		public IServiceProvider ServiceProvider { get; set; }
+		public IServiceProvider ServiceProvider { get; private set; }
 
 		public IServiceCollection Services { get; set; } = new ServiceCollection();
 
