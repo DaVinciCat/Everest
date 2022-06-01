@@ -20,6 +20,8 @@ namespace Everest
 
 		public bool IsListening => listener.IsListening;
 
+		public PrefixCollection Prefixes { get; }
+
 		public Router Router { get; }
 
 		public IServiceProvider ServiceProvider { get; private set; }
@@ -32,15 +34,22 @@ namespace Everest
 
 		public RestServer(Router router, IServiceCollection services, ILogger<RestServer> logger)
 		{
+			if (!HttpListener.IsSupported)
+			{
+				throw new NotSupportedException($"This OS does not support {nameof(HttpListener)} class.");
+			}
+
 			Router = router;
 			Services = services;
 			Logger = logger;
-
-			listener = new HttpListener();
+			
+			listener = new HttpListener(); 
 			listenerThread = new Thread(ListenAsync);
+			
+			Prefixes = new PrefixCollection(listener.Prefixes);
 		}
 
-		public void Start(string host, int port)
+		public void Start()
 		{
 			if (IsDisposed)
 				throw new ObjectDisposedException(GetType().FullName);
@@ -52,9 +61,7 @@ namespace Everest
 
 			try
 			{
-				var prefix = $@"http://{host}:{port}/";
-				Logger.LogTrace($"Starting server at {prefix}");
-				listener.Prefixes.Add(prefix);
+				Logger.LogTrace($"Starting server at {string.Join("; ", Prefixes)}");
 				listener.Start();
 				listenerThread.Start();
 				Logger.LogTrace("Server is started");

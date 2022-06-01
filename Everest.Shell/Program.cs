@@ -56,9 +56,10 @@ namespace Everest.Shell
 				//	context.Response.SendJson(new { Message = "Hello!", From = "Everest", Success = true });
 				//});
 
+				rest.AddPrefix("http://localhost:8080/");
 				rest.RegisterTransientService(() => new GreetingsService());
 				rest.ScanRoutes(Assembly.GetCallingAssembly());
-				rest.Start("localhost", 8080);
+				rest.Start();
 
 				Console.WriteLine("GET localhost:8080/api/1.0/welcome");
 				Console.WriteLine("GET localhost:8080/api/1.0/welcome/{me}");

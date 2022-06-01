@@ -7,6 +7,19 @@ namespace Everest
 {
 	public static class RestServerExtensions
 	{
+		public static void AddPrefix(this RestServer server, string prefix)
+		{
+			server.Prefixes.Add(prefix);
+		}
+
+		public static void AddPrefixes(this RestServer server, string[] prefixes)
+		{
+			foreach (var prefix in prefixes)
+			{
+				server.Prefixes.Add(prefix);
+			}
+		}
+
 		public static void RegisterRoute(this RestServer server, string httpMethod, string routePattern, Action<HttpContext> action)
 		{
 			server.Router.RegisterRoute(httpMethod, routePattern, action);
