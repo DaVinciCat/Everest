@@ -5,9 +5,14 @@ using Everest.Utils;
 
 namespace Everest.Routing
 {
+	public interface IRouteSegmentBuilder
+	{
+		RouteSegment Build(string routePattern);
+	}
+	
 	public delegate RouteSegment BuildRouteSegment(string value, RouteSegment next);
-
-	public class RouteSegmentBuilder
+	
+	public class RouteSegmentBuilder : IRouteSegmentBuilder
 	{
 		public Dictionary<string, BuildRouteSegment> Builders { get; } = new()
 		{

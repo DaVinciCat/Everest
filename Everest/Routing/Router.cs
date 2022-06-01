@@ -3,20 +3,26 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Reflection;
 using Microsoft.Extensions.Logging;
 
 namespace Everest.Routing
 {
-	public class Router
+	public interface IRouter
+	{
+		void Route(HttpContext context);
+
+		void RegisterRoute(string httpMethod, string routePattern, Action<HttpContext> action);
+
+		void RegisterRoute(Route route);
+	}
+
+	public class Router : IRouter
 	{
 		public ILogger<Router> Logger { get; }
 		
-		public RouteSegmentBuilder RouteBuilder { get; } 
+		public IRouteSegmentBuilder RouteBuilder { get; } 
 
-		public RouteSegmentParser RouteParser { get; }
-
-		public RouteScanner RouteScanner { get; }
+		public IRouteSegmentParser RouteParser { get; }
 		
 		private readonly Dictionary<string, Dictionary<RouteSegment, Route>> methods = new();
 		
@@ -25,11 +31,10 @@ namespace Everest.Routing
 			context.Response.SendInternalServerError($"Failed to process request: {context.Request.Description}.\r\n{ex.Message}");
 		};
 
-		public Router(RouteSegmentBuilder builder, RouteSegmentParser parser, RouteScanner scanner, ILogger<Router> logger)
+		public Router(IRouteSegmentBuilder builder, IRouteSegmentParser parser, ILogger<Router> logger)
 		{
 			RouteBuilder = builder;
 			RouteParser = parser;
-			RouteScanner = scanner;
 			Logger = logger;
 		}
 
@@ -88,15 +93,7 @@ namespace Everest.Routing
 
 			Logger.LogTrace($"Route registered - {route.Description}");
 		}
-
-		public void ScanRoutes(Assembly assembly)
-		{
-			foreach (var route in RouteScanner.Scan(assembly).ToArray())
-			{
-				RegisterRoute(route);
-			}
-		}
-
+		
 		private bool ResolveRoute(HttpContext context, out Route route)
 		{
 			route = null;

@@ -19,20 +19,22 @@ namespace Everest
 		public bool IsStarting { get; private set; }
 
 		public bool IsListening => listener.IsListening;
+		
+		public IRouter Router { get; }
 
-		public PrefixCollection Prefixes { get; }
-
-		public Router Router { get; }
+		public IRouteScanner RouteScanner { get; }
 
 		public IServiceProvider ServiceProvider { get; private set; }
 
 		public IServiceCollection Services { get; }
 
+		public PrefixCollection Prefixes { get; }
+
 		private readonly HttpListener listener;
 
 		private readonly Thread listenerThread;
 
-		public RestServer(Router router, IServiceCollection services, ILogger<RestServer> logger)
+		public RestServer(IRouter router, IRouteScanner scanner, IServiceCollection services, ILogger<RestServer> logger)
 		{
 			if (!HttpListener.IsSupported)
 			{
@@ -40,6 +42,7 @@ namespace Everest
 			}
 
 			Router = router;
+			RouteScanner = scanner;
 			Services = services;
 			Logger = logger;
 			

@@ -8,7 +8,12 @@ using Everest.Annotations;
 
 namespace Everest.Routing
 {
-	public class RouteScanner
+	public interface IRouteScanner
+	{
+		IEnumerable<Route> Scan(Assembly assembly);
+	}
+
+	public class RouteScanner : IRouteScanner
 	{
 		public ILogger<RouteScanner> Logger { get; }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using Everest.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,7 +28,10 @@ namespace Everest
 
 		public static void ScanRoutes(this RestServer server, Assembly assembly)
 		{
-			server.Router.ScanRoutes(assembly);
+			foreach(var route in server.RouteScanner.Scan(assembly).ToArray())
+			{
+				server.Router.RegisterRoute(route);
+			}
 		}
 
 		public static void RegisterTransientService<TService>(this RestServer server, Func<TService> factory)

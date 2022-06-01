@@ -3,7 +3,12 @@ using Everest.Utils;
 
 namespace Everest.Routing
 {
-	public class RouteSegmentParser
+	public interface IRouteSegmentParser
+	{
+		bool TryParse(RouteSegment segment, string url, NameValueCollection parameters = null);
+	}
+
+	public class RouteSegmentParser : IRouteSegmentParser
 	{
 		public bool TryParse(RouteSegment segment, string url, NameValueCollection parameters = null)
 		{
