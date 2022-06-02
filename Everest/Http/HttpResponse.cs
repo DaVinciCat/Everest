@@ -48,17 +48,16 @@ namespace Everest.Http
 			set => response.ContentLength64 = value;
 		}
 
+		public Compression Compression { get; }
+
 		public Stream OutputStream => response.OutputStream;
 
 		private readonly HttpListenerResponse response;
-
-		private readonly Compression compression;
-
+			
 		public HttpResponse(HttpListenerResponse response, Compression compression)
 		{
 			this.response = response;
-			this.compression = compression;
-
+			Compression = compression;
 			AppendHeader("Server", "Everest");
 		}
 
@@ -67,49 +66,6 @@ namespace Everest.Http
 		public void AppendHeader(string name, string value) => response.AppendHeader(name, value);
 
 		public void RemoveHeader(string name) => response.Headers.Remove(name);
-
-		public void Send200Ok(string content)
-		{
-			RemoveHeader("Content-Type");
-			AppendHeader("Content-Type", "text/plain; charset=utf-8");
-			Send(content, HttpStatusCode.OK);
-		}
-
-		public void Send500InternalServerError(string content)
-		{
-			KeepAlive = false;
-			RemoveHeader("Content-Type");
-			AppendHeader("Content-Type", "text/plain; charset=utf-8");
-			Send(content, HttpStatusCode.InternalServerError);
-		}
-
-		public void Send400BadRequest(string content)
-		{
-			KeepAlive = false;
-			RemoveHeader("Content-Type");
-			AppendHeader("Content-Type", "text/plain; charset=utf-8");
-			Send(content, HttpStatusCode.BadRequest);
-		}
-
-		public void Send404NotFound(string content)
-		{
-			KeepAlive = false;
-			RemoveHeader("Content-Type");
-			AppendHeader("Content-Type", "text/plain; charset=utf-8");
-			Send(content, HttpStatusCode.NotFound);
-		}
-
-		public void SendJson<T>(T content)
-		{
-			SendJson(content, HttpStatusCode.OK);
-		}
-
-		public void SendJson<T>(T content, HttpStatusCode code)
-		{
-			RemoveHeader("Content-Type");
-			AddHeader("Content-Type", "application/json");
-			Send(content.ToJson(), code);
-		}
 
 		public void Send(string content, HttpStatusCode code)
 		{
@@ -125,15 +81,15 @@ namespace Everest.Http
 		public void Send(string content, Encoding encoding)
 		{
 			var buffer = encoding.GetBytes(content);
-			if (buffer.Length >= compression.CompressionMinLength)
+			if (buffer.Length >= Compression.CompressionMinLength)
 			{
-				if (compression.TryCompress(ref buffer, out var enc))
+				if (Compression.TryCompress(ref buffer, out var enc))
 				{
 					RemoveHeader("Content-Encoding");
 					AddHeader("Content-Encoding", enc);
 				}
-			} 
-			
+			}
+
 			Send(buffer);
 		}
 
@@ -172,4 +128,51 @@ namespace Everest.Http
 			ResponseClosed = true;
 		}
 	}
+
+	public static class HttpResponseExtensions
+	{
+		public static void Send200Ok(this HttpResponse response, string content)
+		{
+			response.RemoveHeader("Content-Type");
+			response.AppendHeader("Content-Type", "text/plain; charset=utf-8");
+			response.Send(content, HttpStatusCode.OK);
+		}
+
+		public static void Send500InternalServerError(this HttpResponse response, string content)
+		{
+			response.KeepAlive = false;
+			response.RemoveHeader("Content-Type");
+			response.AppendHeader("Content-Type", "text/plain; charset=utf-8");
+			response.Send(content, HttpStatusCode.InternalServerError);
+		}
+
+		public static void Send400BadRequest(this HttpResponse response, string content)
+		{
+			response.KeepAlive = false;
+			response.RemoveHeader("Content-Type");
+			response.AppendHeader("Content-Type", "text/plain; charset=utf-8");
+			response.Send(content, HttpStatusCode.BadRequest);
+		}
+
+		public static void Send404NotFound(this HttpResponse response, string content)
+		{
+			response.KeepAlive = false;
+			response.RemoveHeader("Content-Type");
+			response.AppendHeader("Content-Type", "text/plain; charset=utf-8");
+			response.Send(content, HttpStatusCode.NotFound);
+		}
+
+		public static void SendJson<T>(this HttpResponse response, T content)
+		{
+			response.SendJson(content, HttpStatusCode.OK);
+		}
+
+		public static void SendJson<T>(this HttpResponse response, T content, HttpStatusCode code)
+		{
+			response.RemoveHeader("Content-Type");
+			response.AddHeader("Content-Type", "application/json");
+			response.Send(content.ToJson(), code);
+		}
+	}
+
 }
