@@ -174,5 +174,4 @@ namespace Everest.Http
 			response.Send(content.ToJson(), code);
 		}
 	}
-
 }
