@@ -14,10 +14,10 @@ namespace Everest.Shell
 		[RestRoute("GET", "welcome")]
 		public static void Welcome(HttpContext context)
 		{
-			//var service = context.GetGreetingsService();
-			//var greetings = service.Greet();
+			var service = context.GetGreetingsService();
+			var greetings = service.Greet();
 
-			//context.Response.SendJson(new { Message = greetings, From = "Everest", Success = true }); 
+			context.Response.SendJson(new { Message = greetings, From = "Everest", Success = true });
 		}
 
 		[HttpGet("welcome/{me}")]
@@ -58,7 +58,7 @@ namespace Everest.Shell
 				builder.SetMinimumLevel(LogLevel.Trace);
 			});
 			
-			using (var rest = RestServerBuilder.Build())
+			using (var rest = RestServerBuilder.Build(loggerFactory))
 			{
 				//If you want to register routes manually
 				//rest.RegisterRoute("GET", "welcome", context =>
