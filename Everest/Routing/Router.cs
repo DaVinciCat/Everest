@@ -28,7 +28,7 @@ namespace Everest.Routing
 		
 		public Action<HttpContext, Exception> ErrorHandler { get; set; } = (context, ex) =>
 		{
-			context.Response.SendInternalServerError($"Failed to process request: {context.Request.Description}.\r\n{ex.Message}");
+			context.Response.Send500InternalServerError($"Failed to process request: {context.Request.Description}.\r\n{ex.Message}");
 		};
 
 		public Router(IRouteSegmentBuilder builder, IRouteSegmentParser parser, ILogger<Router> logger)
@@ -46,7 +46,7 @@ namespace Everest.Routing
 				if (!ResolveRoute(context, out var route))
 				{
 					Logger.LogWarning($"{context.Request.Id} - Route not found");
-					context.Response.SendNotFound($"Requested route not found: {context.Request.Description}.");
+					context.Response.Send404NotFound($"Requested route not found: {context.Request.Description}.");
 					return;
 				}
 

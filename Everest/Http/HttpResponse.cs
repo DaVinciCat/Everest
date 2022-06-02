@@ -68,14 +68,14 @@ namespace Everest.Http
 
 		public void RemoveHeader(string name) => response.Headers.Remove(name);
 
-		public void SendOk(string content)
+		public void Send200Ok(string content)
 		{
 			RemoveHeader("Content-Type");
 			AppendHeader("Content-Type", "text/plain; charset=utf-8");
 			Send(content, HttpStatusCode.OK);
 		}
 
-		public void SendInternalServerError(string content)
+		public void Send500InternalServerError(string content)
 		{
 			KeepAlive = false;
 			RemoveHeader("Content-Type");
@@ -83,7 +83,7 @@ namespace Everest.Http
 			Send(content, HttpStatusCode.InternalServerError);
 		}
 
-		public void SendBadRequest(string content)
+		public void Send400BadRequest(string content)
 		{
 			KeepAlive = false;
 			RemoveHeader("Content-Type");
@@ -91,7 +91,7 @@ namespace Everest.Http
 			Send(content, HttpStatusCode.BadRequest);
 		}
 
-		public void SendNotFound(string content)
+		public void Send404NotFound(string content)
 		{
 			KeepAlive = false;
 			RemoveHeader("Content-Type");
