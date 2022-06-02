@@ -19,7 +19,7 @@ namespace Everest
 		public bool IsStarting { get; private set; }
 
 		public bool IsListening => listener.IsListening;
-		
+
 		public IRouter Router { get; }
 
 		public IRouteScanner RouteScanner { get; }
@@ -27,6 +27,8 @@ namespace Everest
 		public IServiceProvider ServiceProvider { get; private set; }
 
 		public IServiceCollection Services { get; }
+
+		public ICompressionProvider CompressionProvider { get; set; } = new CompressionProvider();
 
 		public PrefixCollection Prefixes { get; }
 
@@ -45,10 +47,10 @@ namespace Everest
 			RouteScanner = scanner;
 			Services = services;
 			Logger = logger;
-			
-			listener = new HttpListener(); 
+
+			listener = new HttpListener();
 			listenerThread = new Thread(ListenAsync);
-			
+
 			Prefixes = new PrefixCollection(listener.Prefixes);
 		}
 
@@ -119,11 +121,11 @@ namespace Everest
 					if (ServiceProvider == null)
 						ServiceProvider = Services.BuildServiceProvider();
 
-					var httpContext = new HttpContext(context)
-					{
-						Services = ServiceProvider.CreateScope().ServiceProvider
-					};
-
+					var request = new HttpRequest(context.Request);
+					var response = new HttpResponse(context.Response, CompressionProvider.GetCompression(request));
+					var services = ServiceProvider.CreateScope().ServiceProvider;
+					var httpContext = new HttpContext(request, response, services);
+						
 					ThreadPool.QueueUserWorkItem(ProcessRequestAsync, httpContext, false);
 				}
 				catch (HttpListenerException ex) when (ex.ErrorCode == 995 && (IsStopping || !IsListening))

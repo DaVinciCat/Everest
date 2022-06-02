@@ -48,13 +48,13 @@ namespace Everest.Http
 			set => response.ContentLength64 = value;
 		}
 
-		public Compression Compression { get; }
+		public ICompression Compression { get; }
 
 		public Stream OutputStream => response.OutputStream;
 
 		private readonly HttpListenerResponse response;
 			
-		public HttpResponse(HttpListenerResponse response, Compression compression)
+		public HttpResponse(HttpListenerResponse response, ICompression compression)
 		{
 			this.response = response;
 			Compression = compression;
@@ -81,13 +81,10 @@ namespace Everest.Http
 		public void Send(string content, Encoding encoding)
 		{
 			var buffer = encoding.GetBytes(content);
-			if (buffer.Length >= Compression.CompressionMinLength)
+			if (Compression.TryCompress(ref buffer, out var enc))
 			{
-				if (Compression.TryCompress(ref buffer, out var enc))
-				{
-					RemoveHeader("Content-Encoding");
-					AddHeader("Content-Encoding", enc);
-				}
+				RemoveHeader("Content-Encoding");
+				AddHeader("Content-Encoding", enc);
 			}
 
 			Send(buffer);

@@ -5,11 +5,16 @@ using System.IO.Compression;
 
 namespace Everest.Http
 {
-	public class Compression
+	public interface ICompression
+	{
+		bool TryCompress(ref byte[] content, out string encoding);
+	}
+
+	public class Compression : ICompression
 	{
 		public int CompressionMinLength { get; set; } = 2048;
 
-		private readonly Dictionary<string, Func<byte[], byte[]>> encodingActions = new()
+		public Dictionary<string, Func<byte[], byte[]>> Encoders = new()
 		{
 			{ "gzip", Gzip },
 			{ "deflate", Deflate }
@@ -24,11 +29,17 @@ namespace Everest.Http
 
 		public bool TryCompress(ref byte[] content, out string encoding)
 		{
+			if (content.Length < CompressionMinLength)
+			{
+				encoding = null;
+				return false;
+			}
+
 			encoding = string.Empty;
 
 			foreach (var enc in AcceptEncodings)
 			{
-				if (encodingActions.TryGetValue(enc, out var action))
+				if (Encoders.TryGetValue(enc, out var action))
 				{
 					content = action(content);
 					encoding = enc;
