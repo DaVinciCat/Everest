@@ -4,6 +4,8 @@ namespace Everest.Http
 {
 	public class HttpContext
 	{
+		public Guid Id { get; } = Guid.NewGuid();
+
 		public HttpRequest Request { get; }
 
 		public HttpResponse Response { get; }

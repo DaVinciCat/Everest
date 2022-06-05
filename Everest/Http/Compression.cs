@@ -7,12 +7,14 @@ namespace Everest.Http
 {
 	public interface ICompression
 	{
-		bool TryCompress(ref byte[] content, out string encoding);
+		bool TryCompress(byte[] content, out byte[] compressed, out string encoding);
 	}
 
 	public class Compression : ICompression
 	{
 		public int CompressionMinLength { get; set; } = 2048;
+		
+		public string[] AcceptEncodings { get; }
 
 		public Dictionary<string, Func<byte[], byte[]>> Encoders = new()
 		{
@@ -20,28 +22,27 @@ namespace Everest.Http
 			{ "deflate", Deflate }
 		};
 
-		public string[] AcceptEncodings { get; }
-
 		public Compression(string[] acceptEncodings)
 		{
 			AcceptEncodings = acceptEncodings;
 		}
 
-		public bool TryCompress(ref byte[] content, out string encoding)
+		public bool TryCompress(byte[] content, out byte[] compressed, out string encoding)
 		{
-			if (content.Length < CompressionMinLength)
-			{
-				encoding = null;
+			encoding = null;
+			compressed = new byte[] { };
+
+			if (content == null)
 				return false;
-			}
 
-			encoding = string.Empty;
-
+			if (content.Length < CompressionMinLength)
+				return false;
+			
 			foreach (var enc in AcceptEncodings)
 			{
 				if (Encoders.TryGetValue(enc, out var action))
 				{
-					content = action(content);
+					compressed = action(content);
 					encoding = enc;
 					return true;
 				}

@@ -8,9 +8,9 @@ namespace Everest.Http
 {
 	public class HttpResponse
 	{
-		public bool ResponseSent { get; private set; }
+		public bool IsSent { get; private set; }
 
-		public bool ResponseClosed { get; private set; }
+		public bool IsClosed { get; private set; }
 
 		public bool KeepAlive
 		{
@@ -48,16 +48,15 @@ namespace Everest.Http
 			set => response.ContentLength64 = value;
 		}
 
-		public ICompression Compression { get; }
-
-		public Stream OutputStream => response.OutputStream;
+		internal Stream OutputStream => response.OutputStream;
+		
+		public byte[] Body { get; private set; } 
 
 		private readonly HttpListenerResponse response;
 			
-		public HttpResponse(HttpListenerResponse response, ICompression compression)
+		public HttpResponse(HttpListenerResponse response)
 		{
 			this.response = response;
-			Compression = compression;
 			AppendHeader("Server", "Everest");
 		}
 
@@ -67,46 +66,47 @@ namespace Everest.Http
 
 		public void RemoveHeader(string name) => response.Headers.Remove(name);
 
-		public void Send(string content, HttpStatusCode code)
+		public void Write(string content, HttpStatusCode code)
 		{
-			Send(content, ContentEncoding, code);
+			Write(content, ContentEncoding, code);
 		}
 
-		public void Send(string content, Encoding encoding, HttpStatusCode code)
+		public void Write(string content, Encoding encoding, HttpStatusCode code)
 		{
 			StatusCode = code;
-			Send(content, encoding);
+			Write(content, encoding);
 		}
 
-		public void Send(string content, Encoding encoding)
+		public void Write(string content, Encoding encoding)
 		{
-			var buffer = encoding.GetBytes(content);
-			if (Compression.TryCompress(ref buffer, out var enc))
-			{
-				RemoveHeader("Content-Encoding");
-				AddHeader("Content-Encoding", enc);
-			}
-
-			Send(buffer);
+			Body = encoding.GetBytes(content);
 		}
 
-		public void Send(byte[] content)
+		public void Write(byte[] content)
+		{
+			Body = content;
+		}
+
+		public void Send()
 		{
 			try
 			{
-				if (ResponseSent)
+				if (IsSent)
 					throw new InvalidOperationException("Response is already sent.");
 
-				if (ResponseClosed)
+				if (IsClosed)
 					throw new InvalidOperationException("Response is closed.");
 
 				if (!OutputStream.CanWrite)
 					throw new NotSupportedException("Response stream does not support writing.");
 
-				ContentLength64 = content.Length;
-				OutputStream.Write(content, 0, content.Length);
-
-				ResponseSent = true;
+				if (Body != null)
+				{
+					ContentLength64 = Body.Length;
+					OutputStream.Write(Body, 0, Body.Length);
+				}
+				
+				IsSent = true;
 			}
 			finally
 			{
@@ -119,56 +119,56 @@ namespace Everest.Http
 
 		public void Close()
 		{
-			if (!ResponseClosed)
+			if (!IsClosed)
 				response.Close();
 
-			ResponseClosed = true;
+			IsClosed = true;
 		}
 	}
 
 	public static class HttpResponseExtensions
 	{
-		public static void Send200Ok(this HttpResponse response, string content)
+		public static void Write200Ok(this HttpResponse response, string content)
 		{
 			response.RemoveHeader("Content-Type");
 			response.AppendHeader("Content-Type", "text/plain; charset=utf-8");
-			response.Send(content, HttpStatusCode.OK);
+			response.Write(content, HttpStatusCode.OK);
 		}
 
-		public static void Send500InternalServerError(this HttpResponse response, string content)
+		public static void Write500InternalServerError(this HttpResponse response, string content)
 		{
 			response.KeepAlive = false;
 			response.RemoveHeader("Content-Type");
 			response.AppendHeader("Content-Type", "text/plain; charset=utf-8");
-			response.Send(content, HttpStatusCode.InternalServerError);
+			response.Write(content, HttpStatusCode.InternalServerError);
 		}
 
-		public static void Send400BadRequest(this HttpResponse response, string content)
+		public static void Write400BadRequest(this HttpResponse response, string content)
 		{
 			response.KeepAlive = false;
 			response.RemoveHeader("Content-Type");
 			response.AppendHeader("Content-Type", "text/plain; charset=utf-8");
-			response.Send(content, HttpStatusCode.BadRequest);
+			response.Write(content, HttpStatusCode.BadRequest);
 		}
 
-		public static void Send404NotFound(this HttpResponse response, string content)
+		public static void Write404NotFound(this HttpResponse response, string content)
 		{
 			response.KeepAlive = false;
 			response.RemoveHeader("Content-Type");
 			response.AppendHeader("Content-Type", "text/plain; charset=utf-8");
-			response.Send(content, HttpStatusCode.NotFound);
+			response.Write(content, HttpStatusCode.NotFound);
 		}
 
-		public static void SendJson<T>(this HttpResponse response, T content)
+		public static void WriteJson<T>(this HttpResponse response, T content)
 		{
-			response.SendJson(content, HttpStatusCode.OK);
+			response.WriteJson(content, HttpStatusCode.OK);
 		}
 
-		public static void SendJson<T>(this HttpResponse response, T content, HttpStatusCode code)
+		public static void WriteJson<T>(this HttpResponse response, T content, HttpStatusCode code)
 		{
 			response.RemoveHeader("Content-Type");
 			response.AddHeader("Content-Type", "application/json");
-			response.Send(content.ToJson(), code);
+			response.Write(content.ToJson(), code);
 		}
 	}
 }

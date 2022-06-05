@@ -9,7 +9,7 @@ namespace Everest.Routing
 {
 	public interface IRouter
 	{
-		void Route(HttpContext context);
+		bool TryRoute(HttpContext context);
 
 		void RegisterRoute(string httpMethod, string routePattern, Action<HttpContext> action);
 
@@ -19,17 +19,12 @@ namespace Everest.Routing
 	public class Router : IRouter
 	{
 		public ILogger<Router> Logger { get; }
-		
-		public IRouteSegmentBuilder RouteBuilder { get; } 
+
+		public IRouteSegmentBuilder RouteBuilder { get; }
 
 		public IRouteSegmentParser RouteParser { get; }
-		
+
 		private readonly Dictionary<string, Dictionary<RouteSegment, Route>> methods = new();
-		
-		public Action<HttpContext, Exception> ErrorHandler { get; set; } = (context, ex) =>
-		{
-			context.Response.Send500InternalServerError($"Failed to process request: {context.Request.Description}.\r\n{ex.Message}");
-		};
 
 		public Router(IRouteSegmentBuilder builder, IRouteSegmentParser parser, ILogger<Router> logger)
 		{
@@ -38,38 +33,19 @@ namespace Everest.Routing
 			Logger = logger;
 		}
 
-		public void Route(HttpContext context)
+		public bool TryRoute(HttpContext context)
 		{
-			try
+			Logger.LogTrace($"{context.Id} - Routing request for: {context.Request.Description}");
+			if (!ResolveRoute(context, out var route))
 			{
-				Logger.LogTrace($"{context.Request.Id} - Routing request for: {context.Request.Description}");
-				if (!ResolveRoute(context, out var route))
-				{
-					Logger.LogWarning($"{context.Request.Id} - Route not found");
-					context.Response.Send404NotFound($"Requested route not found: {context.Request.Description}.");
-					return;
-				}
+				Logger.LogWarning($"{context.Id} - Route not found");
+				return false;
+			}
 
-				Logger.LogTrace($"{context.Request.Id} - Routing from: {context.Request.Description}	to: {route.Description}");
-				route.Invoke(context);
-				Logger.LogTrace($"{context.Request.Id} - Routing complete");
-			}
-			catch (Exception ex)
-			{
-				try
-				{
-					Logger.LogError(ex, $"{context.Request.Id} - Routing failed");
-					ErrorHandler?.Invoke(context, ex);
-				}
-				catch (Exception e)
-				{
-					Logger.LogError(e, $"{context.Request.Id} - Routing error handling failed");
-				}
-			}
-			finally
-			{
-				context.Response.Close();
-			}
+			Logger.LogTrace($"{context.Id} - Routing from: {context.Request.Description}	to: {route.Description}");
+			route.Invoke(context);
+			Logger.LogTrace($"{context.Id} - Routing complete");
+			return true;
 		}
 
 		public void RegisterRoute(string httpMethod, string routePattern, Action<HttpContext> action)
@@ -93,7 +69,7 @@ namespace Everest.Routing
 
 			Logger.LogTrace($"Route registered - {route.Description}");
 		}
-		
+
 		private bool ResolveRoute(HttpContext context, out Route route)
 		{
 			route = null;

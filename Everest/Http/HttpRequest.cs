@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Specialized;
+﻿using System.Collections.Specialized;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -8,8 +7,6 @@ namespace Everest.Http
 {
 	public class HttpRequest
 	{
-		public Guid Id => request.RequestTraceIdentifier;	
-
 		public string HttpMethod => request.HttpMethod;
 
 		public bool HasEntityBody => request.HasEntityBody;

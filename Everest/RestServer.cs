@@ -1,8 +1,10 @@
 ﻿using Everest.Http;
-using Everest.Routing;
 using System;
 using System.Net;
 using System.Threading;
+using Everest.Middleware;
+using Everest.Routing;
+using Everest.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -20,32 +22,24 @@ namespace Everest
 
 		public bool IsListening => listener.IsListening;
 
-		public IRouter Router { get; }
+		internal IServiceProvider ServiceProvider { get; }
 
-		public IRouteScanner RouteScanner { get; }
-
-		public IServiceProvider ServiceProvider { get; private set; }
-
-		public IServiceCollection Services { get; }
-
-		public ICompressionProvider CompressionProvider { get; set; } = new CompressionProvider();
+		internal AggregateMiddleware Middleware { get; } = new();
 
 		public PrefixCollection Prefixes { get; }
-
+		
 		private readonly HttpListener listener;
 
 		private readonly Thread listenerThread;
-
-		public RestServer(IRouter router, IRouteScanner scanner, IServiceCollection services, ILogger<RestServer> logger)
+		
+		public RestServer(IServiceProvider serviceProvider, ILogger<RestServer> logger)
 		{
 			if (!HttpListener.IsSupported)
 			{
 				throw new NotSupportedException($"This OS does not support {nameof(HttpListener)} class.");
 			}
 
-			Router = router;
-			RouteScanner = scanner;
-			Services = services;
+			ServiceProvider = serviceProvider;
 			Logger = logger;
 
 			listener = new HttpListener();
@@ -117,12 +111,8 @@ namespace Everest
 				try
 				{
 					var context = await listener.GetContextAsync();
-
-					if (ServiceProvider == null)
-						ServiceProvider = Services.BuildServiceProvider();
-
 					var request = new HttpRequest(context.Request);
-					var response = new HttpResponse(context.Response, CompressionProvider.GetCompression(request));
+					var response = new HttpResponse(context.Response);
 					var services = ServiceProvider.CreateScope().ServiceProvider;
 					var httpContext = new HttpContext(request, response, services);
 						
@@ -141,7 +131,21 @@ namespace Everest
 
 		private void ProcessRequestAsync(HttpContext context)
 		{
-			Router.Route(context);
+			try
+			{
+				Middleware.Invoke(context);
+
+				if (!context.Response.IsSent && !context.Response.IsClosed)
+					context.Response.Send();
+			}
+			catch (Exception ex)
+			{
+				Logger.LogCritical(ex, "Failed to process incoming request");
+			}
+			finally
+			{
+				context.Response.Close();
+			}
 		}
 
 		public void Dispose()
@@ -157,6 +161,49 @@ namespace Everest
 			{
 				IsDisposed = true;
 			}
+		}
+	}
+
+	public static class RestServerExtensions
+	{
+		public static RestServer AddPrefix(this RestServer server, string prefix)
+		{
+			server.Prefixes.Add(prefix);
+			return server;
+		}
+
+		public static RestServer AddPrefixes(this RestServer server, string[] prefixes)
+		{
+			foreach (var prefix in prefixes)
+			{
+				server.Prefixes.Add(prefix);
+			}
+
+			return server;
+		}
+
+		public static RestServer UseMiddleware(this RestServer server, IMiddleware middleware)
+		{
+			server.Middleware.AddMiddleware(middleware);
+			return server;
+		}
+
+		public static RestServer UseExceptionHandlingMiddleware(this RestServer server, ILogger<ExceptionHandlingMiddleware> logger)
+		{
+			server.Middleware.AddMiddleware(new ExceptionHandlingMiddleware(logger));
+			return server;
+		}
+
+		public static RestServer UseRoutingMiddleware(this RestServer server, IRouter router)
+		{
+			server.Middleware.AddMiddleware(new RoutingMiddleware(router));
+			return server;
+		}
+
+		public static RestServer UseCompressionMiddleware(this RestServer server, ICompressionProvider provider)
+		{
+			server.Middleware.AddMiddleware(new CompressionMiddleware(provider));
+			return server;
 		}
 	}
 }
