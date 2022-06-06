@@ -79,6 +79,7 @@ namespace Everest
 			server.UseExceptionHandlingMiddleware(LoggerFactory.CreateLogger<ExceptionHandlingMiddleware>());
 			server.UseRoutingMiddleware(Router);
 			server.UseCompressionMiddleware(CompressionProvider);
+			server.UseCorsMiddleware();
 
 			return server;
 		}

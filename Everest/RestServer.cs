@@ -205,5 +205,11 @@ namespace Everest
 			server.Middleware.AddMiddleware(new CompressionMiddleware(provider));
 			return server;
 		}
+
+		public static RestServer UseCorsMiddleware(this RestServer server)
+		{
+			server.Middleware.AddMiddleware(new CorsMiddleware());
+			return server;
+		}
 	}
 }
