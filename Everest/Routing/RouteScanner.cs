@@ -39,7 +39,7 @@ namespace Everest.Routing
 					{
 						var action = (Action<HttpContext>)method.CreateDelegate(typeof(Action<HttpContext>), null);
 						var route = new Route(attribute.HttpMethod, $"{routePrefix}/{attribute.RoutePattern}", action);
-						Logger.LogTrace($"Route found	- {route.Description} at {type}.{method.Name}()");
+						Logger.LogTrace($"Route found - {route.Description} at {type}.{method.Name}()");
 						count++;
 
 						yield return route;
