@@ -36,7 +36,7 @@ namespace Everest.Shell
 			using var rest = new RestServerBuilder()
 				.UseConsoleLogger()
 				.RegisterTransientService(() => new GreetingsService())
-				.ScanRoutes(Assembly.GetCallingAssembly())
+				.ScanRoutes(Assembly.GetExecutingAssembly())
 				.Build();
 
 			rest.AddPrefix("http://localhost:8080/")
