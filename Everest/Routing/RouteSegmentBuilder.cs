@@ -14,7 +14,7 @@ namespace Everest.Routing
 	
 	public class RouteSegmentBuilder : IRouteSegmentBuilder
 	{
-		public char[] Delimiters { get; } = { '/', '#', '?' };
+		public char[] Delimiters { get; } = { '/' };
 
 		public Dictionary<string, BuildRouteSegment> Builders { get; } = new()
 		{

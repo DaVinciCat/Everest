@@ -11,7 +11,7 @@ namespace Everest.Routing
 
 	public class RouteEndPointParser : IRouteEndPointParser
 	{
-		public char[] Delimiters { get; } = { '/', '#' };
+		public char[] Delimiters { get; } = { '/' };
 
 		public bool TryParse(RouteSegment segment, string endPoint, NameValueCollection parameters = null)
 		{
