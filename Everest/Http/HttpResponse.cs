@@ -1,8 +1,8 @@
-﻿using Everest.Utils;
-using System;
+﻿using System;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Text.Json;
 
 namespace Everest.Http
 {
@@ -66,12 +66,12 @@ namespace Everest.Http
 
 		public void RemoveHeader(string name) => response.Headers.Remove(name);
 
-		public void Write(string content, HttpStatusCode code)
+		public void Write(HttpStatusCode code, string content)
 		{
-			Write(content, ContentEncoding, code);
+			Write(code, content, ContentEncoding);
 		}
 
-		public void Write(string content, Encoding encoding, HttpStatusCode code)
+		public void Write(HttpStatusCode code, string content, Encoding encoding)
 		{
 			StatusCode = code;
 			Write(content, encoding);
@@ -132,7 +132,7 @@ namespace Everest.Http
 		{
 			response.RemoveHeader("Content-Type");
 			response.AppendHeader("Content-Type", "text/plain; charset=utf-8");
-			response.Write(content, HttpStatusCode.OK);
+			response.Write(HttpStatusCode.OK, content);
 		}
 
 		public static void Write500InternalServerError(this HttpResponse response, string content)
@@ -140,7 +140,7 @@ namespace Everest.Http
 			response.KeepAlive = false;
 			response.RemoveHeader("Content-Type");
 			response.AppendHeader("Content-Type", "text/plain; charset=utf-8");
-			response.Write(content, HttpStatusCode.InternalServerError);
+			response.Write(HttpStatusCode.InternalServerError, content);
 		}
 
 		public static void Write400BadRequest(this HttpResponse response, string content)
@@ -148,7 +148,7 @@ namespace Everest.Http
 			response.KeepAlive = false;
 			response.RemoveHeader("Content-Type");
 			response.AppendHeader("Content-Type", "text/plain; charset=utf-8");
-			response.Write(content, HttpStatusCode.BadRequest);
+			response.Write(HttpStatusCode.BadRequest, content);
 		}
 
 		public static void Write404NotFound(this HttpResponse response, string content)
@@ -156,19 +156,34 @@ namespace Everest.Http
 			response.KeepAlive = false;
 			response.RemoveHeader("Content-Type");
 			response.AppendHeader("Content-Type", "text/plain; charset=utf-8");
-			response.Write(content, HttpStatusCode.NotFound);
+			response.Write(HttpStatusCode.NotFound, content);
 		}
 
 		public static void WriteJson<T>(this HttpResponse response, T content)
 		{
-			response.WriteJson(content, HttpStatusCode.OK);
+			response.WriteJson(HttpStatusCode.OK, content);
 		}
 
-		public static void WriteJson<T>(this HttpResponse response, T content, HttpStatusCode code)
+		public static void WriteJson<T>(this HttpResponse response, HttpStatusCode code, T content)
+		{
+			response.WriteJson(code, content, c => JsonSerializer.Serialize(c));
+		}
+
+		public static void WriteJson<T>(this HttpResponse response, HttpStatusCode code, T content, JsonSerializerOptions options)
+		{
+			response.WriteJson(code, content, c => JsonSerializer.Serialize(c, options));
+		}
+
+		public static void WriteJson<T>(this HttpResponse response, T content, Func<T, string> convert)
+		{
+			response.WriteJson(HttpStatusCode.OK, content, convert);
+		}
+
+		public static void WriteJson<T>(this HttpResponse response, HttpStatusCode code, T content, Func<T, string> convert)
 		{
 			response.RemoveHeader("Content-Type");
 			response.AddHeader("Content-Type", "application/json");
-			response.Write(content.ToJson(), code);
+			response.Write(code, convert(content));
 		}
 	}
 }

@@ -9,7 +9,7 @@ namespace Everest.Http
 	{
 		public string HttpMethod => request.HttpMethod;
 
-		public bool HasEntityBody => request.HasEntityBody;
+		public bool HasPayload => request.HasEntityBody;
 
 		public string EndPoint => request.Url?.AbsolutePath;
 
@@ -25,6 +25,10 @@ namespace Everest.Http
 
 		public ParameterCollection PathParameters { get; internal set; }
 
+		public string Payload => payload ??= ReadPayload();
+
+		private string payload;
+
 		private readonly HttpListenerRequest request;
 
 		public HttpRequest(HttpListenerRequest request)
@@ -34,7 +38,7 @@ namespace Everest.Http
 			PathParameters = new ParameterCollection();
 		}
 
-		public string ReadEntityBody()
+		private string ReadPayload()
 		{
 			if (!request.HasEntityBody)
 				return null;
