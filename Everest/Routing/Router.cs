@@ -22,11 +22,11 @@ namespace Everest.Routing
 
 		public IRouteSegmentBuilder RouteBuilder { get; }
 
-		public IRouteSegmentParser RouteParser { get; }
+		public IRouteEndPointParser RouteParser { get; }
 
 		private readonly Dictionary<string, Dictionary<RouteSegment, Route>> methods = new();
 
-		public Router(IRouteSegmentBuilder builder, IRouteSegmentParser parser, ILogger<Router> logger)
+		public Router(IRouteSegmentBuilder builder, IRouteEndPointParser parser, ILogger<Router> logger)
 		{
 			RouteBuilder = builder;
 			RouteParser = parser;
@@ -75,7 +75,7 @@ namespace Everest.Routing
 			route = null;
 
 			var httpMethod = context.Request.HttpMethod;
-			var url = context.Request.EndPoint;
+			var endPoint = context.Request.EndPoint;
 
 			if (!methods.TryGetValue(httpMethod, out var routes))
 				return false;
@@ -83,7 +83,7 @@ namespace Everest.Routing
 			foreach (var (key, value) in routes)
 			{
 				var parameters = new NameValueCollection();
-				if (RouteParser.TryParse(key, url, parameters))
+				if (RouteParser.TryParse(key, endPoint, parameters))
 				{
 					context.Request.PathParameters = new ParameterCollection(parameters);
 					route = value;

@@ -29,7 +29,7 @@ namespace Everest
 
 		public IRouter Router
 		{
-			get => mRouter ??= new Router(new RouteSegmentBuilder(), new RouteSegmentParser(), LoggerFactory.CreateLogger<Router>());
+			get => mRouter ??= new Router(new RouteSegmentBuilder(), new RouteEndPointParser(), LoggerFactory.CreateLogger<Router>());
 			private set => mRouter = value;
 		}
 

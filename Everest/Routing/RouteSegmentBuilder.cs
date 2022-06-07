@@ -14,6 +14,8 @@ namespace Everest.Routing
 	
 	public class RouteSegmentBuilder : IRouteSegmentBuilder
 	{
+		public char[] Delimiters { get; } = { '/', '#', '?' };
+
 		public Dictionary<string, BuildRouteSegment> Builders { get; } = new()
 		{
 			{ AlphaNumericRouteSegment.Pattern, (value, next) => new AlphaNumericRouteSegment(value, next) },
@@ -30,7 +32,7 @@ namespace Everest.Routing
 			if (string.IsNullOrEmpty(routePattern))
 				throw new ArgumentNullException(nameof(routePattern), "Route pattern required.");
 
-			var segments = routePattern.TrimStart('/').TrimEnd('/').Split('/');
+			var segments = routePattern.Split(Delimiters, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 			var iterator = new Iterator<string>(segments);
 
 			return BuildImpl();
