@@ -166,24 +166,24 @@ namespace Everest.Http
 
 		public static void WriteJson<T>(this HttpResponse response, HttpStatusCode code, T content)
 		{
-			response.WriteJson(code, content, c => JsonSerializer.Serialize(c));
+			response.WriteJson(code, JsonSerializer.Serialize(content));
 		}
 
 		public static void WriteJson<T>(this HttpResponse response, HttpStatusCode code, T content, JsonSerializerOptions options)
 		{
-			response.WriteJson(code, content, c => JsonSerializer.Serialize(c, options));
+			response.WriteJson(code, JsonSerializer.Serialize(content, options));
 		}
 
-		public static void WriteJson<T>(this HttpResponse response, T content, Func<T, string> convert)
+		public static void WriteJson(this HttpResponse response, string json)
 		{
-			response.WriteJson(HttpStatusCode.OK, content, convert);
+			response.WriteJson(HttpStatusCode.OK, json);
 		}
 
-		public static void WriteJson<T>(this HttpResponse response, HttpStatusCode code, T content, Func<T, string> convert)
+		public static void WriteJson(this HttpResponse response, HttpStatusCode code, string json)
 		{
 			response.RemoveHeader("Content-Type");
 			response.AddHeader("Content-Type", "application/json");
-			response.Write(code, convert(content));
+			response.Write(code, json);
 		}
 	}
 }
