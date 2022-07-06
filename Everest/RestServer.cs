@@ -206,6 +206,12 @@ namespace Everest
 			return server;
 		}
 
+		public static RestServer UseCorsPreflightMiddleware(this RestServer server)
+		{
+			server.Middleware.AddMiddleware(new CorsPreflightMiddleware());
+			return server;
+		}
+
 		public static RestServer UseCorsMiddleware(this RestServer server)
 		{
 			server.Middleware.AddMiddleware(new CorsMiddleware());
