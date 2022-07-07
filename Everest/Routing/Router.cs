@@ -9,11 +9,13 @@ namespace Everest.Routing
 {
 	public interface IRouter
 	{
-		bool TryRoute(HttpContext context);
-
 		void RegisterRoute(string httpMethod, string routePattern, Action<HttpContext> action);
 
 		void RegisterRoute(Route route);
+
+		bool TryResolveRoute(HttpContext context, out Route route);
+
+		void InvokeRoute(HttpContext context, Route route);
 	}
 
 	public class Router : IRouter
@@ -32,22 +34,7 @@ namespace Everest.Routing
 			RouteMatcher = matcher;
 			Logger = logger;
 		}
-
-		public bool TryRoute(HttpContext context)
-		{
-			Logger.LogTrace($"{context.Id} - Routing request for: {context.Request.Description}");
-			if (!ResolveRoute(context, out var route))
-			{
-				Logger.LogWarning($"{context.Id} - Route not found");
-				return false;
-			}
-
-			Logger.LogTrace($"{context.Id} - Routing from: {context.Request.Description}	to: {route.Description}");
-			route.Invoke(context);
-			Logger.LogTrace($"{context.Id} - Routing complete");
-			return true;
-		}
-
+		
 		public void RegisterRoute(string httpMethod, string routePattern, Action<HttpContext> action)
 		{
 			RegisterRoute(new Route(httpMethod, routePattern, action));
@@ -70,7 +57,27 @@ namespace Everest.Routing
 			Logger.LogTrace($"Route registered - {route.Description}");
 		}
 
-		private bool ResolveRoute(HttpContext context, out Route route)
+		public void InvokeRoute(HttpContext context, Route route)
+		{
+			Logger.LogTrace($"{context.Id} - Routing from: {context.Request.Description}	to: {route.Description}");
+			route.Invoke(context);
+			Logger.LogTrace($"{context.Id} - Routing complete");
+		}
+
+		public bool TryResolveRoute(HttpContext context, out Route route)
+		{
+			Logger.LogTrace($"{context.Id} - Routing request for: {context.Request.Description}");
+			if (!TryResolveRouteImpl(context, out route))
+			{
+				Logger.LogWarning($"{context.Id} - Route not found");
+				return false;
+			}
+
+			Logger.LogTrace($"{context.Id} - Route found: {route.Description}");
+			return true;
+		}
+
+		private bool TryResolveRouteImpl(HttpContext context, out Route route)
 		{
 			route = null;
 

@@ -26,9 +26,12 @@ namespace Everest.Middleware
 
 		public override void Invoke(HttpContext context)
 		{
-			context.Response.AddHeader("Access-Control-Allow-Headers", headers.AllowHeaders);
-			context.Response.AddHeader("Access-Control-Allow-Origin", headers.Origin);
-
+			if (!context.IsCorsPreflight())
+			{
+				context.Response.AddHeader("Access-Control-Allow-Headers", headers.AllowHeaders);
+				context.Response.AddHeader("Access-Control-Allow-Origin", headers.Origin);
+			}
+			
 			if (HasNext)
 				Next.Invoke(context);
 		}

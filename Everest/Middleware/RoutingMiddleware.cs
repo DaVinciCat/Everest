@@ -1,4 +1,5 @@
-﻿using Everest.Http;
+﻿using Everest.Features;
+using Everest.Http;
 using Everest.Routing;
 using Everest.Utils;
 
@@ -15,10 +16,15 @@ namespace Everest.Middleware
 
 		public override void Invoke(HttpContext context)
 		{
-			if (!router.TryRoute(context))
+			if (!context.IsCorsPreflight())
 			{
-				context.Response.Write404NotFound($"Requested route not found: {context.Request.Description}.");
-				return;
+				if (!router.TryResolveRoute(context, out var route))
+				{
+					context.Response.Write404NotFound($"Requested route not found: {context.Request.Description}.");
+					return;
+				}
+
+				context.Features.Set<IRouteFeature>(new RouteFeature(route));
 			}
 			
 			if (HasNext)

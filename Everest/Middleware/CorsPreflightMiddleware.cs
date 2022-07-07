@@ -36,10 +36,7 @@ namespace Everest.Middleware
 
 		public override void Invoke(HttpContext context)
 		{
-			if (HttpMethodIsOptions(context) &&
-				HasAccessControlRequestMethodHeader(context) &&
-				HasAccessControlRequestHeadersHeader(context) &&
-				HasOriginHeader(context))
+			if (context.IsCorsPreflight())
 			{
 				context.Response.AddHeader("Access-Control-Allow-Methods", headers.AllowMethods);
 				context.Response.AddHeader("Access-Control-Allow-Headers", headers.AllowHeaders);
@@ -47,34 +44,13 @@ namespace Everest.Middleware
 				context.Response.AddHeader("Access-Control-Max-Age", headers.MaxAge);
 
 				context.Response.StatusCode = HttpStatusCode.NoContent;
-
 				return;
 			}
 
 			if (HasNext)
 				Next.Invoke(context);
 		}
-
-		private static bool HttpMethodIsOptions(HttpContext context)
-		{
-			return context.Request.HttpMethod == "OPTIONS";
-		}
-
-		private static bool HasAccessControlRequestMethodHeader(HttpContext context)
-		{
-			return context.Request.Headers["Access-Control-Request-Method"] != null;
-		}
-
-		private static bool HasAccessControlRequestHeadersHeader(HttpContext context)
-		{
-			return context.Request.Headers["Access-Control-Request-Headers"] != null;
-		}
-
-		private static bool HasOriginHeader(HttpContext context)
-		{
-			return context.Request.Headers["Origin"] != null;
-		}
-
+		
 		private class Headers
 		{
 			public string AllowMethods { get; }

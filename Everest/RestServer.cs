@@ -113,8 +113,9 @@ namespace Everest
 					var context = await listener.GetContextAsync();
 					var request = new HttpRequest(context.Request);
 					var response = new HttpResponse(context.Response);
+					var features = new FeatureCollection();
 					var services = ServiceProvider.CreateScope().ServiceProvider;
-					var httpContext = new HttpContext(request, response, services);
+					var httpContext = new HttpContext(request, response, features, services);
 						
 					ThreadPool.QueueUserWorkItem(ProcessRequestAsync, httpContext, false);
 				}
@@ -197,6 +198,12 @@ namespace Everest
 		public static RestServer UseRoutingMiddleware(this RestServer server, IRouter router)
 		{
 			server.Middleware.AddMiddleware(new RoutingMiddleware(router));
+			return server;
+		}
+
+		public static RestServer UseEndPointMiddleware(this RestServer server, IRouter router)
+		{
+			server.Middleware.AddMiddleware(new EndPointMiddleware(router));
 			return server;
 		}
 

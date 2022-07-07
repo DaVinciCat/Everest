@@ -13,10 +13,10 @@ namespace Everest.Tests
 			const string endPoint = "/";
 
 			var builder = new RouteSegmentBuilder();
-			var parser = new RouteSegmentMatcher();
+			var matcher = new RouteSegmentMatcher();
 			var segment = builder.Build(pattern);
 
-			Assert.False(parser.TryMatch(segment, endPoint, new NameValueCollection()));
+			Assert.False(matcher.TryMatch(segment, endPoint, new NameValueCollection()));
 		}
 
 		[Fact]
@@ -26,10 +26,10 @@ namespace Everest.Tests
 			const string endPoint = "/foo/bar";
 
 			var builder = new RouteSegmentBuilder();
-			var parser = new RouteSegmentMatcher();
+			var matcher = new RouteSegmentMatcher();
 			var segment = builder.Build(pattern);
 
-			Assert.True(parser.TryMatch(segment, endPoint, new NameValueCollection()));
+			Assert.True(matcher.TryMatch(segment, endPoint, new NameValueCollection()));
 		}
 
 		[Fact]
@@ -39,10 +39,10 @@ namespace Everest.Tests
 			const string endPoint = "/bar";
 
 			var builder = new RouteSegmentBuilder();
-			var parser = new RouteSegmentMatcher();
+			var matcher = new RouteSegmentMatcher();
 			var segment = builder.Build(pattern);
 
-			Assert.False(parser.TryMatch(segment, endPoint, new NameValueCollection()));
+			Assert.False(matcher.TryMatch(segment, endPoint, new NameValueCollection()));
 		}
 
 		[Fact]
@@ -52,10 +52,10 @@ namespace Everest.Tests
 			const string endPoint = "/foo/baz";
 
 			var builder = new RouteSegmentBuilder();
-			var parser = new RouteSegmentMatcher();
+			var matcher = new RouteSegmentMatcher();
 			var segment = builder.Build(pattern);
 
-			Assert.False(parser.TryMatch(segment, endPoint, new NameValueCollection()));
+			Assert.False(matcher.TryMatch(segment, endPoint, new NameValueCollection()));
 		}
 
 		[Fact]
@@ -65,11 +65,11 @@ namespace Everest.Tests
 			const string endPoint = "/foo/bar/1";
 
 			var builder = new RouteSegmentBuilder();
-			var parser = new RouteSegmentMatcher();
+			var matcher = new RouteSegmentMatcher();
 			var segment = builder.Build(pattern);
 			var parameters = new NameValueCollection();
 
-			Assert.True(parser.TryMatch(segment, endPoint, parameters));
+			Assert.True(matcher.TryMatch(segment, endPoint, parameters));
 			Assert.True(parameters["id"] != null);
 			Assert.True(parameters["id"] == "1");
 		}
@@ -81,11 +81,11 @@ namespace Everest.Tests
 			const string endPoint = "/foo/1/bar/2";
 
 			var builder = new RouteSegmentBuilder();
-			var parser = new RouteSegmentMatcher();
+			var matcher = new RouteSegmentMatcher();
 			var segment = builder.Build(pattern);
 			var parameters = new NameValueCollection();
 
-			Assert.True(parser.TryMatch(segment, endPoint, parameters));
+			Assert.True(matcher.TryMatch(segment, endPoint, parameters));
 			Assert.True(parameters["id1"] != null);
 			Assert.True(parameters["id1"] == "1");
 
@@ -100,11 +100,11 @@ namespace Everest.Tests
 			const string endPoint = "/foo/1";
 
 			var builder = new RouteSegmentBuilder();
-			var parser = new RouteSegmentMatcher();
+			var matcher = new RouteSegmentMatcher();
 			var segment = builder.Build(pattern);
 			var parameters = new NameValueCollection();
 
-			Assert.False(parser.TryMatch(segment, endPoint, parameters));
+			Assert.False(matcher.TryMatch(segment, endPoint, parameters));
 		}
 
 		[Fact]
@@ -114,10 +114,10 @@ namespace Everest.Tests
 			const string endPoint = "/foo/bar?id=1";
 
 			var builder = new RouteSegmentBuilder();
-			var parser = new RouteSegmentMatcher();
+			var matcher = new RouteSegmentMatcher();
 			var segment = builder.Build(pattern);
 
-			Assert.False(parser.TryMatch(segment, endPoint, new NameValueCollection()));
+			Assert.False(matcher.TryMatch(segment, endPoint, new NameValueCollection()));
 		}
 
 		[Fact]
@@ -127,11 +127,11 @@ namespace Everest.Tests
 			const string endPoint = "/foo/bar/1";
 
 			var builder = new RouteSegmentBuilder();
-			var parser = new RouteSegmentMatcher();
+			var matcher = new RouteSegmentMatcher();
 			var segment = builder.Build(pattern);
 			var parameters = new NameValueCollection();
 
-			Assert.True(parser.TryMatch(segment, endPoint, parameters));
+			Assert.True(matcher.TryMatch(segment, endPoint, parameters));
 			Assert.True(parameters["id"] != null);
 			Assert.True(parameters["id"] == "1");
 		}
@@ -143,11 +143,11 @@ namespace Everest.Tests
 			const string endPoint = "/foo/bar/1.10";
 
 			var builder = new RouteSegmentBuilder();
-			var parser = new RouteSegmentMatcher();
+			var matcher = new RouteSegmentMatcher();
 			var segment = builder.Build(pattern);
 			var parameters = new NameValueCollection();
 
-			Assert.False(parser.TryMatch(segment, endPoint, parameters));
+			Assert.False(matcher.TryMatch(segment, endPoint, parameters));
 		}
 
 		[Fact]
@@ -157,11 +157,11 @@ namespace Everest.Tests
 			const string endPoint = "/foo/bar/abc";
 
 			var builder = new RouteSegmentBuilder();
-			var parser = new RouteSegmentMatcher();
+			var matcher = new RouteSegmentMatcher();
 			var segment = builder.Build(pattern);
 			var parameters = new NameValueCollection();
 
-			Assert.False(parser.TryMatch(segment, endPoint, parameters));
+			Assert.False(matcher.TryMatch(segment, endPoint, parameters));
 		}
 
 		[Fact]
@@ -171,11 +171,11 @@ namespace Everest.Tests
 			const string endPoint = "/foo/bar/D01E3FC6-2A16-43A0-AABB-CC9B67A494FD";
 
 			var builder = new RouteSegmentBuilder();
-			var parser = new RouteSegmentMatcher();
+			var matcher = new RouteSegmentMatcher();
 			var segment = builder.Build(pattern);
 			var parameters = new NameValueCollection();
 
-			Assert.True(parser.TryMatch(segment, endPoint, parameters));
+			Assert.True(matcher.TryMatch(segment, endPoint, parameters));
 			Assert.True(parameters["id"] != null);
 			Assert.True(parameters["id"] == "D01E3FC6-2A16-43A0-AABB-CC9B67A494FD");
 		}
@@ -187,11 +187,11 @@ namespace Everest.Tests
 			const string endPoint = "/foo/bar/D01E3FC6-2A16-43A0-AABB-CC9B67A494FD-ERROR";
 
 			var builder = new RouteSegmentBuilder();
-			var parser = new RouteSegmentMatcher();
+			var matcher = new RouteSegmentMatcher();
 			var segment = builder.Build(pattern);
 			var parameters = new NameValueCollection();
 
-			Assert.False(parser.TryMatch(segment, endPoint, parameters));
+			Assert.False(matcher.TryMatch(segment, endPoint, parameters));
 		}
 
 		[Fact]
@@ -201,11 +201,11 @@ namespace Everest.Tests
 			const string endPoint = "/foo/bar/1";
 
 			var builder = new RouteSegmentBuilder();
-			var parser = new RouteSegmentMatcher();
+			var matcher = new RouteSegmentMatcher();
 			var segment = builder.Build(pattern);
 			var parameters = new NameValueCollection();
 
-			Assert.True(parser.TryMatch(segment, endPoint, parameters));
+			Assert.True(matcher.TryMatch(segment, endPoint, parameters));
 			Assert.True(parameters["id"] != null);
 			Assert.True(parameters["id"] == "1");
 		}
@@ -217,11 +217,11 @@ namespace Everest.Tests
 			const string endPoint = "/foo/bar/1.10";
 
 			var builder = new RouteSegmentBuilder();
-			var parser = new RouteSegmentMatcher();
+			var matcher = new RouteSegmentMatcher();
 			var segment = builder.Build(pattern);
 			var parameters = new NameValueCollection();
 
-			Assert.True(parser.TryMatch(segment, endPoint, parameters));
+			Assert.True(matcher.TryMatch(segment, endPoint, parameters));
 			Assert.True(parameters["id"] != null);
 			Assert.True(parameters["id"] == "1.10");
 		}
@@ -233,11 +233,11 @@ namespace Everest.Tests
 			const string endPoint = "/foo/bar/abc";
 
 			var builder = new RouteSegmentBuilder();
-			var parser = new RouteSegmentMatcher();
+			var matcher = new RouteSegmentMatcher();
 			var segment = builder.Build(pattern);
 			var parameters = new NameValueCollection();
 
-			Assert.False(parser.TryMatch(segment, endPoint, parameters));
+			Assert.False(matcher.TryMatch(segment, endPoint, parameters));
 		}
 
 		[Fact]
@@ -247,11 +247,11 @@ namespace Everest.Tests
 			const string endPoint = "/foo/bar/2018-01-04T05:52:20.698";
 
 			var builder = new RouteSegmentBuilder();
-			var parser = new RouteSegmentMatcher();
+			var matcher = new RouteSegmentMatcher();
 			var segment = builder.Build(pattern);
 			var parameters = new NameValueCollection();
 
-			Assert.True(parser.TryMatch(segment, endPoint, parameters));
+			Assert.True(matcher.TryMatch(segment, endPoint, parameters));
 			Assert.True(parameters["dt"] != null);
 			Assert.True(parameters["dt"] == "2018-01-04T05:52:20.698");
 		}
@@ -263,11 +263,11 @@ namespace Everest.Tests
 			const string endPoint = "/foo/bar/true";
 
 			var builder = new RouteSegmentBuilder();
-			var parser = new RouteSegmentMatcher();
+			var matcher = new RouteSegmentMatcher();
 			var segment = builder.Build(pattern);
 			var parameters = new NameValueCollection();
 
-			Assert.True(parser.TryMatch(segment, endPoint, parameters));
+			Assert.True(matcher.TryMatch(segment, endPoint, parameters));
 			Assert.True(parameters["b"] != null);
 			Assert.True(parameters["b"] == "true");
 		}
@@ -279,11 +279,11 @@ namespace Everest.Tests
 			const string endPoint = "/foo/bar/false";
 
 			var builder = new RouteSegmentBuilder();
-			var parser = new RouteSegmentMatcher();
+			var matcher = new RouteSegmentMatcher();
 			var segment = builder.Build(pattern);
 			var parameters = new NameValueCollection();
 
-			Assert.True(parser.TryMatch(segment, endPoint, parameters));
+			Assert.True(matcher.TryMatch(segment, endPoint, parameters));
 			Assert.True(parameters["b"] != null);
 			Assert.True(parameters["b"] == "false");
 		}

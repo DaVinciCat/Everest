@@ -29,7 +29,7 @@ namespace Everest
 
 		public IRouter Router
 		{
-			get => mRouter ??= new Router(new RouteSegmentBuilder(), new RouteEndPointParser(), LoggerFactory.CreateLogger<Router>());
+			get => mRouter ??= new Router(new RouteSegmentBuilder(), new RouteSegmentMatcher(), LoggerFactory.CreateLogger<Router>());
 			private set => mRouter = value;
 		}
 
@@ -77,10 +77,11 @@ namespace Everest
 		{
 			var server = new RestServer(Services.BuildServiceProvider(), LoggerFactory.CreateLogger<RestServer>());
 			server.UseExceptionHandlingMiddleware(LoggerFactory.CreateLogger<ExceptionHandlingMiddleware>());
+			server.UseRoutingMiddleware(Router);
 			server.UseCorsPreflightMiddleware();
 			server.UseCorsMiddleware();
-			server.UseRoutingMiddleware(Router);
 			server.UseCompressionMiddleware(CompressionProvider);
+			server.UseEndPointMiddleware(Router);
 
 			return server;
 		}
