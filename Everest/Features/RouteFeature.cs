@@ -4,7 +4,7 @@ namespace Everest.Features
 {
 	public interface IRouteFeature
 	{
-		public Route Route { get; }
+		Route Route { get; }
 	}
 
 	public class RouteFeature : IRouteFeature

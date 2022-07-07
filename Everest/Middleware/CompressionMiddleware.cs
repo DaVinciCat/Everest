@@ -16,10 +16,10 @@ namespace Everest.Middleware
 		{
 			var compression = provider.GetCompression(context.Request);
 
-			if (compression.TryCompress(context.Response.Body, out var compressed, out var enc))
+			if (compression.TryCompress(context.Response.Body, out var compressed, out var encoding))
 			{
 				context.Response.RemoveHeader("Content-Encoding");
-				context.Response.AddHeader("Content-Encoding", enc);
+				context.Response.AddHeader("Content-Encoding", encoding);
 				context.Response.Write(compressed);
 			}
 
