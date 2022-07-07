@@ -78,7 +78,6 @@ namespace Everest
 			var server = new RestServer(Services.BuildServiceProvider(), LoggerFactory.CreateLogger<RestServer>());
 			server.UseExceptionHandlingMiddleware(LoggerFactory.CreateLogger<ExceptionHandlingMiddleware>());
 			server.UseRoutingMiddleware(Router);
-			server.UseCorsPreflightMiddleware();
 			server.UseCorsMiddleware();
 			server.UseCompressionMiddleware(CompressionProvider);
 			server.UseEndPointMiddleware(Router);
