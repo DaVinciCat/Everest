@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace Everest.Utils
@@ -7,7 +8,7 @@ namespace Everest.Utils
 	{
 	}
 
-	public class FeatureCollection : Dictionary<Type, object>, IFeatureCollection
+	public class FeatureCollection : ConcurrentDictionary<Type, object>, IFeatureCollection
 	{
 
 	}
