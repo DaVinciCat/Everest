@@ -16,7 +16,7 @@ namespace Everest.Middleware
 
 		public override void Invoke(HttpContext context)
 		{
-			if (!context.IsCorsPreflight())
+			if (!context.Request.IsCorsPreflight())
 			{
 				if (!router.TryResolveRoute(context, out var route))
 				{

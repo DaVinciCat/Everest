@@ -49,4 +49,15 @@ namespace Everest.Http
 			}
 		}
 	}
+
+	public static class HttpRequestExtensions
+	{
+		public static bool IsCorsPreflight(this HttpRequest request)
+		{
+			return request.HttpMethod == "OPTIONS" &&
+			       request.Headers["Access-Control-Request-Method"] != null &&
+			       request.Headers["Access-Control-Request-Headers"] != null &&
+			       request.Headers["Origin"] != null;
+		}
+	}
 }

@@ -32,13 +32,5 @@ namespace Everest.Http
 		{
 			return context.Features.Get<IRouteFeature>()?.Route;
 		}
-
-		public static bool IsCorsPreflight(this HttpContext context)
-		{
-			return context.Request.HttpMethod == "OPTIONS" &&
-			       context.Request.Headers["Access-Control-Request-Method"] != null &&
-			       context.Request.Headers["Access-Control-Request-Headers"] != null &&
-			       context.Request.Headers["Origin"] != null;
-		}
 	}
 }

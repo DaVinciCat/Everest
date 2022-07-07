@@ -36,13 +36,13 @@ namespace Everest.Middleware
 
 		public override void Invoke(HttpContext context)
 		{
-			if (context.IsCorsPreflight())
-			{
-				context.Response.AddHeader("Access-Control-Allow-Methods", headers.AllowMethods);
-				context.Response.AddHeader("Access-Control-Allow-Headers", headers.AllowHeaders);
-				context.Response.AddHeader("Access-Control-Allow-Origin", headers.Origin);
-				context.Response.AddHeader("Access-Control-Max-Age", headers.MaxAge);
+			context.Response.AddHeader("Access-Control-Allow-Methods", headers.AllowMethods);
+			context.Response.AddHeader("Access-Control-Allow-Headers", headers.AllowHeaders);
+			context.Response.AddHeader("Access-Control-Allow-Origin", headers.Origin);
+			context.Response.AddHeader("Access-Control-Max-Age", headers.MaxAge);
 
+			if (context.Request.IsCorsPreflight())
+			{
 				context.Response.StatusCode = HttpStatusCode.NoContent;
 				return;
 			}
