@@ -4,16 +4,16 @@ using Everest.Utils;
 
 namespace Everest.Routing
 {
-	public interface IRouteEndPointParser
+	public interface IRouteSegmentMatcher
 	{
-		bool TryParse(RouteSegment segment, string endPoint, NameValueCollection parameters = null);
+		bool TryMatch(RouteSegment segment, string endPoint, NameValueCollection parameters = null);
 	}
 
-	public class RouteEndPointParser : IRouteEndPointParser
+	public class RouteSegmentMatcher : IRouteSegmentMatcher
 	{
 		public char[] Delimiters { get; } = { '/' };
 
-		public bool TryParse(RouteSegment segment, string endPoint, NameValueCollection parameters = null)
+		public bool TryMatch(RouteSegment segment, string endPoint, NameValueCollection parameters = null)
 		{
 			parameters ??= new NameValueCollection();
 

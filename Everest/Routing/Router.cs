@@ -22,14 +22,14 @@ namespace Everest.Routing
 
 		public IRouteSegmentBuilder RouteBuilder { get; }
 
-		public IRouteEndPointParser RouteParser { get; }
+		public IRouteSegmentMatcher RouteMatcher { get; }
 
 		private readonly Dictionary<string, Dictionary<RouteSegment, Route>> methods = new();
 
-		public Router(IRouteSegmentBuilder builder, IRouteEndPointParser parser, ILogger<Router> logger)
+		public Router(IRouteSegmentBuilder builder, IRouteSegmentMatcher matcher, ILogger<Router> logger)
 		{
 			RouteBuilder = builder;
-			RouteParser = parser;
+			RouteMatcher = matcher;
 			Logger = logger;
 		}
 
@@ -83,7 +83,7 @@ namespace Everest.Routing
 			foreach (var (key, value) in routes)
 			{
 				var parameters = new NameValueCollection();
-				if (RouteParser.TryParse(key, endPoint, parameters))
+				if (RouteMatcher.TryMatch(key, endPoint, parameters))
 				{
 					context.Request.PathParameters = new ParameterCollection(parameters);
 					route = value;
