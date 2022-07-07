@@ -2,7 +2,7 @@
 using System.Collections.Specialized;
 using System.ComponentModel;
 
-namespace Everest.Utils
+namespace Everest.Collections
 {
 	public static class NameValueCollectionExtensions
 	{

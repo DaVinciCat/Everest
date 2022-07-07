@@ -1,5 +1,5 @@
 ﻿using Everest.Http;
-using Everest.Utils;
+using Everest.ResponseCompression;
 
 namespace Everest.Middleware
 {

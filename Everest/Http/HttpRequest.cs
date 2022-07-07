@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net;
 using System.Text;
+using Everest.Collections;
 
 namespace Everest.Http
 {

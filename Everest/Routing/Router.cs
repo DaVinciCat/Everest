@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using Everest.Collections;
 using Microsoft.Extensions.Logging;
 
 namespace Everest.Routing

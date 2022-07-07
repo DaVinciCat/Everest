@@ -1,6 +1,5 @@
 ﻿using System;
 using Everest.Http;
-using Everest.Utils;
 using Microsoft.Extensions.Logging;
 
 namespace Everest.Middleware

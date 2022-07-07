@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
-namespace Everest.Utils
+namespace Everest.Collections
 {
 	public interface IFeatureCollection : IDictionary<Type, object>
 	{

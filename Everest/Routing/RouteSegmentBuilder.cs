@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using Everest.Utils;
+using Everest.Collections;
 
 namespace Everest.Routing
 {

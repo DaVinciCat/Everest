@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using Everest.Http;
 using Everest.Middleware;
+using Everest.ResponseCompression;
 using Everest.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

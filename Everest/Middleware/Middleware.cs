@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Everest.Http;
 
-namespace Everest.Utils
+namespace Everest.Middleware
 {
 	public interface IMiddleware
 	{

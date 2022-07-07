@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.IO.Compression;
 
-namespace Everest.Utils
+namespace Everest.ResponseCompression
 {
 	public static class CompressionExtensions
 	{

@@ -1,4 +1,6 @@
-﻿namespace Everest.Http
+﻿using Everest.Http;
+
+namespace Everest.ResponseCompression
 {
 	public interface ICompressionProvider
 	{

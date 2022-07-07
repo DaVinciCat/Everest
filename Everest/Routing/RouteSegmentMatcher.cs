@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Specialized;
-using Everest.Utils;
+using Everest.Collections;
 
 namespace Everest.Routing
 {

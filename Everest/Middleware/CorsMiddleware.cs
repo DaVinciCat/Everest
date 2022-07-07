@@ -1,5 +1,4 @@
 ﻿using Everest.Http;
-using Everest.Utils;
 using System.Net;
 
 namespace Everest.Middleware

@@ -1,9 +1,8 @@
-﻿using Everest.Utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO.Compression;
 
-namespace Everest.Http
+namespace Everest.ResponseCompression
 {
 	public interface ICompression
 	{

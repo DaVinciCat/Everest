@@ -1,6 +1,5 @@
 ﻿using Everest.Http;
 using Everest.Routing;
-using Everest.Utils;
 
 namespace Everest.Middleware
 {

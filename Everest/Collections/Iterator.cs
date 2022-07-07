@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Everest.Utils
+namespace Everest.Collections
 {
 	public class Iterator<T> : IEnumerator<T>
 	{

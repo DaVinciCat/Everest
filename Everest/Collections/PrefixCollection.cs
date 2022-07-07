@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 
-namespace Everest.Http
+namespace Everest.Collections
 {
 	public class PrefixCollection : ICollection<string>
 	{

@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Specialized;
-using Everest.Utils;
 
-namespace Everest.Http
+namespace Everest.Collections
 {
 	public class ParameterCollection : NameValueCollection
 	{
