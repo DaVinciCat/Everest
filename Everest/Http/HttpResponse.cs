@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Net;
 using System.Text;
 using System.Text.Json;
@@ -47,8 +46,6 @@ namespace Everest.Http
 			get => response.ContentLength64;
 			set => response.ContentLength64 = value;
 		}
-
-		internal Stream OutputStream => response.OutputStream;
 		
 		public byte[] Body { get; private set; } 
 
@@ -97,21 +94,21 @@ namespace Everest.Http
 				if (IsClosed)
 					throw new InvalidOperationException("Response is closed.");
 
-				if (!OutputStream.CanWrite)
+				if (!response.OutputStream.CanWrite)
 					throw new NotSupportedException("Response stream does not support writing.");
 
 				if (Body != null)
 				{
 					ContentLength64 = Body.Length;
-					OutputStream.Write(Body, 0, Body.Length);
+					response.OutputStream.Write(Body, 0, Body.Length);
 				}
 				
 				IsSent = true;
 			}
 			finally
 			{
-				if (OutputStream.CanWrite)
-					OutputStream.Close();
+				if (response.OutputStream.CanWrite)
+					response.OutputStream.Close();
 
 				Close();
 			}
