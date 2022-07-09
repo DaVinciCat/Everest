@@ -28,9 +28,9 @@ namespace Everest.Http
 
 	public static class HttpContextExtensions
 	{
-		public static Route GetRoute(this HttpContext context)
+		public static EndPoint GetEndPoint(this HttpContext context)
 		{
-			return context.Features.Get<IRouteFeature>()?.Route;
+			return context.Features.Get<IEndPointFeature>()?.EndPoint;
 		}
 	}
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using Everest.Collections;
 using Everest.Http;
 using Everest.Middleware;
 using Everest.ResponseCompression;
@@ -18,23 +19,11 @@ namespace Everest
 
 		public ILoggerFactory LoggerFactory
 		{
-			get => mLoggerFactory ??= new NullLoggerFactory();
-			private set => mLoggerFactory = value;
+			get => loggerFactory ??= new NullLoggerFactory();
+			private set => loggerFactory = value;
 		}
 
-		private ILoggerFactory mLoggerFactory;
-
-		#endregion
-
-		#region Router
-
-		public IRouter Router
-		{
-			get => mRouter ??= new Router(new RouteSegmentBuilder(), new RouteSegmentMatcher(), LoggerFactory.CreateLogger<Router>());
-			private set => mRouter = value;
-		}
-
-		private IRouter mRouter;
+		private ILoggerFactory loggerFactory;
 
 		#endregion
 
@@ -42,11 +31,35 @@ namespace Everest
 
 		public IRouteScanner RouteScanner
 		{
-			get => mRouteScanner ??= new RouteScanner(LoggerFactory.CreateLogger<RouteScanner>());
-			private set => mRouteScanner = value;
+			get => routeScanner ??= new RouteScanner(RouteSegmentBuilder, LoggerFactory.CreateLogger<RouteScanner>());
+			private set => routeScanner = value;
 		}
 
-		private IRouteScanner mRouteScanner;
+		private IRouteScanner routeScanner;
+
+		#endregion
+
+		#region EndPointResolver 
+
+		public IEndPointResolver EndPointResolver
+		{
+			get => endPointResolver ??= new EndPointResolver(Routes, RouteSegmentMatcher, LoggerFactory.CreateLogger<EndPointResolver>());
+			private set => endPointResolver = value;
+		}
+
+		private IEndPointResolver endPointResolver;
+
+		#endregion
+
+		#region EndPointInvoker
+
+		public IEndPointInvoker EndPointInvoker
+		{
+			get => endPointInvoker ??= new EndPointInvoker(LoggerFactory.CreateLogger<EndPointInvoker>());
+			private set => endPointInvoker = value;
+		}
+
+		private IEndPointInvoker endPointInvoker;
 
 		#endregion
 
@@ -54,11 +67,47 @@ namespace Everest
 
 		public IServiceCollection Services
 		{
-			get => mServices ??= new ServiceCollection();
-			private set => mServices = value;
+			get => serviceCollection ??= new ServiceCollection();
+			private set => serviceCollection = value;
 		}
 
-		private IServiceCollection mServices;
+		private IServiceCollection serviceCollection;
+
+		#endregion
+
+		#region Routes
+
+		public IRouteCollection Routes
+		{
+			get => routeCollection ??= new RouteCollection();
+			private set => routeCollection = value;
+		}
+
+		private IRouteCollection routeCollection;
+
+		#endregion
+
+		#region RouteSegmentBuilder 
+
+		public IRouteSegmentBuilder RouteSegmentBuilder
+		{
+			get => routeSegmentBuilder ??= new RouteSegmentBuilder();
+			private set => routeSegmentBuilder = value;
+		}
+
+		private IRouteSegmentBuilder routeSegmentBuilder;
+
+		#endregion
+
+		#region RouteSegmentMatcher 
+
+		public IRouteSegmentMatcher RouteSegmentMatcher
+		{
+			get => routeSegmentMatcher ??= new RouteSegmentMatcher();
+			private set => routeSegmentMatcher = value;
+		}
+
+		private IRouteSegmentMatcher routeSegmentMatcher;
 
 		#endregion
 
@@ -66,11 +115,11 @@ namespace Everest
 
 		public ICompressionProvider CompressionProvider
 		{
-			get => mCompressionProvider ??= new CompressionProvider();
-			private set => mCompressionProvider = value;
+			get => compressionProvider ??= new CompressionProvider();
+			private set => compressionProvider = value;
 		}
 
-		private ICompressionProvider mCompressionProvider;
+		private ICompressionProvider compressionProvider;
 
 		#endregion
 
@@ -78,10 +127,10 @@ namespace Everest
 		{
 			var server = new RestServer(Services.BuildServiceProvider(), LoggerFactory.CreateLogger<RestServer>());
 			server.UseExceptionHandlingMiddleware(LoggerFactory.CreateLogger<ExceptionHandlingMiddleware>());
-			server.UseRoutingMiddleware(Router);
+			server.UseRoutingMiddleware(EndPointResolver);
 			server.UseCorsMiddleware();
 			server.UseCompressionMiddleware(CompressionProvider);
-			server.UseEndPointMiddleware(Router);
+			server.UseEndPointMiddleware(EndPointInvoker);
 
 			return server;
 		}
@@ -92,9 +141,33 @@ namespace Everest
 			return this;
 		}
 
-		public RestServerBuilder WithRouter(IRouter router)
+		public RestServerBuilder WithEndPointInvoker(IEndPointInvoker invoker)
 		{
-			Router = router;
+			EndPointInvoker = invoker;
+			return this;
+		}
+
+		public RestServerBuilder WithRoutes(IRouteCollection routes)
+		{
+			Routes = routes;
+			return this;
+		}
+
+		public RestServerBuilder WithRouteSegmentBuilder(IRouteSegmentBuilder builder)
+		{
+			RouteSegmentBuilder = builder;
+			return this;
+		}
+
+		public RestServerBuilder WithRouteSegmentMatcher(IRouteSegmentMatcher matcher)
+		{
+			RouteSegmentMatcher = matcher;
+			return this;
+		}
+
+		public RestServerBuilder WithEndPointResolver(IEndPointResolver resolver)
+		{
+			EndPointResolver = resolver;
 			return this;
 		}
 
@@ -123,7 +196,7 @@ namespace Everest
 		{
 			foreach (var route in builder.RouteScanner.Scan(assembly).ToArray())
 			{
-				builder.Router.RegisterRoute(route);
+				builder.Routes.Add(route);
 			}
 
 			return builder;
@@ -131,7 +204,12 @@ namespace Everest
 
 		public static RestServerBuilder RegisterRoute(this RestServerBuilder builder, string httpMethod, string routePattern, Action<HttpContext> action)
 		{
-			builder.Router.RegisterRoute(httpMethod, routePattern, action);
+			var route = new Route(httpMethod, routePattern);
+			var segment = builder.RouteSegmentBuilder.Build(routePattern);
+			var endPoint = new EndPoint(action.Target?.GetType(), action.Method, action);
+			var descriptor = new RouteDescriptor(route, segment, endPoint);
+			
+			builder.Routes.Add(descriptor);
 			return builder;
 		}
 
@@ -176,8 +254,8 @@ namespace Everest
 			where TImplementation : class, TService
 			where TService : class
 		{
-			 builder.Services.AddSingleton(_ => factory());
-			 return builder;
+			builder.Services.AddSingleton(_ => factory());
+			return builder;
 		}
 
 		public static RestServerBuilder UseConsoleLogger(this RestServerBuilder builder)
