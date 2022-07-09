@@ -1,28 +1,31 @@
-﻿using Everest.Http;
-using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Everest.Annotations;
+using Everest.Http;
+using Microsoft.Extensions.Logging;
 
 namespace Everest.Routing
 {
 	public interface IRouteScanner
 	{
-		IEnumerable<Route> Scan(Assembly assembly);
+		IEnumerable<RouteDescriptor> Scan(Assembly assembly);
 	}
 
 	public class RouteScanner : IRouteScanner
 	{
 		public ILogger<RouteScanner> Logger { get; }
 
-		public RouteScanner(ILogger<RouteScanner> logger)
+		private readonly IRouteSegmentBuilder builder;
+
+		public RouteScanner(IRouteSegmentBuilder builder, ILogger<RouteScanner> logger)
 		{
+			this.builder = builder;
 			Logger = logger;
 		}
 
-		public IEnumerable<Route> Scan(Assembly assembly)
+		public IEnumerable<RouteDescriptor> Scan(Assembly assembly)
 		{
 			var count = 0;
 
@@ -38,11 +41,15 @@ namespace Everest.Routing
 					if (attribute != null)
 					{
 						var action = (Action<HttpContext>)method.CreateDelegate(typeof(Action<HttpContext>), null);
-						var route = new Route(method, attribute.HttpMethod, $"{routePrefix}/{attribute.RoutePattern}", action);
-						Logger.LogTrace($"Route found - {route.Description} at {type}.{method.Name}()");
+						var route = new Route(attribute.HttpMethod, $"{routePrefix}/{attribute.RoutePattern}");
+						var endPoint = new EndPoint(type, method, action);
+						var segment = builder.Build(route.Pattern);
+						var descriptor = new RouteDescriptor(route, segment, endPoint);
+
+						Logger.LogTrace($"Route found - {route.Description} at {endPoint.Description}");
 						count++;
 
-						yield return route;
+						yield return descriptor;
 					}
 				}
 			}
@@ -66,10 +73,10 @@ namespace Everest.Routing
 				yield return method;
 		}
 
-		public static IEnumerable<T> GetAttributes<T>(MethodInfo method) 
+		public static IEnumerable<T> GetAttributes<T>(MethodInfo method)
 			where T : Attribute
 		{
-			foreach (var attribute in method.GetCustomAttributes(typeof(T), false).OfType<T>()) 
+			foreach (var attribute in method.GetCustomAttributes(typeof(T), false).OfType<T>())
 				yield return attribute;
 		}
 

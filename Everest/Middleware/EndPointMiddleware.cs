@@ -5,18 +5,18 @@ namespace Everest.Middleware
 {
 	public class EndPointMiddleware : MiddlewareBase
 	{
-		private readonly IRouter router;
+		private readonly IEndPointInvoker invoker;
 
-		public EndPointMiddleware(IRouter router)
+		public EndPointMiddleware(IEndPointInvoker invoker)
 		{
-			this.router = router;
+			this.invoker = invoker;
 		}
 
 		public override void Invoke(HttpContext context)
 		{
-			var route = context.GetRoute();
-			if(route != null)
-				router.InvokeRoute(context, route);
+			var endPoint = context.GetEndPoint();
+			if(endPoint != null)
+				invoker.Invoke(context, endPoint);
 
 			if (HasNext)
 				Next.Invoke(context);
