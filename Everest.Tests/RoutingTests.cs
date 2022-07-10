@@ -1,4 +1,3 @@
-using System.Collections.Specialized;
 using Everest.Routing;
 using Xunit;
 
@@ -16,7 +15,7 @@ namespace Everest.Tests
 			var matcher = new RouteSegmentMatcher();
 			var segment = builder.Build(pattern);
 
-			Assert.False(matcher.TryMatch(segment, endPoint, new NameValueCollection()));
+			Assert.False(matcher.TryMatch(segment, endPoint, out _));
 		}
 
 		[Fact]
@@ -29,7 +28,7 @@ namespace Everest.Tests
 			var matcher = new RouteSegmentMatcher();
 			var segment = builder.Build(pattern);
 
-			Assert.True(matcher.TryMatch(segment, endPoint, new NameValueCollection()));
+			Assert.True(matcher.TryMatch(segment, endPoint, out _));
 		}
 
 		[Fact]
@@ -42,7 +41,7 @@ namespace Everest.Tests
 			var matcher = new RouteSegmentMatcher();
 			var segment = builder.Build(pattern);
 
-			Assert.False(matcher.TryMatch(segment, endPoint, new NameValueCollection()));
+			Assert.False(matcher.TryMatch(segment, endPoint, out _));
 		}
 
 		[Fact]
@@ -55,7 +54,7 @@ namespace Everest.Tests
 			var matcher = new RouteSegmentMatcher();
 			var segment = builder.Build(pattern);
 
-			Assert.False(matcher.TryMatch(segment, endPoint, new NameValueCollection()));
+			Assert.False(matcher.TryMatch(segment, endPoint, out _));
 		}
 
 		[Fact]
@@ -67,9 +66,8 @@ namespace Everest.Tests
 			var builder = new RouteSegmentBuilder();
 			var matcher = new RouteSegmentMatcher();
 			var segment = builder.Build(pattern);
-			var parameters = new NameValueCollection();
 
-			Assert.True(matcher.TryMatch(segment, endPoint, parameters));
+			Assert.True(matcher.TryMatch(segment, endPoint, out var parameters));
 			Assert.True(parameters["id"] != null);
 			Assert.True(parameters["id"] == "1");
 		}
@@ -83,9 +81,8 @@ namespace Everest.Tests
 			var builder = new RouteSegmentBuilder();
 			var matcher = new RouteSegmentMatcher();
 			var segment = builder.Build(pattern);
-			var parameters = new NameValueCollection();
 
-			Assert.True(matcher.TryMatch(segment, endPoint, parameters));
+			Assert.True(matcher.TryMatch(segment, endPoint, out var parameters));
 			Assert.True(parameters["id1"] != null);
 			Assert.True(parameters["id1"] == "1");
 
@@ -102,9 +99,8 @@ namespace Everest.Tests
 			var builder = new RouteSegmentBuilder();
 			var matcher = new RouteSegmentMatcher();
 			var segment = builder.Build(pattern);
-			var parameters = new NameValueCollection();
 
-			Assert.False(matcher.TryMatch(segment, endPoint, parameters));
+			Assert.False(matcher.TryMatch(segment, endPoint, out _));
 		}
 
 		[Fact]
@@ -117,7 +113,7 @@ namespace Everest.Tests
 			var matcher = new RouteSegmentMatcher();
 			var segment = builder.Build(pattern);
 
-			Assert.False(matcher.TryMatch(segment, endPoint, new NameValueCollection()));
+			Assert.False(matcher.TryMatch(segment, endPoint, out _));
 		}
 
 		[Fact]
@@ -129,9 +125,8 @@ namespace Everest.Tests
 			var builder = new RouteSegmentBuilder();
 			var matcher = new RouteSegmentMatcher();
 			var segment = builder.Build(pattern);
-			var parameters = new NameValueCollection();
 
-			Assert.True(matcher.TryMatch(segment, endPoint, parameters));
+			Assert.True(matcher.TryMatch(segment, endPoint, out var parameters));
 			Assert.True(parameters["id"] != null);
 			Assert.True(parameters["id"] == "1");
 		}
@@ -145,9 +140,8 @@ namespace Everest.Tests
 			var builder = new RouteSegmentBuilder();
 			var matcher = new RouteSegmentMatcher();
 			var segment = builder.Build(pattern);
-			var parameters = new NameValueCollection();
 
-			Assert.False(matcher.TryMatch(segment, endPoint, parameters));
+			Assert.False(matcher.TryMatch(segment, endPoint, out _));
 		}
 
 		[Fact]
@@ -159,9 +153,8 @@ namespace Everest.Tests
 			var builder = new RouteSegmentBuilder();
 			var matcher = new RouteSegmentMatcher();
 			var segment = builder.Build(pattern);
-			var parameters = new NameValueCollection();
 
-			Assert.False(matcher.TryMatch(segment, endPoint, parameters));
+			Assert.False(matcher.TryMatch(segment, endPoint, out _));
 		}
 
 		[Fact]
@@ -173,9 +166,8 @@ namespace Everest.Tests
 			var builder = new RouteSegmentBuilder();
 			var matcher = new RouteSegmentMatcher();
 			var segment = builder.Build(pattern);
-			var parameters = new NameValueCollection();
 
-			Assert.True(matcher.TryMatch(segment, endPoint, parameters));
+			Assert.True(matcher.TryMatch(segment, endPoint, out var parameters));
 			Assert.True(parameters["id"] != null);
 			Assert.True(parameters["id"] == "D01E3FC6-2A16-43A0-AABB-CC9B67A494FD");
 		}
@@ -189,9 +181,8 @@ namespace Everest.Tests
 			var builder = new RouteSegmentBuilder();
 			var matcher = new RouteSegmentMatcher();
 			var segment = builder.Build(pattern);
-			var parameters = new NameValueCollection();
 
-			Assert.False(matcher.TryMatch(segment, endPoint, parameters));
+			Assert.False(matcher.TryMatch(segment, endPoint, out _));
 		}
 
 		[Fact]
@@ -203,9 +194,8 @@ namespace Everest.Tests
 			var builder = new RouteSegmentBuilder();
 			var matcher = new RouteSegmentMatcher();
 			var segment = builder.Build(pattern);
-			var parameters = new NameValueCollection();
 
-			Assert.True(matcher.TryMatch(segment, endPoint, parameters));
+			Assert.True(matcher.TryMatch(segment, endPoint, out var parameters));
 			Assert.True(parameters["id"] != null);
 			Assert.True(parameters["id"] == "1");
 		}
@@ -219,9 +209,8 @@ namespace Everest.Tests
 			var builder = new RouteSegmentBuilder();
 			var matcher = new RouteSegmentMatcher();
 			var segment = builder.Build(pattern);
-			var parameters = new NameValueCollection();
 
-			Assert.True(matcher.TryMatch(segment, endPoint, parameters));
+			Assert.True(matcher.TryMatch(segment, endPoint, out var parameters));
 			Assert.True(parameters["id"] != null);
 			Assert.True(parameters["id"] == "1.10");
 		}
@@ -235,9 +224,8 @@ namespace Everest.Tests
 			var builder = new RouteSegmentBuilder();
 			var matcher = new RouteSegmentMatcher();
 			var segment = builder.Build(pattern);
-			var parameters = new NameValueCollection();
 
-			Assert.False(matcher.TryMatch(segment, endPoint, parameters));
+			Assert.False(matcher.TryMatch(segment, endPoint, out _));
 		}
 
 		[Fact]
@@ -249,9 +237,8 @@ namespace Everest.Tests
 			var builder = new RouteSegmentBuilder();
 			var matcher = new RouteSegmentMatcher();
 			var segment = builder.Build(pattern);
-			var parameters = new NameValueCollection();
 
-			Assert.True(matcher.TryMatch(segment, endPoint, parameters));
+			Assert.True(matcher.TryMatch(segment, endPoint, out var parameters));
 			Assert.True(parameters["dt"] != null);
 			Assert.True(parameters["dt"] == "2018-01-04T05:52:20.698");
 		}
@@ -265,9 +252,8 @@ namespace Everest.Tests
 			var builder = new RouteSegmentBuilder();
 			var matcher = new RouteSegmentMatcher();
 			var segment = builder.Build(pattern);
-			var parameters = new NameValueCollection();
 
-			Assert.True(matcher.TryMatch(segment, endPoint, parameters));
+			Assert.True(matcher.TryMatch(segment, endPoint, out var parameters));
 			Assert.True(parameters["b"] != null);
 			Assert.True(parameters["b"] == "true");
 		}
@@ -281,9 +267,8 @@ namespace Everest.Tests
 			var builder = new RouteSegmentBuilder();
 			var matcher = new RouteSegmentMatcher();
 			var segment = builder.Build(pattern);
-			var parameters = new NameValueCollection();
 
-			Assert.True(matcher.TryMatch(segment, endPoint, parameters));
+			Assert.True(matcher.TryMatch(segment, endPoint, out var parameters));
 			Assert.True(parameters["b"] != null);
 			Assert.True(parameters["b"] == "false");
 		}

@@ -1,8 +1,4 @@
-﻿using Everest.Http;
-using System;
-using System.Reflection;
-
-namespace Everest.Routing
+﻿namespace Everest.Routing
 {
 	public class Route
 	{
@@ -11,27 +7,11 @@ namespace Everest.Routing
 		public string HttpMethod { get; }
 
 		public string Pattern { get; }
-		
-		public Action<HttpContext> Action { get; }
 
-		public MethodInfo MethodInfo { get; }
-
-		public Route(string httpMethod, string pattern, Action<HttpContext> action)
+		public Route(string httpMethod, string pattern)
 		{
 			HttpMethod = httpMethod;
 			Pattern = pattern;
-			Action = action;
-		}
-
-		public Route(MethodInfo methodInfo, string httpMethod, string pattern, Action<HttpContext> action)
-			: this(httpMethod, pattern, action)
-		{
-			MethodInfo = methodInfo;
-		}
-
-		public void Invoke(HttpContext context)
-		{
-			Action.Invoke(context);
 		}
 	}
 }

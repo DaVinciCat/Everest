@@ -196,15 +196,15 @@ namespace Everest
 			return server;
 		}
 
-		public static RestServer UseRoutingMiddleware(this RestServer server, IRouter router)
+		public static RestServer UseRoutingMiddleware(this RestServer server, IEndPointResolver resolver)
 		{
-			server.Middleware.AddMiddleware(new RoutingMiddleware(router));
+			server.Middleware.AddMiddleware(new RoutingMiddleware(resolver));
 			return server;
 		}
 
-		public static RestServer UseEndPointMiddleware(this RestServer server, IRouter router)
+		public static RestServer UseEndPointMiddleware(this RestServer server, IEndPointInvoker invoker)
 		{
-			server.Middleware.AddMiddleware(new EndPointMiddleware(router));
+			server.Middleware.AddMiddleware(new EndPointMiddleware(invoker));
 			return server;
 		}
 
