@@ -6,7 +6,7 @@ namespace Everest.Routing
 {
 	public interface IEndPointResolver
 	{
-		bool TryResolve(HttpContext context, out EndPoint endPoint);
+		bool TryResolve(HttpContext context, out RouteData routeData);
 	}
 
 	public class EndPointResolver : IEndPointResolver
@@ -21,19 +21,16 @@ namespace Everest.Routing
 			Logger = logger;
 		}
 
-		public bool TryResolve(HttpContext context, out EndPoint endPoint)
+		public bool TryResolve(HttpContext context, out RouteData routeData)
 		{
-			endPoint = null;
-
 			Logger.LogTrace($"{context.Id} - Routing request for: {context.Request.Description}");
-			if (!routes.TryGetRoute(context, out var descriptor))
+			if (!routes.TryGetRouteData(context, out routeData))
 			{
 				Logger.LogWarning($"{context.Id} - Route not found");
 				return false;
 			}
 
-			endPoint = descriptor.EndPoint;
-			Logger.LogTrace($"{context.Id} - Route found from: {descriptor.Route.Description} to {descriptor.EndPoint.Description}");
+			Logger.LogTrace($"{context.Id} - Route found from: {routeData.RouteDescriptor.Route.Description} to {routeData.RouteDescriptor.EndPoint.Description}");
 			return true;
 		}
 	}

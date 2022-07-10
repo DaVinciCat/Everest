@@ -18,15 +18,16 @@ namespace Everest.Middleware
 		{
 			if (!context.Request.IsCorsPreflight())
 			{
-				if (!resolver.TryResolve(context, out var endPoint))
+				if (!resolver.TryResolve(context, out var routeData))
 				{
 					context.Response.Write404NotFound($"Requested route not found: {context.Request.Description}.");
 					return;
 				}
 
-				context.Features.Set<IEndPointFeature>(new EndPointFeature(endPoint));
+				context.Request.PathParameters = routeData.PathParameters;
+				context.Features.Set<IEndPointFeature>(new EndPointFeature(routeData.RouteDescriptor.EndPoint));
 			}
-			
+
 			if (HasNext)
 				Next.Invoke(context);
 		}

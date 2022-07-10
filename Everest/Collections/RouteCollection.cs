@@ -10,7 +10,7 @@ namespace Everest.Collections
 	{
 		void Add(RouteDescriptor routeDescriptor);
 
-		bool TryGetRoute(HttpContext context, out RouteDescriptor routeDescriptor);
+		bool TryGetRouteData(HttpContext context, out RouteData routeData);
 	}
 
 	public class RouteCollection : IRouteCollection
@@ -31,29 +31,28 @@ namespace Everest.Collections
 				routes = new HashSet<RouteDescriptor>();
 				methods[routeDescriptor.Route.HttpMethod] = routes;
 			}
-			
+
 			if (routes.Any(o => o.Route.Description == routeDescriptor.Route.Description))
 				throw new ArgumentException($"Duplicate route: {routeDescriptor.Route.Description}.");
 
 			routes.Add(routeDescriptor);
 		}
 
-		public bool TryGetRoute(HttpContext context, out RouteDescriptor routeDescriptor)
+		public bool TryGetRouteData(HttpContext context, out RouteData routeData)
 		{
-			routeDescriptor = null;
+			routeData = null;
 
 			var httpMethod = context.Request.HttpMethod;
 			var endPoint = context.Request.EndPoint;
 
-			if (!methods.TryGetValue(httpMethod, out var routes))
+			if (!methods.TryGetValue(httpMethod, out var descriptors))
 				return false;
 
-			foreach (var route in routes)
+			foreach (var descriptor in descriptors)
 			{
-				if (matcher.TryMatch(route.Segment, endPoint, out var parameters))
+				if (matcher.TryMatch(descriptor.Segment, endPoint, out var parameters))
 				{
-					context.Request.PathParameters = new ParameterCollection(parameters);
-					routeDescriptor = route;
+					routeData = new RouteData(descriptor, new ParameterCollection(parameters));
 					return true;
 				}
 			}
