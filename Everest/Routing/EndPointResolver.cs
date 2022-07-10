@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using Everest.Collections;
+﻿using Everest.Collections;
 using Everest.Http;
 using Microsoft.Extensions.Logging;
 
@@ -16,13 +15,9 @@ namespace Everest.Routing
 
 		private readonly IRouteCollection routes;
 
-		private readonly IRouteSegmentMatcher matcher;
-
-		public EndPointResolver(IRouteCollection routes, IRouteSegmentMatcher matcher, ILogger<EndPointResolver> logger)
+		public EndPointResolver(IRouteCollection routes, ILogger<EndPointResolver> logger)
 		{
 			this.routes = routes;
-			this.matcher = matcher;
-
 			Logger = logger;
 		}
 
@@ -31,7 +26,7 @@ namespace Everest.Routing
 			endPoint = null;
 
 			Logger.LogTrace($"{context.Id} - Routing request for: {context.Request.Description}");
-			if (!TryResolveRoute(context, out var descriptor))
+			if (!routes.TryGetRoute(context, out var descriptor))
 			{
 				Logger.LogWarning($"{context.Id} - Route not found");
 				return false;
@@ -40,26 +35,6 @@ namespace Everest.Routing
 			endPoint = descriptor.EndPoint;
 			Logger.LogTrace($"{context.Id} - Route found from: {descriptor.Route.Description} to {descriptor.EndPoint.Description}");
 			return true;
-		}
-
-		private bool TryResolveRoute(HttpContext context, out RouteDescriptor routeDescriptor)
-		{
-			routeDescriptor = null;
-
-			var httpMethod = context.Request.HttpMethod;
-			var endPoint = context.Request.EndPoint;
-
-			foreach (var route in routes.Where(o => o.Route.HttpMethod == httpMethod))
-			{
-				if (matcher.TryMatch(route.Segment, endPoint, out var parameters))
-				{
-					context.Request.PathParameters = new ParameterCollection(parameters);
-					routeDescriptor = route;
-					return true;
-				}
-			}
-
-			return false;
 		}
 	}
 }

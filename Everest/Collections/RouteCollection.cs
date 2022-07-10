@@ -1,40 +1,64 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Everest.Http;
 using Everest.Routing;
 
 namespace Everest.Collections
 {
-	public interface IRouteCollection : IEnumerable<RouteDescriptor>
+	public interface IRouteCollection
 	{
 		void Add(RouteDescriptor routeDescriptor);
+
+		bool TryGetRoute(HttpContext context, out RouteDescriptor routeDescriptor);
 	}
 
 	public class RouteCollection : IRouteCollection
 	{
-		private readonly HashSet<RouteDescriptor> descriptors = new();
+		private readonly Dictionary<string, HashSet<RouteDescriptor>> methods = new();
+
+		private readonly IRouteSegmentMatcher matcher;
+
+		public RouteCollection(IRouteSegmentMatcher matcher)
+		{
+			this.matcher = matcher;
+		}
 
 		public void Add(RouteDescriptor routeDescriptor)
 		{
-			if (descriptors.Any(o => o.Route.Description == routeDescriptor.Route.Description))
+			if (!methods.TryGetValue(routeDescriptor.Route.HttpMethod, out var routes))
+			{
+				routes = new HashSet<RouteDescriptor>();
+				methods[routeDescriptor.Route.HttpMethod] = routes;
+			}
+			
+			if (routes.Any(o => o.Route.Description == routeDescriptor.Route.Description))
 				throw new ArgumentException($"Duplicate route: {routeDescriptor.Route.Description}.");
 
-			descriptors.Add(routeDescriptor);
+			routes.Add(routeDescriptor);
 		}
 
-		#region IEnumerable
-
-		public IEnumerator<RouteDescriptor> GetEnumerator()
+		public bool TryGetRoute(HttpContext context, out RouteDescriptor routeDescriptor)
 		{
-			return descriptors.GetEnumerator();
-		}
+			routeDescriptor = null;
 
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
+			var httpMethod = context.Request.HttpMethod;
+			var endPoint = context.Request.EndPoint;
 
-		#endregion
+			if (!methods.TryGetValue(httpMethod, out var routes))
+				return false;
+
+			foreach (var route in routes)
+			{
+				if (matcher.TryMatch(route.Segment, endPoint, out var parameters))
+				{
+					context.Request.PathParameters = new ParameterCollection(parameters);
+					routeDescriptor = route;
+					return true;
+				}
+			}
+
+			return false;
+		}
 	}
 }

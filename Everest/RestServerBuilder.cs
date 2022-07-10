@@ -43,7 +43,7 @@ namespace Everest
 
 		public IEndPointResolver EndPointResolver
 		{
-			get => endPointResolver ??= new EndPointResolver(Routes, RouteSegmentMatcher, LoggerFactory.CreateLogger<EndPointResolver>());
+			get => endPointResolver ??= new EndPointResolver(Routes, LoggerFactory.CreateLogger<EndPointResolver>());
 			private set => endPointResolver = value;
 		}
 
@@ -79,7 +79,7 @@ namespace Everest
 
 		public IRouteCollection Routes
 		{
-			get => routeCollection ??= new RouteCollection();
+			get => routeCollection ??= new RouteCollection(RouteSegmentMatcher);
 			private set => routeCollection = value;
 		}
 
