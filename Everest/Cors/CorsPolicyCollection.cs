@@ -17,6 +17,11 @@ namespace Everest.Cors
 			return policies.Remove(policy.Origin);
 		}
 
+		public void Clear()
+		{
+			policies.Clear();
+		}
+
 		public IEnumerator<CorsPolicy> GetEnumerator()
 		{
 			return policies.Values.GetEnumerator();
