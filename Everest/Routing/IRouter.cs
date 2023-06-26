@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Everest.Http;
+﻿using Everest.Http;
 
 namespace Everest.Routing
 {
