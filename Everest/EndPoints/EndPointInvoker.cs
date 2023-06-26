@@ -21,13 +21,13 @@ namespace Everest.EndPoints
 			
 			if (!context.TryGetRouteDescriptor(out var descriptor))
 			{
-				Logger.LogError($"{context.Id} - Failed to invoke endpoint: no route descriptor");
+				Logger.LogError($"{context.Id} - Failed to invoke endpoint. No route descriptor");
 				return false;
 			}
 
-			Logger.LogTrace($"{context.Id} - Invoking endpoint from: {context.Request.Description} to: {descriptor.EndPoint.Description}");
+			Logger.LogTrace($"{context.Id} - Try invoke endpoint from: {context.Request.Description} to: {descriptor.EndPoint.Description}");
 			descriptor.EndPoint.Invoke(context);
-			Logger.LogTrace($"{context.Id} - Endpoint invoked: {descriptor.EndPoint.Description}");
+			Logger.LogTrace($"{context.Id} - Successfully invoked endpoint: {descriptor.EndPoint.Description}");
 
 			return true;
 		}

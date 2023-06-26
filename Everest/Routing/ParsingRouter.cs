@@ -45,7 +45,7 @@ namespace Everest.Routing
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
 
-			Logger.LogTrace($"{context.Id} - Route request: {context.Request.Description}");
+			Logger.LogTrace($"{context.Id} - Try route request: {context.Request.Description}");
 
 			var httpMethod = context.Request.HttpMethod;
 			var endPoint = context.Request.EndPoint;
@@ -53,7 +53,7 @@ namespace Everest.Routing
 			if (!methods.TryGetValue(httpMethod, out var descriptors))
 			{
 				OnRouteNotFound(context);
-				Logger.LogWarning($"{context.Id} - Unsupported HTTP method: {httpMethod}");
+				Logger.LogWarning($"{context.Id} - Failed to route request. Unsupported HTTP method: {httpMethod}");
 				return false;
 			}
 
@@ -63,13 +63,13 @@ namespace Everest.Routing
 				{
 					context.Request.PathParameters = new ParameterCollection(parameters);
 					context.Features.Set<IRouteDescriptorFeature>(new RouteDescriptorFeature(descriptor));
-					Logger.LogTrace($"{context.Id} - Routed from: {context.Request.Description} to: {descriptor.Route.Description}");
+					Logger.LogTrace($"{context.Id} - Successfully routed from: {context.Request.Description} to: {descriptor.Route.Description}");
 					return true;
 				}
 			}
 
 			OnRouteNotFound(context);
-			Logger.LogWarning($"{context.Id} - Requested route not found: {context.Request.Description}");
+			Logger.LogWarning($"{context.Id} - Failed to route request. Requested route not found: {context.Request.Description}");
 			return false;
 		}
 

@@ -57,7 +57,7 @@ namespace Everest.Cors
 			}
 
 			var origin = context.Request.Headers["Origin"];
-			Logger.LogTrace($"{context.Id} - Try handle CORS preflight request: {context.Request.Description} : Origin: {origin}");
+			Logger.LogTrace($"{context.Id} - Try handle CORS preflight request: {context.Request.Description}. Origin: {origin}");
 			
 			if (string.IsNullOrWhiteSpace(origin))
 			{
@@ -75,12 +75,12 @@ namespace Everest.Cors
 					context.Response.AddHeader("Access-Control-Max-Age", headers.MaxAge);
 					context.Response.StatusCode = HttpStatusCode.NoContent;
 
-					Logger.LogTrace($"{context.Id} - CORS preflight request handled");
+					Logger.LogTrace($"{context.Id} - Successfully handled CORS preflight request");
 					return true;
 				}
 			}
 
-			Logger.LogWarning($"{context.Id} - Failed to handle CORS preflight request: no policy : Origin: {origin}");
+			Logger.LogWarning($"{context.Id} - Failed to handle CORS preflight request. Request contains no supported Origin: {origin}");
 			return true;
 		}
 

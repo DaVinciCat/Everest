@@ -45,19 +45,19 @@ namespace Everest.Authentication
 			var header = context.Request.Headers[options.Header];
 			if (string.IsNullOrEmpty(header))
 			{
-				Logger.LogWarning($"{context.Id} - Scheme: {Scheme} : Authentication failed: no header: {options.Header}");
+				Logger.LogWarning($"{context.Id} - Failed to authenticate. Missing header: {options.Header}. Scheme: {Scheme}. ");
 				return false;
 			}
 
 			if (header == Scheme)
 			{
-				Logger.LogWarning($"{context.Id} - Scheme: {Scheme} : Authentication failed: no credentials supplied");
+				Logger.LogWarning($"{context.Id} - Failed to authenticate. No credentials supplied. Scheme: {Scheme}");
 				return false;
 			}
 
 			if (!header.StartsWith(Scheme + ' ', StringComparison.OrdinalIgnoreCase))
 			{
-				Logger.LogWarning($"{context.Id} - Scheme: {Scheme} : Authentication failed: incorrect header: {options.Header}");
+				Logger.LogWarning($"{context.Id} - Failed to authenticate. Incorrect header: {options.Header}. Scheme: {Scheme}");
 				return false;
 			}
 
@@ -69,7 +69,7 @@ namespace Everest.Authentication
 			}
 			catch(Exception ex)
 			{
-				Logger.LogError(ex, $"{context.Id} - Scheme: {Scheme} : Authentication failed: failed to convert credentials from Base64");
+				Logger.LogError(ex, $"{context.Id} - Failed to authenticate. Failed to convert credentials from Base64. Scheme: {Scheme}");
 				return false;
 			}
 
@@ -80,14 +80,14 @@ namespace Everest.Authentication
 			}
 			catch (Exception ex)
 			{
-				Logger.LogError(ex,$"{context.Id} - Scheme: {Scheme} : Authentication failed: failed to decode Base64 credentials to: {options.Encoding.EncodingName}");
+				Logger.LogError(ex,$"{context.Id} - Failed to authenticate. Failed to decode Base64 credentials to: {options.Encoding.EncodingName}. Scheme: {Scheme}");
 				return false;
 			}
 
 			var delimiterIndex = decodedCredentials.IndexOf(options.CredentialsDelimiter, StringComparison.OrdinalIgnoreCase);
 			if (delimiterIndex == -1)
 			{
-				Logger.LogWarning($"{context.Id} - Scheme: {Scheme} : Authentication failed: missing credentials delimiter: {options.CredentialsDelimiter}");
+				Logger.LogWarning($"{context.Id} - Failed to authenticate. Missing credentials delimiter: {options.CredentialsDelimiter}. Scheme: {Scheme}");
 				return false;
 			}
 
@@ -96,7 +96,7 @@ namespace Everest.Authentication
 			var identity = new BasicIdentity(username, password);
 			context.User.AddIdentity(identity);
 			
-			Logger.LogTrace($"{context.Id} - Scheme: {Scheme} : Authentication succeeded");
+			Logger.LogTrace($"{context.Id} - Successfully authenticated. Scheme: {Scheme}");
 			return true;
 		}
 	}

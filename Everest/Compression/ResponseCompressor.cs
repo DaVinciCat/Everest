@@ -46,11 +46,11 @@ namespace Everest.Compression
 
 			var content = context.Response.Body;
 
-			Logger.LogTrace($"{context.Id} - Response to compress: [{content?.Length.ToReadableSize()}]");
+			Logger.LogTrace($"{context.Id} - Try compress response. Content to compress: [{content?.Length.ToReadableSize()}]");
 			
 			if (content == null || content.Length < options.CompressionMinLength)
 			{
-				Logger.LogTrace($"{context.Id} - No compression required : Content length: [{content?.ToReadableSize()}] < [{options.CompressionMinLength.ToReadableSize()}]");
+				Logger.LogTrace($"{context.Id} - No response compression required. Content length: [{content?.ToReadableSize()}] < [{options.CompressionMinLength.ToReadableSize()}]");
 				return false;
 			}
 			
@@ -60,11 +60,11 @@ namespace Everest.Compression
 
 			if (encodings.Length == 0)
 			{
-				Logger.LogTrace($"{context.Id} - No compression required: no Accept-Encoding header");
+				Logger.LogTrace($"{context.Id} - No response compression required. Missing Accept-Encoding header");
 				return false;
 			}
 
-			Logger.LogTrace($"{context.Id} - Try compress response : Accept-Encoding: [{acceptEncoding}] : Supported encodings: [{string.Join(", ", Encodings)}]");
+			Logger.LogTrace($"{context.Id} - Accept-Encoding: [{acceptEncoding}]. Supported encodings: [{string.Join(", ", Encodings)}]");
 
 			foreach (var encoding in encodings)
 			{
@@ -75,12 +75,12 @@ namespace Everest.Compression
 					context.Response.AddHeader("Content-Encoding", encoding);
 					context.Response.Write(compressed);
 
-					Logger.LogTrace($"{context.Id} - Response compressed: [{content.ToReadableSize()}] -> [{compressed.ToReadableSize()}] : Content-Encoding: {encoding}");
+					Logger.LogTrace($"{context.Id} - Successfully compressed response: [{content.ToReadableSize()}] -> [{compressed.ToReadableSize()}]. Content-Encoding: {encoding}");
 					return true;
 				}
 			}
 			
-			Logger.LogWarning($"{context.Id} - Response compression failed: no supported encodings in Accept-Encoding");
+			Logger.LogWarning($"{context.Id} - Failed to compress response. Accept-Encoding contains no supported encodings");
 			return false;
 		}
 	}
