@@ -13,19 +13,19 @@ namespace Everest.Cors
 	{
 		public static CorsPolicy Default { get; } = new();
 
+		public string Origin { get; set; } = "*";
+
 		public string[] AllowMethods { get; set; } = { "GET", "POST", "PUT", "DELETE" };
 
 		public string[] AllowHeaders { get; set; } = { "Content-Type", "Accept", "X-Requested-With" };
-
-		public string Origin { get; set; } = "*";
-
+		
 		public int MaxAge { get; set; } = 1728000;
 
-		public CorsPolicy(string[] allowMethods, string[] allowHeaders, string origin, int maxAge)
+		public CorsPolicy(string origin, string[] allowMethods, string[] allowHeaders, int maxAge)
 		{
+			Origin = origin;
 			AllowMethods = allowMethods;
 			AllowHeaders = allowHeaders;
-			Origin = origin;
 			MaxAge = maxAge;
 		}
 
@@ -39,13 +39,13 @@ namespace Everest.Cors
 	{
 		public ILogger<CorsRequestHandler> Logger { get; }
 
-		public CorsPolicy[] Policies { get; set; } = { CorsPolicy.Default };
-
+		public CorsPolicyCollection Policies { get; set; } = new();
+		
 		public CorsRequestHandler(ILogger<CorsRequestHandler> logger)
 		{
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
-
+		
 		public bool TryHandleCorsRequest(HttpContext context)
 		{
 			if (context == null) 

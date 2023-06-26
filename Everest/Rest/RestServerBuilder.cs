@@ -250,9 +250,18 @@ namespace Everest.Rest
 			return builder;
 		}
 
-		public static RestServerBuilder UseCorsMiddleware(this RestServerBuilder builder)
+		public static RestServerBuilder UseCorsMiddleware(this RestServerBuilder builder, Action<CorsRequestHandlerBuilder> factory = null)
 		{
 			var handler = builder.Services.GetRequiredService<ICorsRequestHandler>();
+
+			var b = new CorsRequestHandlerBuilder(builder.Services);
+			factory?.Invoke(b);
+
+			if (factory == null)
+			{
+				b.AddCorsPolicy(CorsPolicy.Default);
+			}
+
 			builder.Middleware.Add(new CorsMiddleware(handler));
 			return builder;
 		}
@@ -329,6 +338,22 @@ namespace Everest.Rest
 			var authentication = new JwtAuthentication(options, loggerFactory.CreateLogger<JwtAuthentication>());
 			builder.AddAuthentication(authentication);
 			return builder;
+		}
+	}
+
+	public class CorsRequestHandlerBuilder
+	{
+		public IServiceProvider Services { get; }
+
+		public CorsRequestHandlerBuilder(IServiceProvider services)
+		{
+			Services = services;
+		}
+
+		public void AddCorsPolicy(CorsPolicy policy)
+		{
+			var handler = Services.GetRequiredService<ICorsRequestHandler>();
+			handler.Policies.Add(policy);
 		}
 	}
 }
