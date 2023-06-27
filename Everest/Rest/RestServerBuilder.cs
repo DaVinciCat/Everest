@@ -256,12 +256,7 @@ namespace Everest.Rest
 
 			var b = new CorsRequestHandlerBuilder(builder.Services);
 			factory?.Invoke(b);
-
-			if (factory == null)
-			{
-				b.AddCorsPolicy(CorsPolicy.Default);
-			}
-
+			
 			builder.Middleware.Add(new CorsMiddleware(handler));
 			return builder;
 		}
@@ -344,16 +339,26 @@ namespace Everest.Rest
 	public class CorsRequestHandlerBuilder
 	{
 		public IServiceProvider Services { get; }
-
+		
 		public CorsRequestHandlerBuilder(IServiceProvider services)
 		{
 			Services = services;
 		}
 
-		public void AddCorsPolicy(CorsPolicy policy)
+		public CorsRequestHandlerBuilder AddDefaultCorsPolicy()
+		{
+			var handler = Services.GetRequiredService<ICorsRequestHandler>();
+			handler.Policies.Add(CorsPolicy.Default);
+
+			return this;
+		}
+
+		public CorsRequestHandlerBuilder AddCorsPolicy(CorsPolicy policy)
 		{
 			var handler = Services.GetRequiredService<ICorsRequestHandler>();
 			handler.Policies.Add(policy);
+
+			return this;
 		}
 	}
 }

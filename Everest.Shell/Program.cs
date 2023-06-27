@@ -41,7 +41,7 @@ namespace Everest.Shell
 			using var rest = new RestServerBuilder(services)
 				.UsePrefixes("http://localhost:8080/")
 				.UseExceptionHandlerMiddleware()
-				.UseCorsMiddleware()
+				.UseCorsMiddleware(b => b.AddDefaultCorsPolicy())
 				.UseRoutingMiddleware()
 				.UseAuthenticationMiddleware(b => b.AddBasicAuthentication())
 				.UseEndPointMiddleware()

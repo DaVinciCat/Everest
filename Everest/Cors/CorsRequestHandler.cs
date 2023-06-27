@@ -59,11 +59,6 @@ namespace Everest.Cors
 			var origin = context.Request.Headers["Origin"];
 			Logger.LogTrace($"{context.Id} - Try handle CORS preflight request: {context.Request.Description}. Origin: {origin}");
 			
-			if (string.IsNullOrWhiteSpace(origin))
-			{
-				origin = CorsPolicy.Default.Origin;
-			}
-			
 			foreach (var policy in Policies)
 			{
 				if (string.Equals(policy.Origin, origin, StringComparison.Ordinal))
