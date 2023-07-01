@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Everest.Collections;
 using Everest.Http;
 using Microsoft.Extensions.Logging;
@@ -41,7 +42,7 @@ namespace Everest.Routing
 			routes.Add(path, descriptor);
 		}
 
-		public bool TryRoute(HttpContext context)
+		public async Task<bool> TryRouteAsync(HttpContext context)
 		{
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
@@ -53,14 +54,14 @@ namespace Everest.Routing
 			
 			if (!methods.TryGetValue(httpMethod, out var descriptors))
 			{
-				OnRouteNotFound(context);
+				await OnRouteNotFoundAsync(context);
 				Logger.LogWarning($"{context.Id} - Failed to route request. Unsupported HTTP method: {httpMethod}");
 				return false;
 			}
 
 			if (!descriptors.TryGetValue(endPoint, out var descriptor))
 			{
-				OnRouteNotFound(context);
+				await OnRouteNotFoundAsync(context);
 				Logger.LogWarning($"{context.Id} - Failed to route request. Requested route not found: {context.Request.Description}");
 				return false;
 			}
@@ -70,9 +71,12 @@ namespace Everest.Routing
 			return true;
 		}
 
-		public Action<HttpContext> OnRouteNotFound { get; set; } = context =>
+		public Func<HttpContext, Task> OnRouteNotFoundAsync { get; set; } = async context =>
 		{
-			context.Response.Write404NotFound($"Requested route not found: {context.Request.Description}");
+			if (context == null) 
+				throw new ArgumentNullException(nameof(context));
+
+			await context.Response.Write404NotFoundAsync($"Requested route not found: {context.Request.Description}");
 		};
 	}
 }

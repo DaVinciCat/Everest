@@ -1,10 +1,11 @@
 ﻿using Everest.Http;
 using System;
+using System.Threading.Tasks;
 
 namespace Everest.Exceptions
 {
 	public interface IExceptionHandler
 	{
-		void Handle(HttpContext context, Exception ex);
+		Task HandleAsync(HttpContext context, Exception ex);
 	}
 }

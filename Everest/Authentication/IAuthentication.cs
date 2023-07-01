@@ -1,4 +1,5 @@
-﻿using Everest.Http;
+﻿using System.Threading.Tasks;
+using Everest.Http;
 
 namespace Everest.Authentication
 {
@@ -6,6 +7,6 @@ namespace Everest.Authentication
 	{
 		string Scheme { get; }
 
-		bool TryAuthenticate(HttpContext context);
+		Task<bool> TryAuthenticateAsync(HttpContext context);
 	}
 }

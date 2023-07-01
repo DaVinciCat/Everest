@@ -1,229 +1,307 @@
 ﻿using System;
+using System.IO;
 using System.Net;
 using System.Text;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace Everest.Http
 {
-	public class HttpResponse
-	{
-		public bool IsSent { get; private set; }
+    public class HttpResponse
+    {
+        public bool IsSent { get; private set; }
 
-		public bool IsClosed { get; private set; }
+        public bool IsClosed { get; private set; }
 
-		public bool KeepAlive
-		{
-			get => response.KeepAlive;
-			set => response.KeepAlive = value;
+        public bool KeepAlive
+        {
+            get => response.KeepAlive;
+            set => response.KeepAlive = value;
+        }
+
+        public string ContentType
+        {
+            get => response.ContentType;
+            set => response.ContentType = value;
+        }
+
+        public Encoding ContentEncoding
+        {
+            get => response.ContentEncoding ?? Encoding.UTF8;
+            set => response.ContentEncoding = value;
+        }
+
+        public WebHeaderCollection Headers => response.Headers;
+
+        public HttpStatusCode StatusCode
+        {
+            get => (HttpStatusCode)response.StatusCode;
+            set
+            {
+                response.StatusCode = (int)value;
+                response.StatusDescription = value.ToString();
+            }
+        }
+
+        public long ContentLength64
+        {
+            get => response.ContentLength64;
+            set => response.ContentLength64 = value;
+        }
+
+        public Stream Body { get; } = new MemoryStream();
+
+        private readonly HttpListenerResponse response;
+
+        public HttpResponse(HttpListenerResponse response)
+        {
+            this.response = response ?? throw new ArgumentNullException(nameof(response));
+            AppendHeader("Server", "Everest");
+        }
+
+        public void AddHeader(string name, string value) => response.AddHeader(name, value);
+
+        public void AppendHeader(string name, string value) => response.AppendHeader(name, value);
+
+        public void RemoveHeader(string name) => response.Headers.Remove(name);
+
+        public Task WriteAsync(HttpStatusCode code, string content)
+        {
+	        if (content == null) 
+		        throw new ArgumentNullException(nameof(content));
+
+	        return WriteAsync(code, content, ContentEncoding);
+        }
+
+        public Task WriteAsync(string content)
+        {
+	        if (content == null) 
+		        throw new ArgumentNullException(nameof(content));
+
+	        return WriteAsync(HttpStatusCode.OK, content, ContentEncoding);
+        }
+
+        public async Task WriteAsync(HttpStatusCode code, string content, Encoding encoding)
+        {
+	        if (content == null) 
+		        throw new ArgumentNullException(nameof(content));
+	       
+	        if (encoding == null) 
+		        throw new ArgumentNullException(nameof(encoding));
+
+	        StatusCode = code;
+            await WriteAsync(content, encoding);
+        }
+
+        public async Task WriteAsync(string content, Encoding encoding)
+        {
+	        if (content == null)
+		        throw new ArgumentNullException(nameof(content));
+	       
+	        if (encoding == null) 
+		        throw new ArgumentNullException(nameof(encoding));
+
+	        var bytes = encoding.GetBytes(content);
+	        await WriteAsync(bytes);
+        }
+        
+        public async Task WriteAsync(byte[] content)
+        {
+	        if (content == null)
+		        throw new ArgumentNullException(nameof(content));
+
+	        using (var ms = new MemoryStream(content))
+	        {
+		        await WriteAsync(ms);
+	        }
 		}
 
-		public string ContentType
-		{
-			get => response.ContentType;
-			set => response.ContentType = value;
-		}
+        public async Task WriteAsync(Stream content)
+        {
+	        if (content == null)
+		        throw new ArgumentNullException(nameof(content));
 
-		public Encoding ContentEncoding
-		{
-			get => response.ContentEncoding ?? Encoding.UTF8;
-			set => response.ContentEncoding = value;
-		}
+	        await FlushAsync();
+	        await content.CopyToAsync(Body);
+	        Body.Position = 0;
+        }
 
-		public WebHeaderCollection Headers => response.Headers;
+        public async Task FlushAsync()
+        {
+	        if (Body.Length > 0)
+	        {
+		        await Body.FlushAsync();
+	        }
+        }
 
-		public HttpStatusCode StatusCode
-		{
-			get => (HttpStatusCode)response.StatusCode;
-			set
-			{
-				response.StatusCode = (int)value;
-				response.StatusDescription = value.ToString();
-			}
-		}
+        public async Task SendAsync()
+        {
+            try
+            {
+                if (IsSent)
+                    throw new InvalidOperationException("Response is already sent.");
 
-		public long ContentLength64
-		{
-			get => response.ContentLength64;
-			set => response.ContentLength64 = value;
-		}
-		
-		public byte[] Body { get; private set; } 
+                if (IsClosed)
+                    throw new InvalidOperationException("Response is closed.");
 
-		private readonly HttpListenerResponse response;
-			
-		public HttpResponse(HttpListenerResponse response)
-		{
-			this.response = response ?? throw new ArgumentNullException(nameof(response));
-			AppendHeader("Server", "Everest");
-		}
-
-		public void AddHeader(string name, string value) => response.AddHeader(name, value);
-
-		public void AppendHeader(string name, string value) => response.AppendHeader(name, value);
-
-		public void RemoveHeader(string name) => response.Headers.Remove(name);
-		
-		public void Write(HttpStatusCode code, string content)
-		{
-			Write(code, content, ContentEncoding);
-		}
-		
-		public void Write(string content)
-		{
-			Write(HttpStatusCode.OK, content, ContentEncoding);
-		}
-
-		public void Write(HttpStatusCode code, string content, Encoding encoding)
-		{
-			StatusCode = code;
-			Write(content, encoding);
-		}
-
-		public void Write(string content, Encoding encoding)
-		{
-			Body = encoding.GetBytes(content);
-		}
-
-		public void Write(byte[] content)
-		{
-			Body = content;
-		}
-
-		public void Send()
-		{
-			try
-			{
-				if (IsSent)
-					throw new InvalidOperationException("Response is already sent.");
-
-				if (IsClosed)
-					throw new InvalidOperationException("Response is closed.");
-
-				if (!response.OutputStream.CanWrite)
-					throw new NotSupportedException("Response stream does not support writing.");
+                if (!response.OutputStream.CanWrite)
+                    throw new NotSupportedException("Response stream does not support writing.");
 
 				if (Body != null)
 				{
-					ContentLength64 = Body.Length;
-					response.OutputStream.Write(Body, 0, Body.Length);
+					Body.Position = 0;
+					await Body.CopyToAsync(response.OutputStream);
 				}
-				
+
 				IsSent = true;
-			}
-			finally
-			{
-				if (response.OutputStream.CanWrite)
-					response.OutputStream.Close();
+            }
+            finally
+            {
+                if (response.OutputStream.CanWrite)
+                    response.OutputStream.Close();
 
-				Close();
-			}
-		}
+                Close();
+            }
+        }
 
-		public void Close()
-		{
-			if (!IsClosed)
-				response.Close();
+        public void Close()
+        {
+            if (!IsClosed)
+                response.Close();
 
-			IsClosed = true;
-		}
-	}
+            IsClosed = true;
+        }
+    }
 
-	public static class HttpResponseExtensions
+    public static class HttpResponseExtensions
 	{
-		public static void Write200Ok(this HttpResponse response, string content)
+		public static async Task Write200OkAsync(this HttpResponse response, string content)
 		{
 			if (response == null) throw 
 				new ArgumentNullException(nameof(response));
+			
+			if (content == null) 
+				throw new ArgumentNullException(nameof(content));
 
 			response.RemoveHeader("Content-Type");
 			response.AppendHeader("Content-Type", "text/plain; charset=utf-8");
-			response.Write(HttpStatusCode.OK, content);
+			await response.WriteAsync(HttpStatusCode.OK, content);
 		}
 
-		public static void Write500InternalServerError(this HttpResponse response, string content)
+		public static async Task Write500InternalServerErrorAsync(this HttpResponse response, string content)
 		{
 			if (response == null) 
 				throw new ArgumentNullException(nameof(response));
+			
+			if (content == null) 
+				throw new ArgumentNullException(nameof(content));
 
 			response.KeepAlive = false;
 			response.RemoveHeader("Content-Type");
 			response.AppendHeader("Content-Type", "text/plain; charset=utf-8");
-			response.Write(HttpStatusCode.InternalServerError, content);
+			await response.WriteAsync(HttpStatusCode.InternalServerError, content);
 		}
 
-		public static void Write400BadRequest(this HttpResponse response, string content)
+		public static async Task Write400BadRequestAsync(this HttpResponse response, string content)
 		{
 			if (response == null) 
 				throw new ArgumentNullException(nameof(response));
+			
+			if (content == null) 
+				throw new ArgumentNullException(nameof(content));
 
 			response.KeepAlive = false;
 			response.RemoveHeader("Content-Type");
 			response.AppendHeader("Content-Type", "text/plain; charset=utf-8");
-			response.Write(HttpStatusCode.BadRequest, content);
+			await response.WriteAsync(HttpStatusCode.BadRequest, content);
 		}
 
-		public static void Write404NotFound(this HttpResponse response, string content)
+		public static async Task Write404NotFoundAsync(this HttpResponse response, string content)
 		{
 			if (response == null) 
 				throw new ArgumentNullException(nameof(response));
+			
+			if (content == null) 
+				throw new ArgumentNullException(nameof(content));
 
 			response.KeepAlive = false;
 			response.RemoveHeader("Content-Type");
 			response.AppendHeader("Content-Type", "text/plain; charset=utf-8");
-			response.Write(HttpStatusCode.NotFound, content);
+			await response.WriteAsync(HttpStatusCode.NotFound, content);
 		}
 
-		public static void Write401Unauthorized(this HttpResponse response, string content)
+		public static async Task Write401UnauthorizedAsync(this HttpResponse response, string content)
 		{
 			if (response == null) 
 				throw new ArgumentNullException(nameof(response));
+			
+			if (content == null) 
+				throw new ArgumentNullException(nameof(content));
 
 			response.KeepAlive = false;
 			response.RemoveHeader("Content-Type");
 			response.AppendHeader("Content-Type", "text/plain; charset=utf-8");
-			response.Write(HttpStatusCode.Unauthorized, content);
+			await response.WriteAsync(HttpStatusCode.Unauthorized, content);
 		}
 
-		public static void WriteJson<T>(this HttpResponse response, T content)
+		public static async Task WriteJsonAsync<T>(this HttpResponse response, T content)
 		{
 			if (response == null) 
 				throw new ArgumentNullException(nameof(response));
+			
+			if (content == null) 
+				throw new ArgumentNullException(nameof(content));
 
-			response.WriteJson(HttpStatusCode.OK, content);
+			await response.WriteJsonAsync(HttpStatusCode.OK, content);
 		}
 
-		public static void WriteJson<T>(this HttpResponse response, HttpStatusCode code, T content)
+		public static async Task WriteJsonAsync<T>(this HttpResponse response, HttpStatusCode code, T content)
 		{
 			if (response == null) 
 				throw new ArgumentNullException(nameof(response));
+			
+			if (content == null) 
+				throw new ArgumentNullException(nameof(content));
 
-			response.WriteJson(code, JsonSerializer.Serialize(content));
+			await response.WriteJsonAsync(code, JsonSerializer.Serialize(content));
 		}
 
-		public static void WriteJson<T>(this HttpResponse response, HttpStatusCode code, T content, JsonSerializerOptions options)
+		public static async Task WriteJsonAsync<T>(this HttpResponse response, HttpStatusCode code, T content, JsonSerializerOptions options)
 		{
 			if (response == null) 
 				throw new ArgumentNullException(nameof(response));
+			
+			if (content == null) 
+				throw new ArgumentNullException(nameof(content));
+			
+			if (options == null) 
+				throw new ArgumentNullException(nameof(options));
 
-			response.WriteJson(code, JsonSerializer.Serialize(content, options));
+			await response.WriteJsonAsync(code, JsonSerializer.Serialize(content, options));
 		}
 
-		public static void WriteJson(this HttpResponse response, string json)
+		public static async Task WriteJsonAsync(this HttpResponse response, string json)
 		{
 			if (response == null) 
 				throw new ArgumentNullException(nameof(response));
+			
+			if (json == null) 
+				throw new ArgumentNullException(nameof(json));
 
-			response.WriteJson(HttpStatusCode.OK, json);
+			await response.WriteJsonAsync(HttpStatusCode.OK, json);
 		}
 
-		public static void WriteJson(this HttpResponse response, HttpStatusCode code, string json)
+		public static async Task WriteJsonAsync(this HttpResponse response, HttpStatusCode code, string json)
 		{
 			if (response == null) 
 				throw new ArgumentNullException(nameof(response));
+			
+			if (json == null) 
+				throw new ArgumentNullException(nameof(json));
 
 			response.RemoveHeader("Content-Type");
 			response.AddHeader("Content-Type", "application/json");
-			response.Write(code, json);
+			await response.WriteAsync(code, json);
 		}
 	}
 }

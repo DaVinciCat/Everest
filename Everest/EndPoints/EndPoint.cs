@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Threading.Tasks;
 using Everest.Http;
 
 namespace Everest.EndPoints
@@ -12,21 +13,21 @@ namespace Everest.EndPoints
 
 		public MethodInfo MethodInfo { get; }
 
-		public Action<HttpContext> Action { get; }
+		public Func<HttpContext, Task> Action { get; }
 		
-		public EndPoint(Type type, MethodInfo methodInfo, Action<HttpContext> action)
+		public EndPoint(Type type, MethodInfo methodInfo, Func<HttpContext, Task> action)
 		{
 			Type = type ?? throw new ArgumentNullException(nameof(type));
 			MethodInfo = methodInfo ?? throw new ArgumentNullException(nameof(methodInfo));
 			Action = action ?? throw new ArgumentNullException(nameof(action));
 		}
 
-		public void Invoke(HttpContext context)
+		public async Task InvokeAsync(HttpContext context)
 		{
 			if(context == null)
 				throw new ArgumentNullException(nameof(context));
 
-			Action.Invoke(context);
+			await Action.Invoke(context);
 		}
 	}
 }

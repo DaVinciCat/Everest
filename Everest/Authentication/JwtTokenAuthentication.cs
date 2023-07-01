@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Threading.Tasks;
 using Everest.Http;
 using Everest.Security;
 using Microsoft.Extensions.Logging;
@@ -41,7 +42,7 @@ namespace Everest.Authentication
 			
 		}
 
-		public bool TryAuthenticate(HttpContext context)
+		public Task<bool> TryAuthenticateAsync(HttpContext context)
 		{
 			if (context == null) 
 				throw new ArgumentNullException(nameof(context));
@@ -50,19 +51,19 @@ namespace Everest.Authentication
 			if (string.IsNullOrEmpty(header))
 			{
 				Logger.LogWarning($"{context.Id} - Failed to authenticate. Missing header: {options.Header}. Scheme: {Scheme}. ");
-				return false;
+				return Task.FromResult(false);
 			}
 
 			if (Scheme == options.Header)
 			{
 				Logger.LogWarning($"{context.Id} - Failed to authenticate. No token supplied. Scheme: {Scheme}");
-				return false;
+				return Task.FromResult(false);
 			}
 
 			if (!header.StartsWith(Scheme + ' ', StringComparison.OrdinalIgnoreCase))
 			{
 				Logger.LogWarning($"{context.Id} - Failed to authenticate. Wrong header: {options.Header}. Scheme: {Scheme}");
-				return false;
+				return Task.FromResult(false);
 			}
 
 			try
@@ -75,12 +76,12 @@ namespace Everest.Authentication
 				context.User.AddIdentity(identity);
 
 				Logger.LogTrace($"{context.Id} - Successfully authenticated. Scheme: {Scheme}");
-				return true;
+				return Task.FromResult(true);
 			}
 			catch(Exception ex)
 			{
 				Logger.LogError(ex, $"{context.Id} - Failed to authenticate. Failed to validate token. Scheme: {Scheme}");
-				return false;
+				return Task.FromResult(false);
 			}
 		}
 	}

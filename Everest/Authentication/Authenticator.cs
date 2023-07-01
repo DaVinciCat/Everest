@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Everest.Http;
 using Microsoft.Extensions.Logging;
 
@@ -17,7 +18,7 @@ namespace Everest.Authentication
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 		
-		public void Authenticate(HttpContext context)
+		public async Task AuthenticateAsync(HttpContext context)
 		{
 			if (context == null) 
 				throw new ArgumentNullException(nameof(context));
@@ -26,7 +27,7 @@ namespace Everest.Authentication
 
 			foreach (var authentication in Authentications)
 			{
-				authentication.TryAuthenticate(context);
+				await authentication.TryAuthenticateAsync(context);
 			}
 		}
 	}

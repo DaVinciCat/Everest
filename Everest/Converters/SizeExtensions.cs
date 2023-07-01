@@ -1,13 +1,25 @@
-﻿namespace Everest.Converters
+﻿using System.IO;
+
+namespace Everest.Converters
 {
 	public static class SizeExtensions
 	{
+		public static string ToReadableSize(this Stream stream)
+		{
+			return ToReadableSize(stream?.Length ?? 0);
+		}
+
 		public static string ToReadableSize(this byte[] bytes)
 		{
 			return ToReadableSize(bytes?.Length ?? 0);
 		}
 
-		public static string ToReadableSize(this int size, int unit = 0)
+		public static string ToReadableSize(this int size)
+		{
+			return ToReadableSize(size, 0);
+		}
+
+		public static string ToReadableSize(this long size, int unit = 0)
 		{
 			string[] units = { "B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB" };
 

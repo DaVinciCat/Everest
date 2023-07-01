@@ -1,9 +1,10 @@
-﻿using Everest.Http;
+﻿using System.Threading.Tasks;
+using Everest.Http;
 
 namespace Everest.EndPoints
 {
 	public interface IEndPointInvoker
 	{
-		bool TryInvokeEndPoint(HttpContext context);
+		Task<bool> TryInvokeEndPointAsync(HttpContext context);
 	}
 }

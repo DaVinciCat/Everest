@@ -3,8 +3,10 @@ using Everest.Http;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System;
+using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Everest.Compression
 {
@@ -17,10 +19,10 @@ namespace Everest.Compression
 	{
 		public string[] Encodings => Compressors.Keys.ToArray();
 
-		public Dictionary<string, Func<byte[], byte[]>> Compressors { get; set; } = new()
+		public Dictionary<string, Func<Stream, Task<Stream>>> Compressors { get; set; } = new()
 		{
-			{ "gzip", bytes => bytes.Gzip(CompressionLevel.Fastest) },
-			{ "deflate", bytes => bytes.Deflate(CompressionLevel.Fastest) }
+			{ "gzip", stream => stream.GzipAsync(CompressionLevel.Fastest) },
+			{ "deflate", stream => stream.DeflateAsync(CompressionLevel.Fastest) }
 		};
 
 		private readonly ResponseCompressionOptions options;
@@ -39,7 +41,7 @@ namespace Everest.Compression
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
-		public bool TryCompressResponse(HttpContext context)
+		public async Task<bool> TryCompressResponseAsync(HttpContext context)
 		{
 			if (context == null) 
 				throw new ArgumentNullException(nameof(context));
@@ -70,10 +72,10 @@ namespace Everest.Compression
 			{
 				if (Compressors.TryGetValue(encoding, out var compressor))
 				{
-					var compressed = compressor(content);
+					var compressed = await compressor(content);
 					context.Response.RemoveHeader("Content-Encoding");
 					context.Response.AddHeader("Content-Encoding", encoding);
-					context.Response.Write(compressed);
+					await context.Response.WriteAsync(compressed);
 
 					Logger.LogTrace($"{context.Id} - Successfully compressed response: [{content.ToReadableSize()}] -> [{compressed.ToReadableSize()}]. Content-Encoding: {encoding}");
 					return true;

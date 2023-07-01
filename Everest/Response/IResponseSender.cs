@@ -1,9 +1,10 @@
-﻿using Everest.Http;
+﻿using System.Threading.Tasks;
+using Everest.Http;
 
 namespace Everest.Response
 {
 	public interface IResponseSender
 	{
-		bool TrySendResponse(HttpContext context);
+		Task<bool> TrySendResponseAsync(HttpContext context);
 	}
 }

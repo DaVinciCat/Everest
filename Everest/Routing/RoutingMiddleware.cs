@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Everest.Http;
 using Everest.Middleware;
 
@@ -13,15 +14,15 @@ namespace Everest.Routing
             this.router = router ?? throw new ArgumentNullException(nameof(router));
         }
 
-        public override void Invoke(HttpContext context)
+        public override async Task InvokeAsync(HttpContext context)
         {
 	        if (context == null) 
 		        throw new ArgumentNullException(nameof(context));
 
-	        router.TryRoute(context);
+	        await router.TryRouteAsync(context);
             
             if (HasNext)
-                Next.Invoke(context);
+                await Next.InvokeAsync(context);
         }
     }
 }

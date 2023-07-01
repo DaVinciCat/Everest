@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Everest.Converters;
 using Everest.Http;
 using Everest.Net;
@@ -15,7 +16,7 @@ namespace Everest.Response
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
-		public bool TrySendResponse(HttpContext context)
+		public async Task<bool> TrySendResponseAsync(HttpContext context)
 		{
 			if (context == null) 
 				throw new ArgumentNullException(nameof(context));
@@ -34,8 +35,8 @@ namespace Everest.Response
 				return false;
 			}
 
-			context.Response.Send();
-			Logger.LogTrace($"{context.Id} - Successfully sended response to: {context.Request.RemoteEndPoint.Description()} [{context.Response.Body.ToReadableSize()}]");
+			await context.Response.SendAsync();
+			Logger.LogTrace($"{context.Id} - Successfully sended response to: {context.Request.RemoteEndPoint.Description()} [{context.Response.ContentLength64.ToReadableSize()}]");
 			return true;
 		}
 	}

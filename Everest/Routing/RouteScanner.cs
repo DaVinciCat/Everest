@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using Everest.EndPoints;
 using Everest.Http;
 using Everest.Rest;
@@ -39,7 +40,7 @@ namespace Everest.Routing
 					var attribute = GetAttributes<RestRouteAttribute>(method).FirstOrDefault();
 					if (attribute != null)
 					{
-						var action = (Action<HttpContext>)method.CreateDelegate(typeof(Action<HttpContext>), null);
+						var action = (Func<HttpContext, Task>)method.CreateDelegate(typeof(Func<HttpContext, Task>), null);
 						var route = new Route(attribute.HttpMethod, $"{routePrefix}/{attribute.RoutePattern}");
 						var endPoint = new EndPoint(type, method, action);
 						var segment = builder.Build(route.Pattern);

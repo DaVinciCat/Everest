@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Everest.Http;
 using Everest.Routing;
 using Microsoft.Extensions.Logging;
@@ -14,7 +15,7 @@ namespace Everest.EndPoints
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
-		public bool TryInvokeEndPoint(HttpContext context)
+		public async Task<bool> TryInvokeEndPointAsync(HttpContext context)
 		{
 			if (context == null) 
 				throw new ArgumentNullException(nameof(context));
@@ -26,7 +27,7 @@ namespace Everest.EndPoints
 			}
 
 			Logger.LogTrace($"{context.Id} - Try invoke endpoint from: {context.Request.Description} to: {descriptor.EndPoint.Description}");
-			descriptor.EndPoint.Invoke(context);
+			await descriptor.EndPoint.InvokeAsync(context);
 			Logger.LogTrace($"{context.Id} - Successfully invoked endpoint: {descriptor.EndPoint.Description}");
 
 			return true;

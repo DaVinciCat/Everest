@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using Everest.Http;
 using Everest.Rest;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,22 +12,24 @@ namespace Everest.Shell
 	public static class Rest
 	{
 		[RestRoute("GET", "welcome")]
-		public static void Welcome(HttpContext context)
+		public static async Task Welcome(HttpContext context)
 		{
 			var service = context.GetGreetingsService();
 			var greetings = service.Greet();
-
-			context.Response.WriteJson(new { Message = greetings, From = "Everest", Success = true });
+			
+			await context.Response.WriteJsonAsync(new { Message = greetings, From = "Everest", Success = true });
 		}
 
 		[HttpGet("welcome/{me:string}")]
-		public static void WelcomeMe(HttpContext context)
+		public static async Task WelcomeMe(HttpContext context)
 		{
 			var me = context.Request.PathParameters.GetParameterValue<string>("me");
 			var service = context.GetGreetingsService();
 			var greetings = service.Greet();
 
-			context.Response.WriteJson(new { Message = greetings, To = me, From = "Everest", Success = true });
+			Thread.Sleep(50);
+
+			await context.Response.WriteJsonAsync(new { Message = greetings, To = me, From = "Everest", Success = true });
 		}
 	}
 
@@ -35,8 +39,8 @@ namespace Everest.Shell
 		{
 			var services = new ServiceCollection();
 			services.AddDefaults()
-					.AddSingleton(_ => new GreetingsService())
-					.AddConsoleLoggerFactory();
+				.AddSingleton(_ => new GreetingsService());
+					//.AddConsoleLoggerFactory();
 
 			using var rest = new RestServerBuilder(services)
 				.UsePrefixes("http://localhost:8080/")

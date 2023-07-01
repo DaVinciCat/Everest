@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Specialized;
+using System.Threading.Tasks;
 using Everest.Collections;
 
 namespace Everest.Routing
@@ -24,7 +25,7 @@ namespace Everest.Routing
 			this.options = options ?? throw new ArgumentNullException(nameof(options));
 		}
 
-		public bool TryParse(RouteSegment segment, string endPoint, out NameValueCollection parameters)
+		public async Task<bool> TryParseAsync(RouteSegment segment, string endPoint, NameValueCollection parameters = null)
 		{
 			if (segment == null) 
 				throw new ArgumentNullException(nameof(segment));
@@ -32,12 +33,12 @@ namespace Everest.Routing
 			if (endPoint == null) 
 				throw new ArgumentNullException(nameof(endPoint));
 
-			parameters = new NameValueCollection();
+			parameters ??= new NameValueCollection();
 
 			var splitted = endPoint.Split(options.Delimiters, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 			var segments = new Iterator<string>(splitted);
 
-			return segment.TryParse(segments, parameters) && !segments.HasNext();
+			return await segment.TryParseAsync(segments, parameters) && !segments.HasNext();
 		}
 	}
 }

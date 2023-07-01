@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Everest.Http;
 using Everest.Middleware;
 
@@ -13,15 +14,15 @@ namespace Everest.Response
             this.sender = sender ?? throw new ArgumentNullException(nameof(sender));
         }
 
-        public override void Invoke(HttpContext context)
+        public override async Task InvokeAsync(HttpContext context)
         {
 	        if (context == null) 
 		        throw new ArgumentNullException(nameof(context));
 
-	        sender.TrySendResponse(context);
+	        await sender.TrySendResponseAsync(context);
 
             if (HasNext)
-                Next.Invoke(context);
+                await Next.InvokeAsync(context);
         }
     }
 }

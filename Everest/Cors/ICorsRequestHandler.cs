@@ -1,4 +1,5 @@
-﻿using Everest.Http;
+﻿using System.Threading.Tasks;
+using Everest.Http;
 
 namespace Everest.Cors
 {
@@ -6,6 +7,6 @@ namespace Everest.Cors
 	{
 		CorsPolicyCollection Policies { get; }
 		
-		public bool TryHandleCorsRequest(HttpContext context);
+		public Task<bool> TryHandleCorsRequestAsync(HttpContext context);
 	}
 }

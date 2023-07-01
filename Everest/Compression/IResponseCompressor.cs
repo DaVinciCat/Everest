@@ -1,9 +1,10 @@
-﻿using Everest.Http;
+﻿using System.Threading.Tasks;
+using Everest.Http;
 
 namespace Everest.Compression
 {
 	public interface IResponseCompressor
 	{
-		bool TryCompressResponse(HttpContext context);
+		Task<bool> TryCompressResponseAsync(HttpContext context);
 	}
 }

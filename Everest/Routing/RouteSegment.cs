@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Everest.Collections;
 
 namespace Everest.Routing
@@ -22,7 +23,7 @@ namespace Everest.Routing
 			NextSegment = next;
 		}
 
-		public abstract bool TryParse(Iterator<string> segments, NameValueCollection parameters);
+		public abstract Task<bool> TryParseAsync(Iterator<string> segments, NameValueCollection parameters);
 	}
 
 	public class AlphaNumericRouteSegment : RouteSegment
@@ -37,7 +38,7 @@ namespace Everest.Routing
 
 		}
 
-		public override bool TryParse(Iterator<string> segments, NameValueCollection parameters)
+		public override async Task<bool> TryParseAsync(Iterator<string> segments, NameValueCollection parameters)
 		{
 			if (segments == null) 
 				throw new ArgumentNullException(nameof(segments));
@@ -54,7 +55,7 @@ namespace Everest.Routing
 
 			if (result && HasNextSegment)
 			{
-				return NextSegment.TryParse(segments, parameters);
+				await NextSegment.TryParseAsync(segments, parameters);
 			}
 
 			return result;
@@ -82,7 +83,7 @@ namespace Everest.Routing
 			Name = match.Groups[0].Value;
 		}
 
-		public override bool TryParse(Iterator<string> segments, NameValueCollection parameters)
+		public override async Task<bool> TryParseAsync(Iterator<string> segments, NameValueCollection parameters)
 		{
 			if (segments == null) 
 				throw new ArgumentNullException(nameof(segments));
@@ -99,7 +100,7 @@ namespace Everest.Routing
 
 			if (HasNextSegment)
 			{
-				return NextSegment.TryParse(segments, parameters);
+				await NextSegment.TryParseAsync(segments, parameters);
 			}
 
 			return true;
@@ -124,7 +125,7 @@ namespace Everest.Routing
 			Name = match.Groups[0].Value;
 		}
 
-		public override bool TryParse(Iterator<string> segments, NameValueCollection parameters)
+		public override async Task<bool> TryParseAsync(Iterator<string> segments, NameValueCollection parameters)
 		{
 			if (segments == null)
 				throw new ArgumentNullException(nameof(segments));
@@ -144,7 +145,7 @@ namespace Everest.Routing
 
 			if (HasNextSegment)
 			{
-				return NextSegment.TryParse(segments, parameters);
+				await NextSegment.TryParseAsync(segments, parameters);
 			}
 
 			return true;
@@ -169,7 +170,7 @@ namespace Everest.Routing
 			Name = match.Groups[0].Value;
 		}
 
-		public override bool TryParse(Iterator<string> segments, NameValueCollection parameters)
+		public override async Task<bool> TryParseAsync(Iterator<string> segments, NameValueCollection parameters)
 		{
 			if (segments == null)
 				throw new ArgumentNullException(nameof(segments));
@@ -189,7 +190,7 @@ namespace Everest.Routing
 
 			if (HasNextSegment)
 			{
-				return NextSegment.TryParse(segments, parameters);
+				await NextSegment.TryParseAsync(segments, parameters);
 			}
 
 			return true;
@@ -214,7 +215,7 @@ namespace Everest.Routing
 			Name = match.Groups[0].Value;
 		}
 
-		public override bool TryParse(Iterator<string> segments, NameValueCollection parameters)
+		public override async Task<bool> TryParseAsync(Iterator<string> segments, NameValueCollection parameters)
 		{
 			if (segments == null)
 				throw new ArgumentNullException(nameof(segments));
@@ -234,7 +235,7 @@ namespace Everest.Routing
 
 			if (HasNextSegment)
 			{
-				return NextSegment.TryParse(segments, parameters);
+				await NextSegment.TryParseAsync(segments, parameters);
 			}
 
 			return true;
@@ -259,7 +260,7 @@ namespace Everest.Routing
 			Name = match.Groups[0].Value;
 		}
 
-		public override bool TryParse(Iterator<string> segments, NameValueCollection parameters)
+		public override async Task<bool> TryParseAsync(Iterator<string> segments, NameValueCollection parameters)
 		{
 			if (segments == null)
 				throw new ArgumentNullException(nameof(segments));
@@ -279,7 +280,7 @@ namespace Everest.Routing
 
 			if (HasNextSegment)
 			{
-				return NextSegment.TryParse(segments, parameters);
+				await NextSegment.TryParseAsync(segments, parameters);
 			}
 
 			return true;
@@ -304,7 +305,7 @@ namespace Everest.Routing
 			Name = match.Groups[0].Value;
 		}
 
-		public override bool TryParse(Iterator<string> segments, NameValueCollection parameters)
+		public override async Task<bool> TryParseAsync(Iterator<string> segments, NameValueCollection parameters)
 		{
 			if (segments == null)
 				throw new ArgumentNullException(nameof(segments));
@@ -324,7 +325,7 @@ namespace Everest.Routing
 
 			if (HasNextSegment)
 			{
-				return NextSegment.TryParse(segments, parameters);
+				await NextSegment.TryParseAsync(segments, parameters);
 			}
 
 			return true;
@@ -349,7 +350,7 @@ namespace Everest.Routing
 			Name = match.Groups[0].Value;
 		}
 
-		public override bool TryParse(Iterator<string> segments, NameValueCollection parameters)
+		public override async Task<bool> TryParseAsync(Iterator<string> segments, NameValueCollection parameters)
 		{
 			if (segments == null)
 				throw new ArgumentNullException(nameof(segments));
@@ -369,7 +370,7 @@ namespace Everest.Routing
 
 			if (HasNextSegment)
 			{
-				return NextSegment.TryParse(segments, parameters);
+				await NextSegment.TryParseAsync(segments, parameters);
 			}
 
 			return true;

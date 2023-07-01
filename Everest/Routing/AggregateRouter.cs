@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Everest.Http;
 
 namespace Everest.Routing
@@ -28,15 +29,15 @@ namespace Everest.Routing
 				}
 			};
 
-			TryRoute = context =>
+			TryRouteAsync = async context =>
 			{
 				foreach (var router in Routers)
 				{
-					if (router.TryRoute(context))
+					if (await router.TryRouteAsync(context))
 						return true;
 				}
 
-				OnRouteNotFound(context);
+				await OnRouteNotFoundAsync(context);
 				return false;
 			};
 		}
@@ -46,18 +47,21 @@ namespace Everest.Routing
 			RegisterRoute(descriptor);
 		}
 
-		bool IRouter.TryRoute(HttpContext context)
+		Task<bool> IRouter.TryRouteAsync(HttpContext context)
 		{
-			return TryRoute(context);
+			return TryRouteAsync(context);
 		}
 
 		public Action<RouteDescriptor> RegisterRoute { get; set; }
 
-		public Func<HttpContext, bool> TryRoute { get; set; }
+		public Func<HttpContext, Task<bool>> TryRouteAsync { get; set; }
 
-		public Action<HttpContext> OnRouteNotFound { get; set; } = context =>
+		public Func<HttpContext, Task> OnRouteNotFoundAsync { get; set; } = async context =>
 		{
-			context.Response.Write404NotFound($"Requested route not found: {context.Request.Description}");
+			if (context == null) 
+				throw new ArgumentNullException(nameof(context));
+
+			await context.Response.Write404NotFoundAsync($"Requested route not found: {context.Request.Description}");
 		};
 	}
 }

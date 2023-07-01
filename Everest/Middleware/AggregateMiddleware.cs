@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Everest.Http;
 
 namespace Everest.Middleware
@@ -38,7 +39,7 @@ namespace Everest.Middleware
 			collection.Add(middleware);
 		}
 		
-		public override void Invoke(HttpContext request)
+		public override async Task InvokeAsync(HttpContext request)
 		{
 			if (request == null) 
 				throw new ArgumentNullException(nameof(request));
@@ -46,7 +47,7 @@ namespace Everest.Middleware
 			if (collection.Count <= 0)
 				throw new InvalidOperationException("No middleware added");
 			
-			collection[0].Invoke(request);
+			await collection[0].InvokeAsync(request);
 		}
 	}
 }

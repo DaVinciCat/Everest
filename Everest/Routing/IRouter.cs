@@ -1,4 +1,5 @@
-﻿using Everest.Http;
+﻿using System.Threading.Tasks;
+using Everest.Http;
 
 namespace Everest.Routing
 {
@@ -8,6 +9,6 @@ namespace Everest.Routing
 
 		void RegisterRoute(RouteDescriptor descriptor);
 
-		bool TryRoute(HttpContext context);
+		Task<bool> TryRouteAsync(HttpContext context);
 	}
 }

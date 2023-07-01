@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Everest.Http;
 using Microsoft.Extensions.Logging;
 
@@ -13,7 +14,7 @@ namespace Everest.Exceptions
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
-		public void Handle(HttpContext context, Exception ex)
+		public async Task HandleAsync(HttpContext context, Exception ex)
 		{
 			if (context == null) 
 				throw new ArgumentNullException(nameof(context));
@@ -22,12 +23,12 @@ namespace Everest.Exceptions
 				throw new ArgumentNullException(nameof(ex));
 
 			Logger.LogError(ex, $"{context.Id} - {ex.Message}");
-			OnException(context, ex);
+			await OnExceptionAsync(context, ex);
 		}
 
-		public Action<HttpContext, Exception> OnException { get; set; } = (context, ex) =>
+		public Func<HttpContext, Exception, Task> OnExceptionAsync { get; set; } = async (context, ex) =>
 		{
-			context.Response.Write500InternalServerError($"Failed to process request: {context.Request.Description}.{Environment.NewLine}{ex.Message}");
+			await context.Response.Write500InternalServerErrorAsync($"Failed to process request: {context.Request.Description}.{Environment.NewLine}{ex.Message}");
 		};
 	}
 }

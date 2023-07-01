@@ -1,39 +1,40 @@
 ﻿using System;
 using System.IO;
 using System.IO.Compression;
+using System.Threading.Tasks;
 
 namespace Everest.Compression
 {
 	public static class CompressionExtensions
 	{
-		public static byte[] Gzip(this byte[] buffer, CompressionLevel level = CompressionLevel.Optimal)
+		public static async Task<Stream> GzipAsync(this Stream content, CompressionLevel level = CompressionLevel.Optimal)
 		{
-			if (buffer == null) 
-				throw new ArgumentNullException(nameof(buffer));
+			if (content == null)
+				throw new ArgumentNullException(nameof(content));
 
-			using (var ms = new MemoryStream())
-			using (var gzip = new GZipStream(ms, level))
+			var ms = new MemoryStream();
+			await using (var gzip = new GZipStream(ms, level, true))
 			{
-				gzip.Write(buffer, 0, buffer.Length);
-				gzip.Close();
-
-				return ms.ToArray();
+				await content.CopyToAsync(gzip);
 			}
+
+			ms.Position = 0;
+			return ms;
 		}
 
-		public static byte[] Deflate(this byte[] buffer, CompressionLevel level = CompressionLevel.Optimal)
+		public static async Task<Stream> DeflateAsync(this Stream content, CompressionLevel level = CompressionLevel.Optimal)
 		{
-			if (buffer == null) 
-				throw new ArgumentNullException(nameof(buffer));
+			if (content == null)
+				throw new ArgumentNullException(nameof(content));
 
-			using (var ms = new MemoryStream())
-			using (var deflate = new DeflateStream(ms, level))
+			var ms = new MemoryStream();
+			await using (var deflate = new DeflateStream(ms, level, true))
 			{
-				deflate.Write(buffer, 0, buffer.Length);
-				deflate.Close();
-
-				return ms.ToArray();
+				await content.CopyToAsync(deflate);
 			}
+
+			ms.Position = 0;
+			return ms;
 		}
-	}
+    }
 }

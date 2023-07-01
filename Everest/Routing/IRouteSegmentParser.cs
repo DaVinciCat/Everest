@@ -1,9 +1,10 @@
 ﻿using System.Collections.Specialized;
+using System.Threading.Tasks;
 
 namespace Everest.Routing
 {
 	public interface IRouteSegmentParser
 	{
-		bool TryParse(RouteSegment segment, string endPoint, out NameValueCollection parameters);
+		Task<bool> TryParseAsync(RouteSegment segment, string endPoint, NameValueCollection parameters = null);
 	}
 }

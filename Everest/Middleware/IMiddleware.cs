@@ -1,4 +1,5 @@
-﻿using Everest.Http;
+﻿using System.Threading.Tasks;
+using Everest.Http;
 
 namespace Everest.Middleware
 {
@@ -6,6 +7,6 @@ namespace Everest.Middleware
 	{
 		void SetNextMiddleware(IMiddleware next);
 
-		void Invoke(HttpContext context);
+		Task InvokeAsync(HttpContext context);
 	}
 }

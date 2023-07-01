@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Threading.Tasks;
 using Everest.Http;
 using Microsoft.Extensions.Logging;
 
@@ -46,14 +47,14 @@ namespace Everest.Cors
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 		
-		public bool TryHandleCorsRequest(HttpContext context)
+		public Task<bool> TryHandleCorsRequestAsync(HttpContext context)
 		{
 			if (context == null) 
 				throw new ArgumentNullException(nameof(context));
 
 			if (!context.Request.IsCorsPreflight())
 			{
-				return false;
+				return Task.FromResult(false);
 			}
 
 			var origin = context.Request.Headers["Origin"];
@@ -71,12 +72,12 @@ namespace Everest.Cors
 					context.Response.StatusCode = HttpStatusCode.NoContent;
 
 					Logger.LogTrace($"{context.Id} - Successfully handled CORS preflight request");
-					return true;
+					return Task.FromResult(true);
 				}
 			}
 
 			Logger.LogWarning($"{context.Id} - Failed to handle CORS preflight request. Request contains no supported Origin: {origin}");
-			return true;
+			return Task.FromResult(true);
 		}
 
 		#region Headers

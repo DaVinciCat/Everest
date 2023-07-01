@@ -153,14 +153,14 @@ namespace Everest.Rest
 			}
 		}
 
-		private void ProcessRequestAsync(HttpContext context)
+		private async void ProcessRequestAsync(HttpContext context)
 		{
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
 
 			try
 			{
-				aggregateMiddleware.Invoke(context);
+				await aggregateMiddleware.InvokeAsync(context);
 			}
 			catch (Exception ex)
 			{
