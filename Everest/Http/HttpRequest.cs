@@ -43,20 +43,25 @@ namespace Everest.Http
 			https://learn.microsoft.com/en-us/dotnet/api/system.net.httplistenerrequest.inputstream?view=net-7.0
 		*/
 
+		private string requestData;
+
 		public async Task<string> ReadRequestDataAsync()
 		{
 			if (!request.HasEntityBody)
 				return null;
 
+			if (requestData != null)
+				return requestData;
+
 			await using (request.InputStream)
 			{
 				using (var reader = new StreamReader(request.InputStream, request.ContentEncoding))
 				{
-					await reader.ReadToEndAsync();
+					requestData = await reader.ReadToEndAsync();
 				}
 			}
 
-			return null;
+			return requestData;
 		}
 	}
 }
