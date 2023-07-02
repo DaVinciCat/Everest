@@ -23,7 +23,7 @@ namespace Everest.Response
 
 			Logger.LogTrace($"{context.Id} - Try send response to: {context.Request.RemoteEndPoint.Description()}");
 			await context.Response.SendResponceAsync();
-			Logger.LogTrace($"{context.Id} - Successfully sended response to: {context.Request.RemoteEndPoint.Description()} [{context.Response.OutputStream.Length.ToReadableSize()}]");
+			Logger.LogTrace($"{context.Id} - Successfully sended response to: {context.Request.RemoteEndPoint.Description()} [{context.Response.ContentLength64.ToReadableSize()}]");
 			return true;
 		}
 	}

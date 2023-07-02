@@ -11,7 +11,13 @@ namespace Everest.Http
     {
         public bool ResponseSent { get; private set; }
 
-        public bool KeepAlive
+        public long ContentLength64
+        {
+	        get => response.ContentLength64;
+	        set => response.ContentLength64 = value;
+        }
+		
+		public bool KeepAlive
         {
             get => response.KeepAlive;
             set => response.KeepAlive = value;
