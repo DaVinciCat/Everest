@@ -3,6 +3,7 @@ using System.Collections.Specialized;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
 using Everest.Collections;
 
 namespace Everest.Http
@@ -42,18 +43,20 @@ namespace Everest.Http
 			https://learn.microsoft.com/en-us/dotnet/api/system.net.httplistenerrequest.inputstream?view=net-7.0
 		*/
 
-		public string ReadRequestData()
+		public async Task<string> ReadRequestDataAsync()
 		{
 			if (!request.HasEntityBody)
 				return null;
 
-			using (request.InputStream)
+			await using (request.InputStream)
 			{
 				using (var reader = new StreamReader(request.InputStream, request.ContentEncoding))
 				{
-					return reader.ReadToEnd();
+					await reader.ReadToEndAsync();
 				}
 			}
+
+			return null;
 		}
 	}
 }
