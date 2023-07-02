@@ -39,12 +39,9 @@ namespace Everest.Http
 			PathParameters = new ParameterCollection();
 		}
 
-		/*
-			https://learn.microsoft.com/en-us/dotnet/api/system.net.httplistenerrequest.inputstream?view=net-7.0
-		*/
+		#region RequestData
 
-		private string requestData;
-
+		/*https://learn.microsoft.com/en-us/dotnet/api/system.net.httplistenerrequest.inputstream?view=net-7.0*/
 		public async Task<string> ReadRequestDataAsync()
 		{
 			if (!request.HasEntityBody)
@@ -63,5 +60,9 @@ namespace Everest.Http
 
 			return requestData;
 		}
+
+		private string requestData;
+
+		#endregion
 	}
 }

@@ -11,7 +11,8 @@ namespace Everest.Http
     {
         public bool ResponseSent { get; private set; }
 
-        public long ContentLength64
+		/*https://learn.microsoft.com/ru-ru/dotnet/api/system.net.httplistenerresponse.contentlength64?view=net-7.0*/
+		public long ContentLength64
         {
 	        get => response.ContentLength64;
 	        set => response.ContentLength64 = value;
