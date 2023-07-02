@@ -42,7 +42,7 @@ namespace Everest.Authentication
 			
 		}
 
-		public Task<bool> TryAuthenticateAsync(HttpContext context)
+		public async Task<bool> TryAuthenticateAsync(HttpContext context)
 		{
 			if (context == null) 
 				throw new ArgumentNullException(nameof(context));
@@ -51,37 +51,37 @@ namespace Everest.Authentication
 			if (string.IsNullOrEmpty(header))
 			{
 				Logger.LogWarning($"{context.Id} - Failed to authenticate. Missing header: {options.Header}. Scheme: {Scheme}. ");
-				return Task.FromResult(false);
+				return false;
 			}
 
 			if (Scheme == options.Header)
 			{
 				Logger.LogWarning($"{context.Id} - Failed to authenticate. No token supplied. Scheme: {Scheme}");
-				return Task.FromResult(false);
+				return false;
 			}
 
 			if (!header.StartsWith(Scheme + ' ', StringComparison.OrdinalIgnoreCase))
 			{
 				Logger.LogWarning($"{context.Id} - Failed to authenticate. Wrong header: {options.Header}. Scheme: {Scheme}");
-				return Task.FromResult(false);
+				return false;
 			}
 
 			try
 			{
 				var token = header.Substring(Scheme.Length).Trim();
 				var tokenHandler = new JwtSecurityTokenHandler();
-				var claimsPrincipal = tokenHandler.ValidateToken(token, options.TokenValidationParameters, out var validatedToken);
-				var jwtToken = validatedToken as JwtSecurityToken;
-				var identity = new JwtTokenIdentity(jwtToken, claimsPrincipal.Identity);
+				var validationResult = await tokenHandler.ValidateTokenAsync(token, options.TokenValidationParameters);
+				var jwtToken = validationResult.SecurityToken as JwtSecurityToken;
+				var identity = new JwtTokenIdentity(jwtToken, validationResult.ClaimsIdentity);
 				context.User.AddIdentity(identity);
 
 				Logger.LogTrace($"{context.Id} - Successfully authenticated. Scheme: {Scheme}");
-				return Task.FromResult(true);
+				return true;
 			}
 			catch(Exception ex)
 			{
 				Logger.LogError(ex, $"{context.Id} - Failed to authenticate. Failed to validate token. Scheme: {Scheme}");
-				return Task.FromResult(false);
+				return false;
 			}
 		}
 	}
