@@ -86,6 +86,7 @@ namespace Everest.Http
                 return;
 
             OutputStream.Close();
+            response.OutputStream.Close();
             response.Close();
 
             ResponseClosed = true;
@@ -119,7 +120,7 @@ namespace Everest.Http
 			await response.WriteAsync(content);
 		}
 
-		public static async Task WriteJsonAsync<T>(this HttpResponse response, T content, JsonSerializerOptions options = null)
+        public static async Task WriteJsonAsync<T>(this HttpResponse response, T content, JsonSerializerOptions options = null)
 		{
 			if (response == null)
 				throw new ArgumentNullException(nameof(response));
@@ -130,7 +131,10 @@ namespace Everest.Http
 			response.RemoveHeader("Content-Type");
 			response.AddHeader("Content-Type", "application/json");
 
-			var json =  JsonSerializer.Serialize(content, options ?? new JsonSerializerOptions());
+			var json = options == null ?  
+				JsonSerializer.Serialize(content) : 
+				JsonSerializer.Serialize(content, options);
+
 			await response.WriteAsync(json);
         }
 	}
