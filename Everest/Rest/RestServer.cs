@@ -168,7 +168,10 @@ namespace Everest.Rest
 			}
 			finally
 			{
-				context.Response.CloseResponse();
+				if (!context.Response.ResponseSent)
+				{
+					await context.Response.SendResponceAsync();
+				}
 			}
 		}
 

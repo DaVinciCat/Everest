@@ -11,8 +11,6 @@ namespace Everest.Http
     {
         public bool ResponseSent { get; private set; }
 
-        public bool ResponseClosed { get; private set; }
-
         public bool KeepAlive
         {
             get => response.KeepAlive;
@@ -63,33 +61,33 @@ namespace Everest.Http
 		
         public async Task SendResponceAsync()
         {
-			if (!response.OutputStream.CanWrite)
-				throw new NotSupportedException("Response stream does not support writing.");
-
-			if (OutputStream != null)
+			try
 			{
-				OutputStream.Position = 0;
-				using (var reader = new BinaryReader(OutputStream, ContentEncoding, true))
+				if (OutputStream != null)
 				{
-					var bytes = reader.ReadBytes((int)OutputStream.Length);
-					response.ContentLength64 = bytes.Length;
-                    await response.OutputStream.WriteAsync(bytes, 0, bytes.Length);
+					OutputStream.Position = 0;
+					using (var reader = new BinaryReader(OutputStream, ContentEncoding, true))
+					{
+						var bytes = reader.ReadBytes((int)OutputStream.Length);
+						response.ContentLength64 = bytes.Length;
+						await response.OutputStream.WriteAsync(bytes, 0, bytes.Length);
+					}
+
+					OutputStream.Close();
+					response.OutputStream.Close();
 				}
 			}
-
-            ResponseSent = true;
-		}
-
-        public void CloseResponse()
-        {
-            if (!ResponseClosed)
-                return;
-
-            OutputStream.Close();
-            response.OutputStream.Close();
-            response.Close();
-
-            ResponseClosed = true;
+			finally
+			{
+				try
+				{
+					response.Close();
+				}
+				finally
+				{
+					ResponseSent = true;
+				}
+			}
         }
     }
 
