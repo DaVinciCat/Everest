@@ -19,10 +19,10 @@ namespace Everest.Compression
 	{
 		public string[] Encodings => Compressors.Keys.ToArray();
 
-		public Dictionary<string, Func<Stream, Task<Stream>>> Compressors { get; set; } = new()
+		public Dictionary<string, Func<Stream, Stream>> Compressors { get; set; } = new()
 		{
-			{ "gzip", stream => stream.GzipAsync(CompressionLevel.Fastest) },
-			{ "deflate", stream => stream.DeflateAsync(CompressionLevel.Fastest) }
+			{ "gzip", stream => new GZipStream(stream, CompressionLevel.Fastest, true) },
+			{ "deflate", stream => new DeflateStream(stream, CompressionLevel.Fastest, true) }
 		};
 
 		private readonly ResponseCompressionOptions options;
@@ -46,13 +46,14 @@ namespace Everest.Compression
 			if (context == null) 
 				throw new ArgumentNullException(nameof(context));
 
-			var content = context.Response.Body;
+			if (context.Response.OutputStream == null)
+				return true;
 
-			Logger.LogTrace($"{context.Id} - Try compress response. Content to compress: [{content?.Length.ToReadableSize()}]");
+			Logger.LogTrace($"{context.Id} - Try compress response. Content to compress: [{context.Response.OutputStream.Length.ToReadableSize()}]");
 			
-			if (content == null || content.Length < options.CompressionMinLength)
+			if (context.Response.OutputStream == null || context.Response.OutputStream.Length < options.CompressionMinLength)
 			{
-				Logger.LogTrace($"{context.Id} - No response compression required. Content length: [{content?.ToReadableSize()}] < [{options.CompressionMinLength.ToReadableSize()}]");
+				Logger.LogTrace($"{context.Id} - No response compression required. Content length: [{context.Response.OutputStream.ToReadableSize()}] < [{options.CompressionMinLength.ToReadableSize()}]");
 				return false;
 			}
 			
@@ -70,14 +71,22 @@ namespace Everest.Compression
 
 			foreach (var encoding in encodings)
 			{
-				if (Compressors.TryGetValue(encoding, out var compressor))
+				if (Compressors.TryGetValue(encoding, out var compressorProvider))
 				{
-					var compressed = await compressor(content);
+					var compressed = new MemoryStream();
+					using (var compressor = compressorProvider(compressed))
+					{
+						context.Response.OutputStream.Position = 0;
+						await context.Response.OutputStream.CopyToAsync(compressor);
+					}
+
+					compressed.Position = 0;
+					Logger.LogTrace($"{context.Id} - Successfully compressed response: [{context.Response.OutputStream.ToReadableSize()}] -> [{compressed.ToReadableSize()}]. Content-Encoding: {encoding}");
+					
+					context.Response.OutputStream = compressed;
 					context.Response.RemoveHeader("Content-Encoding");
 					context.Response.AddHeader("Content-Encoding", encoding);
-					await context.Response.WriteAsync(compressed);
-
-					Logger.LogTrace($"{context.Id} - Successfully compressed response: [{content.ToReadableSize()}] -> [{compressed.ToReadableSize()}]. Content-Encoding: {encoding}");
+					
 					return true;
 				}
 			}

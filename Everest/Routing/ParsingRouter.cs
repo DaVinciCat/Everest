@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Everest.Collections;
 using Everest.Http;
@@ -81,7 +82,9 @@ namespace Everest.Routing
 			if (context == null) 
 				throw new ArgumentNullException(nameof(context));
 
-			await context.Response.Write404NotFoundAsync($"Requested route not found: {context.Request.Description}");
+			context.Response.KeepAlive = false;
+			context.Response.StatusCode = HttpStatusCode.NotFound;
+			await context.Response.WriteJsonAsync($"Requested route not found: {context.Request.Description}");
 		};
 	}
 }

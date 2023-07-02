@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Threading.Tasks;
 using Everest.Http;
 using Microsoft.Extensions.Logging;
@@ -31,7 +32,9 @@ namespace Everest.Exceptions
 			if (context == null) 
 				throw new ArgumentNullException(nameof(context));
 
-			await context.Response.Write500InternalServerErrorAsync($"Failed to process request: {context.Request.Description}.{Environment.NewLine}{ex}");
+			context.Response.KeepAlive = false;
+			context.Response.StatusCode = HttpStatusCode.InternalServerError;
+			await context.Response.WriteJsonAsync($"Failed to process request: {context.Request.Description}.{Environment.NewLine}{ex}");
 		};
 	}
 }

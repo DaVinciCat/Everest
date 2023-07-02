@@ -168,7 +168,7 @@ namespace Everest.Rest
 			}
 			finally
 			{
-				context.Response.Close();
+				context.Response.CloseResponse();
 			}
 		}
 
