@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
 using Everest.Http;
 using Everest.Rest;
@@ -27,8 +26,6 @@ namespace Everest.Shell
 			var service = context.GetGreetingsService();
 			var greetings = service.Greet();
 
-			Thread.Sleep(50);
-
 			await context.Response.WriteJsonAsync(new { Message = greetings, To = me, From = "Everest", Success = true });
 		}
 	}
@@ -39,8 +36,8 @@ namespace Everest.Shell
 		{
 			var services = new ServiceCollection();
 			services.AddDefaults()
-				.AddSingleton(_ => new GreetingsService())
-				.AddConsoleLoggerFactory();
+				.AddSingleton(_ => new GreetingsService());
+				//.AddConsoleLoggerFactory();
 
 			using var rest = new RestServerBuilder(services)
 				.UsePrefixes("http://localhost:8080/")
