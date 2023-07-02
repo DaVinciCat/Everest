@@ -41,15 +41,18 @@ namespace Everest.Http
 		/*
 			https://learn.microsoft.com/en-us/dotnet/api/system.net.httplistenerrequest.inputstream?view=net-7.0
 		*/
+
 		public string ReadRequestData()
 		{
 			if (!request.HasEntityBody)
 				return null;
 
-			InputStream.Position = 0;
-			using (var reader = new StreamReader(request.InputStream, request.ContentEncoding))
+			using (request.InputStream)
 			{
-				return reader.ReadToEnd();
+				using (var reader = new StreamReader(request.InputStream, request.ContentEncoding))
+				{
+					return reader.ReadToEnd();
+				}
 			}
 		}
 	}
