@@ -28,7 +28,7 @@ namespace Everest.Exceptions
 
 		public Func<HttpContext, Exception, Task> OnExceptionAsync { get; set; } = async (context, ex) =>
 		{
-			await context.Response.Write500InternalServerErrorAsync($"Failed to process request: {context.Request.Description}.{Environment.NewLine}{ex.Message}");
+			await context.Response.Write500InternalServerErrorAsync($"Failed to process request: {context.Request.Description}.{Environment.NewLine}{ex}");
 		};
 	}
 }
