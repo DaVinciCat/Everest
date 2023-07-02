@@ -29,10 +29,6 @@ namespace Everest.Http
 
 		public ParameterCollection PathParameters { get; set; }
 
-		public string Payload => payload ??= ReadPayload();
-
-		private string payload;
-
 		private readonly HttpListenerRequest request;
 
 		public HttpRequest(HttpListenerRequest request)
@@ -42,11 +38,15 @@ namespace Everest.Http
 			PathParameters = new ParameterCollection();
 		}
 
-		private string ReadPayload()
+		/*
+			https://learn.microsoft.com/en-us/dotnet/api/system.net.httplistenerrequest.inputstream?view=net-7.0
+		*/
+		public string ReadRequestData()
 		{
 			if (!request.HasEntityBody)
 				return null;
 
+			InputStream.Position = 0;
 			using (var reader = new StreamReader(request.InputStream, request.ContentEncoding))
 			{
 				return reader.ReadToEnd();
