@@ -1,5 +1,4 @@
-﻿using Everest.Converters;
-using Everest.Http;
+﻿using Everest.Http;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System;
@@ -7,6 +6,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
+using Everest.Utils;
 
 namespace Everest.Compression
 {

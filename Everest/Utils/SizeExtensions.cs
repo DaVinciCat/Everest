@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace Everest.Converters
+namespace Everest.Utils
 {
 	public static class SizeExtensions
 	{

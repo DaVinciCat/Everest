@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Everest.Converters;
 using Everest.Http;
 using Everest.Net;
+using Everest.Utils;
 using Microsoft.Extensions.Logging;
 
 namespace Everest.Response
