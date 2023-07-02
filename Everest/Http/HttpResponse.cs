@@ -66,15 +66,14 @@ namespace Everest.Http
 				if (OutputStream != null)
 				{
 					OutputStream.Position = 0;
-					using (var reader = new BinaryReader(OutputStream, ContentEncoding, true))
+					using (var reader = new BinaryReader(OutputStream, ContentEncoding))
 					{
 						var bytes = reader.ReadBytes((int)OutputStream.Length);
 						response.ContentLength64 = bytes.Length;
 						await response.OutputStream.WriteAsync(bytes, 0, bytes.Length);
+						await response.OutputStream.FlushAsync();
+						response.OutputStream.Close();
 					}
-
-					OutputStream.Close();
-					response.OutputStream.Close();
 				}
 			}
 			finally
