@@ -313,20 +313,26 @@ namespace Everest.Rest
 
 	public static class AuthenticatorBuilderExtensions
 	{
-		public static AuthenticatorBuilder AddBasicAuthentication(this AuthenticatorBuilder builder, Func<BasicAuthenticationOptions> options = null)
+		public static AuthenticatorBuilder AddBasicAuthentication(this AuthenticatorBuilder builder, Action<BasicAuthenticationOptions> options = null)
 		{
 			var loggerFactory = builder.Services.GetRequiredService<ILoggerFactory>();
-			
-			var authentication = new BasicAuthentication(options?.Invoke() ?? new BasicAuthenticationOptions(), loggerFactory.CreateLogger<BasicAuthentication>());
+
+			var configureOptions = new BasicAuthenticationOptions();
+			options?.Invoke(configureOptions);
+
+			var authentication = new BasicAuthentication(configureOptions, loggerFactory.CreateLogger<BasicAuthentication>());
 			builder.AddAuthentication(authentication);
 			return builder;
 		}
 
-		public static AuthenticatorBuilder AddJwtTokenAuthentication(this AuthenticatorBuilder builder, Func<JwtAuthenticationOptions> options = null)
+		public static AuthenticatorBuilder AddJwtTokenAuthentication(this AuthenticatorBuilder builder, Action<JwtAuthenticationOptions> options = null)
 		{
 			var loggerFactory = builder.Services.GetRequiredService<ILoggerFactory>();
 
-			var authentication = new JwtAuthentication(options?.Invoke() ?? new JwtAuthenticationOptions(), loggerFactory.CreateLogger<JwtAuthentication>());
+			var configureOptions = new JwtAuthenticationOptions();
+			options?.Invoke(configureOptions);
+
+			var authentication = new JwtAuthentication(configureOptions, loggerFactory.CreateLogger<JwtAuthentication>());
 			builder.AddAuthentication(authentication);
 			return builder;
 		}
