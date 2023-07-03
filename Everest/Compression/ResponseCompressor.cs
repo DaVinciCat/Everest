@@ -22,7 +22,8 @@ namespace Everest.Compression
 		public Dictionary<string, Func<Stream, Stream>> Compressors { get; set; } = new()
 		{
 			{ "gzip", stream => new GZipStream(stream, CompressionLevel.Fastest, true) },
-			{ "deflate", stream => new DeflateStream(stream, CompressionLevel.Fastest, true) }
+			{ "deflate", stream => new DeflateStream(stream, CompressionLevel.Fastest, true) },
+			{ "brotli", stream => new BrotliStream(stream, CompressionLevel.Fastest, true)}
 		};
 
 		private readonly ResponseCompressionOptions options;
