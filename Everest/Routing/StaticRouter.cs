@@ -13,7 +13,7 @@ namespace Everest.Routing
 	{
 		public ILogger<StaticRouter> Logger { get; }
 
-		public RouteDescriptor[] RoutingTable => methods.SelectMany(kvp => kvp.Value.Values).ToArray();
+		public RouteDescriptor[] Routes => methods.SelectMany(kvp => kvp.Value.Values).ToArray();
 
 		private readonly Dictionary<string, Dictionary<string, RouteDescriptor>> methods = new();
 

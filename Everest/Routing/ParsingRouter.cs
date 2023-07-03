@@ -14,7 +14,7 @@ namespace Everest.Routing
 	{
 		public ILogger<ParsingRouter> Logger { get; }
 
-		public RouteDescriptor[] RoutingTable => methods.SelectMany(kvp => kvp.Value).ToArray();
+		public RouteDescriptor[] Routes => methods.SelectMany(kvp => kvp.Value).ToArray();
 
 		private readonly Dictionary<string, HashSet<RouteDescriptor>> methods = new();
 

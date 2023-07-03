@@ -8,7 +8,7 @@ namespace Everest.Routing
 {
 	public class AggregateRouter : IRouter
 	{
-		public RouteDescriptor[] RoutingTable => Routers.SelectMany(router => router.RoutingTable).ToArray();
+		public RouteDescriptor[] Routes => Routers.SelectMany(router => router.Routes).ToArray();
 
 		public IRouter[] Routers { get; set; }
 

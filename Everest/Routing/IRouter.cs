@@ -5,7 +5,7 @@ namespace Everest.Routing
 {
 	public interface IRouter
 	{
-		public RouteDescriptor[] RoutingTable { get; }
+		public RouteDescriptor[] Routes { get; }
 
 		void RegisterRoute(RouteDescriptor descriptor);
 
