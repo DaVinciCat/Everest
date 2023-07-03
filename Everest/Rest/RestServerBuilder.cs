@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -244,31 +245,29 @@ namespace Everest.Rest
 			return builder;
 		}
 
-		public static RestServerBuilder UseResponseCompressionMiddleware(this RestServerBuilder builder)
+		public static RestServerBuilder UseResponseCompressionMiddleware(this RestServerBuilder builder, Action<ResponseCompressorBuilder> options = null)
 		{
 			var compressor = builder.Services.GetRequiredService<IResponseCompressor>();
+
+			options?.Invoke(new ResponseCompressorBuilder(builder.Services));
 			builder.Middleware.Add(new ResponseCompressionMiddleware(compressor));
 			return builder;
 		}
 
-		public static RestServerBuilder UseCorsMiddleware(this RestServerBuilder builder, Action<CorsRequestHandlerBuilder> factory = null)
+		public static RestServerBuilder UseCorsMiddleware(this RestServerBuilder builder, Action<CorsRequestHandlerBuilder> options = null)
 		{
 			var handler = builder.Services.GetRequiredService<ICorsRequestHandler>();
 
-			var b = new CorsRequestHandlerBuilder(builder.Services);
-			factory?.Invoke(b);
-			
+			options?.Invoke(new CorsRequestHandlerBuilder(builder.Services));
 			builder.Middleware.Add(new CorsMiddleware(handler));
 			return builder;
 		}
 
-		public static RestServerBuilder UseAuthenticationMiddleware(this RestServerBuilder builder, Action<AuthenticatorBuilder> factory)
+		public static RestServerBuilder UseAuthenticationMiddleware(this RestServerBuilder builder, Action<AuthenticatorBuilder> options)
 		{
 			var authenticator = builder.Services.GetRequiredService<IAuthenticator>();
 
-			var b = new AuthenticatorBuilder(builder.Services);
-			factory(b);
-
+			options?.Invoke(new AuthenticatorBuilder(builder.Services));
 			builder.Middleware.Add(new AuthenticationMiddleware(authenticator));
 			return builder;
 		}
@@ -314,24 +313,20 @@ namespace Everest.Rest
 
 	public static class AuthenticatorBuilderExtensions
 	{
-		public static AuthenticatorBuilder AddBasicAuthentication(this AuthenticatorBuilder builder, Action<BasicAuthenticationOptions> factory = null)
+		public static AuthenticatorBuilder AddBasicAuthentication(this AuthenticatorBuilder builder, Func<BasicAuthenticationOptions> options = null)
 		{
 			var loggerFactory = builder.Services.GetRequiredService<ILoggerFactory>();
-			var options = new BasicAuthenticationOptions();
-			factory?.Invoke(options);
-
-			var authentication = new BasicAuthentication(options, loggerFactory.CreateLogger<BasicAuthentication>());
+			
+			var authentication = new BasicAuthentication(options?.Invoke() ?? new BasicAuthenticationOptions(), loggerFactory.CreateLogger<BasicAuthentication>());
 			builder.AddAuthentication(authentication);
 			return builder;
 		}
 
-		public static AuthenticatorBuilder AddJwtTokenAuthentication(this AuthenticatorBuilder builder, Action<JwtAuthenticationOptions> factory = null)
+		public static AuthenticatorBuilder AddJwtTokenAuthentication(this AuthenticatorBuilder builder, Func<JwtAuthenticationOptions> options = null)
 		{
 			var loggerFactory = builder.Services.GetRequiredService<ILoggerFactory>();
-			var options = new JwtAuthenticationOptions();
-			factory?.Invoke(options);
 
-			var authentication = new JwtAuthentication(options, loggerFactory.CreateLogger<JwtAuthentication>());
+			var authentication = new JwtAuthentication(options?.Invoke() ?? new JwtAuthenticationOptions(), loggerFactory.CreateLogger<JwtAuthentication>());
 			builder.AddAuthentication(authentication);
 			return builder;
 		}
@@ -358,6 +353,24 @@ namespace Everest.Rest
 		{
 			var handler = Services.GetRequiredService<ICorsRequestHandler>();
 			handler.Policies.Add(policy);
+
+			return this;
+		}
+	}
+
+	public class ResponseCompressorBuilder
+	{
+		public IServiceProvider Services { get; }
+
+		public ResponseCompressorBuilder(IServiceProvider services)
+		{
+			Services = services;
+		}
+
+		public ResponseCompressorBuilder AddCompressor(string encoding, Func<Stream, Stream> compressor)
+		{
+			var responseCompressor = Services.GetRequiredService<IResponseCompressor>();
+			responseCompressor.Compressors.Add(encoding, compressor);
 
 			return this;
 		}

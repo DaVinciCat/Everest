@@ -71,13 +71,13 @@ namespace Everest.Compression
 
 			foreach (var encoding in encodings)
 			{
-				if (Compressors.TryGetValue(encoding, out var compressorProvider))
+				if (Compressors.TryGetValue(encoding, out var compressor))
 				{
 					var compressed = new MemoryStream();
-					using (var compressor = compressorProvider(compressed))
+					using (var stream = compressor(compressed))
 					{
 						context.Response.OutputStream.Position = 0;
-						await context.Response.OutputStream.CopyToAsync(compressor);
+						await context.Response.OutputStream.CopyToAsync(stream);
 					}
 
 					compressed.Position = 0;
