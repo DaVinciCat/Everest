@@ -11,7 +11,7 @@ namespace Everest.Authentication
 	{
 		public ILogger<Authenticator> Logger { get; }
 
-		public IList<IAuthentication> Authentications { get; } = new List<IAuthentication>();
+		public IList<IAuthentication> Authentications { get; set; } = new List<IAuthentication>();
 		
 		public Authenticator(ILogger<Authenticator> logger)
 		{
