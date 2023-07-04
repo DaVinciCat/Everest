@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using Everest.Authentication;
 using Everest.Compression;
 using Everest.Cors;
@@ -74,24 +73,7 @@ namespace Everest.Rest
 			{
 				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
 				var parser = provider.GetRequiredService<IRouteSegmentParser>();
-				var staticRouter = new StaticRouter(loggerFactory.CreateLogger<StaticRouter>()) { OnRouteNotFoundAsync = _ => Task.CompletedTask };
-				var parsingRouter = new ParsingRouter(parser, loggerFactory.CreateLogger<ParsingRouter>()) { OnRouteNotFoundAsync = _ => Task.CompletedTask };
-				var aggregateRouter = new AggregateRouter(new IRouter[] { staticRouter, parsingRouter })
-				{
-					RegisterRoute = descriptor =>
-					{
-						if (descriptor.Segment.IsCompletelyStatic())
-						{
-							staticRouter.RegisterRoute(descriptor);
-						}
-						else
-						{
-							parsingRouter.RegisterRoute(descriptor);
-						}
-					}
-				};
-
-				return aggregateRouter;
+				return new Router(parser, loggerFactory.CreateLogger<Router>());
 			});
 			
 			services.TryAddSingleton<IResponseSender>(provider =>

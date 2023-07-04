@@ -14,11 +14,11 @@ namespace Everest.Http
 
 		public bool HasPayload => request.HasEntityBody;
 
-		public string EndPoint => request.Url?.AbsolutePath;
+		public string Path => request.Url?.AbsolutePath;
 
 		public IPEndPoint RemoteEndPoint => request.RemoteEndPoint;
 
-		public string Description => $"{HttpMethod} {EndPoint}";
+		public string Description => $"{HttpMethod} {Path}";
 
 		public Stream InputStream => request.InputStream;
 		
