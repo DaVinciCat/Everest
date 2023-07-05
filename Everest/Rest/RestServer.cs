@@ -35,7 +35,7 @@ namespace Everest.Rest
 		{
 			if (!HttpListener.IsSupported)
 			{
-				throw new NotSupportedException($"This OS does not support {nameof(HttpListener)} class.");
+				throw new NotSupportedException($"This OS does not support {nameof(HttpListener)}.");
 			}
 
 			this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
