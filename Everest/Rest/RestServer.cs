@@ -96,10 +96,10 @@ namespace Everest.Rest
 				return;
 
 			IsStopping = true;
-			Logger.LogTrace("Stopping server");
-
+			
 			try
 			{
+				Logger.LogTrace("Stopping server");
 				listener.Stop();
 				listener.Close();
 			}
