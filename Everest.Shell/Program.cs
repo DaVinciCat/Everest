@@ -36,8 +36,8 @@ namespace Everest.Shell
 		{
 			var services = new ServiceCollection();
 			services.AddDefaults()
-				.AddSingleton(_ => new GreetingsService())
-				.AddConsoleLoggerFactory();
+					.AddSingleton(_ => new GreetingsService())
+					.AddConsoleLoggerFactory();
 
 			using var rest = new RestServerBuilder(services)
 				.UsePrefixes("http://localhost:8080/")
