@@ -68,7 +68,7 @@ namespace Everest.Routing
 
 		public static string Pattern => @"({\w+:string})";
 
-		public string Name { get; }
+		public string ParameterName { get; }
 
 		public StringParameterRouteSegment(string value, RouteSegment next)
 			: base(value, next)
@@ -80,7 +80,7 @@ namespace Everest.Routing
 			if (!match.Success)
 				throw new ArgumentException($"Invalid parameter pattern {value}.");
 
-			Name = match.Groups[0].Value;
+			ParameterName = match.Groups[0].Value;
 		}
 
 		public override async Task<bool> TryParseAsync(Iterator<string> segments, NameValueCollection parameters)
@@ -96,7 +96,7 @@ namespace Everest.Routing
 				return false;
 			}
 
-			parameters.Add(Name, segments.Current);
+			parameters.Add(ParameterName, segments.Current);
 
 			if (HasNextSegment)
 			{
