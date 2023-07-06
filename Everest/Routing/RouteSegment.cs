@@ -55,7 +55,7 @@ namespace Everest.Routing
 
 			if (result && HasNextSegment)
 			{
-				await NextSegment.TryParseAsync(segments, parameters);
+				return await NextSegment.TryParseAsync(segments, parameters);
 			}
 
 			return result;
@@ -100,7 +100,7 @@ namespace Everest.Routing
 
 			if (HasNextSegment)
 			{
-				await NextSegment.TryParseAsync(segments, parameters);
+				return await NextSegment.TryParseAsync(segments, parameters);
 			}
 
 			return true;
@@ -138,14 +138,14 @@ namespace Everest.Routing
 				return false;
 			}
 
-			if (segments.Current != null && !Regex.IsMatch(segments.Current, "^-?[0-9]*$"))
+			if (segments.Current != null && !Regex.IsMatch(segments.Current, @"^-?\d+$"))
 				return false;
 
 			parameters.Add(Name, segments.Current);
 
 			if (HasNextSegment)
 			{
-				await NextSegment.TryParseAsync(segments, parameters);
+				return await NextSegment.TryParseAsync(segments, parameters);
 			}
 
 			return true;
@@ -183,14 +183,14 @@ namespace Everest.Routing
 				return false;
 			}
 
-			if (segments.Current != null && !Regex.IsMatch(segments.Current, "[+-]?([0-9]*[.])?[0-9]+"))
+			if (segments.Current != null && !Regex.IsMatch(segments.Current, @"^-?\d+(\.\d+)?$"))
 				return false;
 
 			parameters.Add(Name, segments.Current);
 
 			if (HasNextSegment)
 			{
-				await NextSegment.TryParseAsync(segments, parameters);
+				return await NextSegment.TryParseAsync(segments, parameters);
 			}
 
 			return true;
@@ -228,14 +228,14 @@ namespace Everest.Routing
 				return false;
 			}
 
-			if (segments.Current != null && !Regex.IsMatch(segments.Current, "[+-]?([0-9]*[.])?[0-9]+"))
+			if (segments.Current != null && !Regex.IsMatch(segments.Current, @"^-?\d+(\.\d+)?$"))
 				return false;
 
 			parameters.Add(Name, segments.Current);
 
 			if (HasNextSegment)
 			{
-				await NextSegment.TryParseAsync(segments, parameters);
+				return await NextSegment.TryParseAsync(segments, parameters);
 			}
 
 			return true;
@@ -280,7 +280,7 @@ namespace Everest.Routing
 
 			if (HasNextSegment)
 			{
-				await NextSegment.TryParseAsync(segments, parameters);
+				return await NextSegment.TryParseAsync(segments, parameters);
 			}
 
 			return true;
@@ -325,7 +325,7 @@ namespace Everest.Routing
 
 			if (HasNextSegment)
 			{
-				await NextSegment.TryParseAsync(segments, parameters);
+				return await NextSegment.TryParseAsync(segments, parameters);
 			}
 
 			return true;
@@ -370,7 +370,7 @@ namespace Everest.Routing
 
 			if (HasNextSegment)
 			{
-				await NextSegment.TryParseAsync(segments, parameters);
+				return await NextSegment.TryParseAsync(segments, parameters);
 			}
 
 			return true;

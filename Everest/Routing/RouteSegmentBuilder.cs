@@ -19,7 +19,7 @@ namespace Everest.Routing
 			{ AlphaNumericRouteSegment.Pattern, (value, next) => new AlphaNumericRouteSegment(value, next) },
 			{ IntParameterRouteSegment.Pattern, (value, next) => new IntParameterRouteSegment(value, next) },
 			{ FloatParameterRouteSegment.Pattern, (value, next) => new FloatParameterRouteSegment(value, next) },
-			{ DoubleParameterRouteSegment.Pattern, (value, next) => new FloatParameterRouteSegment(value, next) },
+			{ DoubleParameterRouteSegment.Pattern, (value, next) => new DoubleParameterRouteSegment(value, next) },
 			{ GuidParameterRouteSegment.Pattern, (value, next) => new GuidParameterRouteSegment(value, next) },
 			{ DateTimeParameterRouteSegment.Pattern, (value, next) => new DateTimeParameterRouteSegment(value, next) },
 			{ BoolParameterRouteSegment.Pattern, (value, next) => new BoolParameterRouteSegment(value, next) },
