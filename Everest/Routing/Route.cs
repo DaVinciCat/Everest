@@ -4,16 +4,16 @@ namespace Everest.Routing
 {
 	public class Route
 	{
-		public string Description => $"{HttpMethod} {Pattern}";
+		public string Description => $"{HttpMethod} {RoutePath}";
 
 		public string HttpMethod { get; }
 
-		public string Pattern { get; }
+		public string RoutePath { get; }
 
-		public Route(string httpMethod, string pattern)
+		public Route(string httpMethod, string routePath)
 		{
 			HttpMethod = httpMethod ?? throw new ArgumentNullException(nameof(httpMethod));
-			Pattern = pattern ?? throw new ArgumentNullException(nameof(pattern));
+			RoutePath = routePath ?? throw new ArgumentNullException(nameof(routePath));
 		}
 	}
 }

@@ -14,7 +14,7 @@ namespace Everest.Http
 
 		public bool HasPayload => request.HasEntityBody;
 
-		public string Path => request.Url?.AbsolutePath;
+		public string Path => request.Url?.AbsolutePath.TrimEnd('/');
 
 		public IPEndPoint RemoteEndPoint => request.RemoteEndPoint;
 

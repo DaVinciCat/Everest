@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Everest.Rest
+namespace Everest.Routing
 {
     [AttributeUsage(AttributeTargets.Class)]
     public class RestResourceAttribute : Attribute

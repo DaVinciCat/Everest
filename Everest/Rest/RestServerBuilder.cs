@@ -57,23 +57,17 @@ namespace Everest.Rest
 				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
 				return new ExceptionHandler(loggerFactory.CreateLogger<ExceptionHandler>());
 			});
-
-			services.TryAddSingleton<IRouteSegmentBuilder>(new RouteSegmentBuilder());
-
-			services.TryAddSingleton<IRouteSegmentParser>(new RouteSegmentParser());
-
+			
 			services.TryAddSingleton<IRouteScanner>(provider =>
 			{
 				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
-				var builder = provider.GetRequiredService<IRouteSegmentBuilder>();
-				return new RouteScanner(builder, loggerFactory.CreateLogger<RouteScanner>());
+				return new RouteScanner(loggerFactory.CreateLogger<RouteScanner>());
 			});
 			
 			services.TryAddSingleton<IRouter>(provider =>
 			{
 				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
-				var parser = provider.GetRequiredService<IRouteSegmentParser>();
-				return new Router(parser, loggerFactory.CreateLogger<Router>());
+				return new Router(loggerFactory.CreateLogger<Router>());
 			});
 			
 			services.TryAddSingleton<IResponseSender>(provider =>
@@ -121,18 +115,6 @@ namespace Everest.Rest
 			return services;
 		}
 		
-		public static IServiceCollection AddRouteSegmentBuilder(this IServiceCollection services, IRouteSegmentBuilder builder)
-		{
-			services.AddSingleton(builder);
-			return services;
-		}
-
-		public static IServiceCollection AddRouteSegmentParser(this IServiceCollection services, IRouteSegmentParser parser)
-		{
-			services.AddSingleton(parser);
-			return services;
-		}
-
 		public static IServiceCollection AddEndPointInvoker(this IServiceCollection services, IEndPointInvoker invoker)
 		{
 			services.AddSingleton(invoker);

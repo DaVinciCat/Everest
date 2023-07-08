@@ -3,30 +3,21 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Everest.Http;
 using Everest.Rest;
+using Everest.Routing;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Everest.Shell
 {
-    [RestResource("api/1.0")]
+    [RestResource("/api/1.0")]
 	public static class Rest
 	{
-		[RestRoute("GET", "welcome")]
+		[RestRoute("GET", "/welcome")]
 		public static async Task Welcome(HttpContext context)
 		{
 			var service = context.GetGreetingsService();
 			var greetings = service.Greet();
 			
 			await context.Response.WriteJsonAsync(new { Message = greetings, From = "Everest", Success = true });
-		}
-
-		[HttpGet("welcome/{me:string}")]
-		public static async Task WelcomeMe(HttpContext context)
-		{
-			var me = context.Request.PathParameters.GetParameterValue<string>("me");
-			var service = context.GetGreetingsService();
-			var greetings = service.Greet();
-
-			await context.Response.WriteJsonAsync(new { Message = greetings, To = me, From = "Everest", Success = true });
 		}
 	}
 
@@ -54,7 +45,6 @@ namespace Everest.Shell
 			rest.Start();
 
 			Console.WriteLine("GET localhost:8080/api/1.0/welcome");
-			Console.WriteLine("GET localhost:8080/api/1.0/welcome/{me}");
 			Console.WriteLine("Press any key to exit");
 			Console.ReadKey();
 		}

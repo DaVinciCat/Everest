@@ -5,7 +5,6 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Everest.EndPoints;
 using Everest.Http;
-using Everest.Rest;
 using Microsoft.Extensions.Logging;
 
 namespace Everest.Routing
@@ -13,12 +12,9 @@ namespace Everest.Routing
 	public class RouteScanner : IRouteScanner
 	{
 		public ILogger<RouteScanner> Logger { get; }
-
-		private readonly IRouteSegmentBuilder builder;
-
-		public RouteScanner(IRouteSegmentBuilder builder, ILogger<RouteScanner> logger)
+		
+		public RouteScanner(ILogger<RouteScanner> logger)
 		{
-			this.builder = builder ?? throw new ArgumentNullException(nameof(builder));
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
@@ -41,10 +37,9 @@ namespace Everest.Routing
 					if (attribute != null)
 					{
 						var action = (Func<HttpContext, Task>)method.CreateDelegate(typeof(Func<HttpContext, Task>), null);
-						var route = new Route(attribute.HttpMethod, $"{routePrefix}/{attribute.RoutePattern}");
+						var route = new Route(attribute.HttpMethod, $"{routePrefix}{attribute.RoutePath}");
 						var endPoint = new EndPoint(type, method, action);
-						var segment = builder.Build(route.Pattern);
-						var descriptor = new RouteDescriptor(route, segment, endPoint);
+						var descriptor = new RouteDescriptor(route, endPoint);
 
 						Logger.LogTrace($"Route found - {route.Description} at: {endPoint.Description}");
 						count++;
