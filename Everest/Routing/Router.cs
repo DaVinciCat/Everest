@@ -36,7 +36,7 @@ namespace Everest.Routing
 			if (routes.Any(o => o.Value.Route.Description == descriptor.Route.Description))
 				throw new InvalidOperationException($"Duplicate route: {descriptor.Route.Description}.");
 
-			routes.Add(descriptor.Route.RoutePath, descriptor);
+			routes.Add(descriptor.Route.RoutePattern, descriptor);
 		}
 
 		public async Task<bool> TryRouteAsync(HttpContext context)

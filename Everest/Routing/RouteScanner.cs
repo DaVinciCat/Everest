@@ -37,7 +37,7 @@ namespace Everest.Routing
 					if (attribute != null)
 					{
 						var action = (Func<HttpContext, Task>)method.CreateDelegate(typeof(Func<HttpContext, Task>), null);
-						var route = new Route(attribute.HttpMethod, $"{routePrefix}{attribute.RoutePath}");
+						var route = new Route(attribute.HttpMethod, $"{routePrefix}{attribute.RoutePattern}");
 						var endPoint = new EndPoint(type, method, action);
 						var descriptor = new RouteDescriptor(route, endPoint);
 

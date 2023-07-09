@@ -7,20 +7,20 @@ namespace Everest.Routing
     {
         public string HttpMethod { get; }
 
-        public string RoutePath { get; }
+        public string RoutePattern { get; }
 
-        public RestRouteAttribute(string httpMethod, string routePath)
+        public RestRouteAttribute(string httpMethod, string routePattern)
         {
             HttpMethod = httpMethod ?? throw new ArgumentNullException(nameof(httpMethod));
-            RoutePath = routePath ?? throw new ArgumentNullException(nameof(routePath));
+            RoutePattern = routePattern ?? throw new ArgumentNullException(nameof(routePattern));
         }
     }
 
     [AttributeUsage(AttributeTargets.Method)]
     public class HttpGetAttribute : RestRouteAttribute
     {
-        public HttpGetAttribute(string routePath)
-            : base("GET", routePath)
+        public HttpGetAttribute(string routePattern)
+            : base("GET", routePattern)
         {
 
         }
@@ -29,8 +29,8 @@ namespace Everest.Routing
     [AttributeUsage(AttributeTargets.Method)]
     public class HttpPostAttribute : RestRouteAttribute
     {
-        public HttpPostAttribute(string routePath)
-            : base("POST", routePath)
+        public HttpPostAttribute(string routePattern)
+            : base("POST", routePattern)
         {
 
         }
@@ -39,8 +39,8 @@ namespace Everest.Routing
     [AttributeUsage(AttributeTargets.Method)]
     public class HttpPutAttribute : RestRouteAttribute
     {
-        public HttpPutAttribute(string routePath)
-            : base("PUT", routePath)
+        public HttpPutAttribute(string routePattern)
+            : base("PUT", routePattern)
         {
 
         }
@@ -49,8 +49,8 @@ namespace Everest.Routing
     [AttributeUsage(AttributeTargets.Method)]
     public class HttpDeleteAttribute : RestRouteAttribute
     {
-        public HttpDeleteAttribute(string routePath)
-            : base("DELETE", routePath)
+        public HttpDeleteAttribute(string routePattern)
+            : base("DELETE", routePattern)
         {
 
         }
@@ -59,8 +59,8 @@ namespace Everest.Routing
     [AttributeUsage(AttributeTargets.Method)]
     public class HttpHeadAttribute : RestRouteAttribute
     {
-        public HttpHeadAttribute(string routePath)
-            : base("HEAD", routePath)
+        public HttpHeadAttribute(string routePattern)
+            : base("HEAD", routePattern)
         {
 
         }
@@ -69,8 +69,8 @@ namespace Everest.Routing
     [AttributeUsage(AttributeTargets.Method)]
     public class HttpPatchAttribute : RestRouteAttribute
     {
-        public HttpPatchAttribute(string routePath)
-            : base("PATCH", routePath)
+        public HttpPatchAttribute(string routePattern)
+            : base("PATCH", routePattern)
         {
 
         }
@@ -79,8 +79,8 @@ namespace Everest.Routing
     [AttributeUsage(AttributeTargets.Method)]
     public class HttpOptionsAttribute : RestRouteAttribute
     {
-        public HttpOptionsAttribute(string routePath)
-            : base("OPTIONS", routePath)
+        public HttpOptionsAttribute(string routePattern)
+            : base("OPTIONS", routePattern)
         {
 
         }
