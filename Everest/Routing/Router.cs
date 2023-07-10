@@ -44,7 +44,7 @@ namespace Everest.Routing
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
 
-			Logger.LogTrace($"{context.Id} - Try route request: {context.Request.Description}");
+			Logger.LogTrace($"{context.Id} - Try to route request: {context.Request.Description}");
 
 			var httpMethod = context.Request.HttpMethod;
 			var path = context.Request.Path;

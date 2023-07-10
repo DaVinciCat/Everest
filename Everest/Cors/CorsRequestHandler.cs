@@ -58,7 +58,13 @@ namespace Everest.Cors
 			}
 
 			var origin = context.Request.Headers["Origin"];
-			Logger.LogTrace($"{context.Id} - Try handle CORS preflight request: {context.Request.Description}. Origin: {origin}");
+			if (origin == null)
+			{
+				Logger.LogWarning($"{context.Id} - Failed to handle CORS preflight request. Origin header is missing");
+				return Task.FromResult(true);
+			}
+
+			Logger.LogTrace($"{context.Id} - Try to handle CORS preflight request: {context.Request.Description}. Origin: {origin}");
 			
 			foreach (var policy in Policies)
 			{

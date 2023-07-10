@@ -47,7 +47,7 @@ namespace Everest.Compression
 			if (context == null) 
 				throw new ArgumentNullException(nameof(context));
 			
-			Logger.LogTrace($"{context.Id} - Try compress response. Response size: [{context.Response.OutputStream.ToReadableSize()}]");
+			Logger.LogTrace($"{context.Id} - Try to compress response. Response size: [{context.Response.OutputStream.ToReadableSize()}]");
 			
 			if (context.Response.OutputStream == null || context.Response.OutputStream.Length < options.CompressionMinLength)
 			{

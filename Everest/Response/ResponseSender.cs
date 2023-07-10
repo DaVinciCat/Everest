@@ -21,7 +21,7 @@ namespace Everest.Response
 			if (context == null) 
 				throw new ArgumentNullException(nameof(context));
 
-			Logger.LogTrace($"{context.Id} - Try send response to: {context.Request.RemoteEndPoint.Description()}");
+			Logger.LogTrace($"{context.Id} - Try to send response to: {context.Request.RemoteEndPoint.Description()}");
 			await context.Response.SendResponceAsync();
 			Logger.LogTrace($"{context.Id} - Successfully sended response to: {context.Request.RemoteEndPoint.Description()} [{context.Response.ContentLength64.ToReadableSize()}]");
 			return true;

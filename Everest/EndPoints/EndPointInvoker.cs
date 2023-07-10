@@ -26,7 +26,7 @@ namespace Everest.EndPoints
 				return false;
 			}
 
-			Logger.LogTrace($"{context.Id} - Try invoke endpoint from: {context.Request.Description} to: {descriptor.EndPoint.Description}");
+			Logger.LogTrace($"{context.Id} - Try to invoke endpoint from: {context.Request.Description} to: {descriptor.EndPoint.Description}");
 			await descriptor.EndPoint.InvokeAsync(context);
 			Logger.LogTrace($"{context.Id} - Successfully invoked endpoint: {descriptor.EndPoint.Description}");
 

@@ -23,7 +23,7 @@ namespace Everest.Authentication
 			if (context == null) 
 				throw new ArgumentNullException(nameof(context));
 
-			Logger.LogTrace($"{context.Id} - Try authenticate. Schemes: [{string.Join(", ", Authentications.Select(authentication => authentication.Scheme))}]");
+			Logger.LogTrace($"{context.Id} - Try to authenticate. Schemes: [{string.Join(", ", Authentications.Select(authentication => authentication.Scheme))}]");
 
 			foreach (var authentication in Authentications)
 			{
