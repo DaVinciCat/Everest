@@ -46,25 +46,27 @@ namespace Everest.Compression
 		{
 			if (context == null) 
 				throw new ArgumentNullException(nameof(context));
-
-			if (context.Response.OutputStream == null)
-				return true;
-
-			Logger.LogTrace($"{context.Id} - Try compress response. Content to compress: [{context.Response.OutputStream.Length.ToReadableSize()}]");
+			
+			Logger.LogTrace($"{context.Id} - Try compress response. Response size: [{context.Response.OutputStream.ToReadableSize()}]");
 			
 			if (context.Response.OutputStream == null || context.Response.OutputStream.Length < options.CompressionMinLength)
 			{
-				Logger.LogTrace($"{context.Id} - No response compression required. Content length: [{context.Response.OutputStream.ToReadableSize()}] < [{options.CompressionMinLength.ToReadableSize()}]");
+				Logger.LogTrace($"{context.Id} - No response compression required: [{context.Response.OutputStream.ToReadableSize()}] < [{options.CompressionMinLength.ToReadableSize()}]");
 				return false;
 			}
 			
 			//TODO: super naive implementation, should replace it with q values support
-			var acceptEncoding = context.Request.Headers["Accept-Encoding"] ?? string.Empty;
-			var encodings = acceptEncoding.Split(',');
+			var acceptEncoding = context.Request.Headers["Accept-Encoding"];
+			if (acceptEncoding == null)
+			{
+				Logger.LogTrace($"{context.Id} - No response compression required. Accept-Encoding header is missing");
+				return false;
+			}
 
+			var encodings = acceptEncoding.Split(',');
 			if (encodings.Length == 0)
 			{
-				Logger.LogTrace($"{context.Id} - No response compression required. Missing Accept-Encoding header");
+				Logger.LogTrace($"{context.Id} - No response compression required. Accept-Encoding header contains no encodings");
 				return false;
 			}
 
@@ -80,11 +82,14 @@ namespace Everest.Compression
 						context.Response.OutputStream.Position = 0;
 						await context.Response.OutputStream.CopyToAsync(stream);
 					}
-
 					compressed.Position = 0;
 					Logger.LogTrace($"{context.Id} - Successfully compressed response: [{context.Response.OutputStream.ToReadableSize()}] -> [{compressed.ToReadableSize()}]. Content-Encoding: {encoding}");
-					
-					context.Response.OutputStream = compressed;
+
+					context.Response.OutputStream.SetLength(0);
+					context.Response.OutputStream.Position = 0;
+					await compressed.CopyToAsync(context.Response.OutputStream);
+					context.Response.OutputStream.Position = 0;
+
 					context.Response.RemoveHeader("Content-Encoding");
 					context.Response.AddHeader("Content-Encoding", encoding);
 					

@@ -48,7 +48,7 @@ namespace Everest.Http
             }
         }
 		
-        public Stream OutputStream { get; set; } = new MemoryStream();
+        public Stream OutputStream { get; } = new MemoryStream();
 
         private readonly HttpListenerResponse response;
 
