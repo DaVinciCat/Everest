@@ -54,6 +54,7 @@ namespace Everest.Shell
 			rest.Start();
 
 			Console.WriteLine("GET localhost:8080/api/1.0/welcome");
+			Console.WriteLine("GET localhost:8080/api/1.0/welcome/{me:string}");
 			Console.WriteLine("Press any key to exit");
 			Console.ReadKey();
 		}
