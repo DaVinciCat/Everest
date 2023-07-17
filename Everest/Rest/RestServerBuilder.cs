@@ -27,29 +27,10 @@ namespace Everest.Rest
 
 		public IServiceProvider Services { get; }
 
-		public RestServerBuilder(IServiceCollection services)
+		public RestServerBuilder(IServiceCollection services = null)
 		{
-			if (services == null)
-				throw new ArgumentNullException(nameof(services));
-
-			Services = services.BuildServiceProvider();
-		}
-
-		public RestServer Build()
-		{
-			var loggerFactory = Services.GetRequiredService<ILoggerFactory>();
-
-			var server = new RestServer(Services, Middleware.ToArray(), loggerFactory.CreateLogger<RestServer>());
-			server.AddPrefixes(Prefixes.ToArray());
-
-			return server;
-		}
-	}
-
-	public static class ServicesExtensions
-	{
-		public static IServiceCollection AddDefaults(this IServiceCollection services)
-		{
+			services ??= new ServiceCollection();
+				
 			services.TryAddSingleton<ILoggerFactory>(new NullLoggerFactory());
 
 			services.TryAddSingleton<IExceptionHandler>(provider =>
@@ -57,19 +38,19 @@ namespace Everest.Rest
 				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
 				return new ExceptionHandler(loggerFactory.CreateLogger<ExceptionHandler>());
 			});
-			
+
 			services.TryAddSingleton<IRouteScanner>(provider =>
 			{
 				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
 				return new RouteScanner(loggerFactory.CreateLogger<RouteScanner>());
 			});
-			
+
 			services.TryAddSingleton<IRouter>(provider =>
 			{
 				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
 				return new Router(loggerFactory.CreateLogger<Router>());
 			});
-			
+
 			services.TryAddSingleton<IResponseSender>(provider =>
 			{
 				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
@@ -100,9 +81,22 @@ namespace Everest.Rest
 				return new Authenticator(loggerFactory.CreateLogger<Authenticator>());
 			});
 
-			return services;
+			Services = services.BuildServiceProvider();
 		}
 
+		public RestServer Build()
+		{
+			var loggerFactory = Services.GetRequiredService<ILoggerFactory>();
+
+			var server = new RestServer(Services, Middleware.ToArray(), loggerFactory.CreateLogger<RestServer>());
+			server.AddPrefixes(Prefixes.ToArray());
+
+			return server;
+		}
+	}
+
+	public static class ServicesExtensions
+	{
 		public static IServiceCollection AddAuthenticator(this IServiceCollection services, IAuthenticator authenticator)
 		{
 			services.AddSingleton(authenticator);

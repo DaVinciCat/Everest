@@ -19,6 +19,16 @@ namespace Everest.Shell
 			
 			await context.Response.WriteJsonAsync(new { Message = greetings, From = "Everest", Success = true });
 		}
+
+		[RestRoute("GET", "/welcome/{me:string}")]
+		public static async Task WelcomeMe(HttpContext context)
+		{
+			var service = context.GetGreetingsService();
+			var greetings = service.Greet();
+			var to = context.Request.PathParameters.GetParameterValue<string>("me");
+
+			await context.Response.WriteJsonAsync(new { Message = greetings, From = "Everest", To = to, Success = true });
+		}
 	}
 
 	class Program
@@ -26,8 +36,7 @@ namespace Everest.Shell
 		static void Main()
 		{
 			var services = new ServiceCollection();
-			services.AddDefaults()
-					.AddSingleton(_ => new GreetingsService())
+			services.AddSingleton(_ => new GreetingsService())
 					.AddConsoleLoggerFactory();
 
 			using var rest = new RestServerBuilder(services)
