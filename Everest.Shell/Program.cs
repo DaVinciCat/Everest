@@ -25,9 +25,9 @@ namespace Everest.Shell
 		{
 			var service = context.GetGreetingsService();
 			var greetings = service.Greet();
-			var to = context.Request.PathParameters.GetParameterValue<string>("me");
+			var me = context.Request.PathParameters.GetParameterValue<string>("me");
 
-			await context.Response.WriteJsonAsync(new { Message = greetings, From = "Everest", To = to, Success = true });
+			await context.Response.WriteJsonAsync(new { Message = greetings, From = "Everest", To = me, Success = true });
 		}
 	}
 
