@@ -11,6 +11,7 @@ using Everest.Exceptions;
 using Everest.Middleware;
 using Everest.Response;
 using Everest.Routing;
+using Everest.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
@@ -30,7 +31,7 @@ namespace Everest.Rest
 		public RestServerBuilder(IServiceCollection services = null)
 		{
 			services ??= new ServiceCollection();
-				
+
 			services.TryAddSingleton<ILoggerFactory>(new NullLoggerFactory());
 
 			services.TryAddSingleton<IExceptionHandler>(provider =>
@@ -97,57 +98,119 @@ namespace Everest.Rest
 
 	public static class ServicesExtensions
 	{
-		public static IServiceCollection AddAuthenticator(this IServiceCollection services, IAuthenticator authenticator)
+		public static IServiceCollection AddAuthenticator(this IServiceCollection services, Func<IServiceProvider, IAuthenticator> builder)
 		{
-			services.AddSingleton(authenticator);
+			if (builder == null) 
+				throw new ArgumentNullException(nameof(builder));
+
+			services.AddSingleton(builder);
 			return services;
 		}
 
-		public static IServiceCollection AddRouter(this IServiceCollection services, IRouter router)
+		public static IServiceCollection AddAuthenticator(this IServiceCollection services, Action<AuthenticatorConfigurator> configurator)
 		{
-			services.AddSingleton(router);
-			return services;
-		}
-		
-		public static IServiceCollection AddEndPointInvoker(this IServiceCollection services, IEndPointInvoker invoker)
-		{
-			services.AddSingleton(invoker);
+			if (configurator == null) 
+				throw new ArgumentNullException(nameof(configurator));
+
+			services.AddSingleton<IAuthenticator>(provider =>
+			{
+				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
+				var authenticator = new Authenticator(loggerFactory.CreateLogger<Authenticator>());
+				configurator(new AuthenticatorConfigurator(authenticator, provider));
+
+				return authenticator;
+			});
+
 			return services;
 		}
 
-		public static IServiceCollection AddResponseSender(this IServiceCollection services, IResponseSender sender)
+		public static IServiceCollection AddRouter(this IServiceCollection services, Func<IServiceProvider, IRouter> builder)
 		{
-			services.AddSingleton(sender);
+			services.AddSingleton(builder);
 			return services;
 		}
 
-		public static IServiceCollection AddResponseCompressor(this IServiceCollection services, IResponseCompressor compressor)
+		public static IServiceCollection AddRouter(this IServiceCollection services, Action<RouterConfigurator> configurator)
 		{
-			services.AddSingleton(compressor);
+			services.AddSingleton<IRouter>(provider =>
+			{
+				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
+				var router = new Router(loggerFactory.CreateLogger<Router>());
+				configurator(new RouterConfigurator(router, provider));
+
+				return router;
+			});
+
 			return services;
 		}
 
-		public static IServiceCollection AddCorsRequestHanler(this IServiceCollection services, ICorsRequestHandler handler)
+		public static IServiceCollection AddEndPointInvoker(this IServiceCollection services, Func<IServiceProvider, IEndPointInvoker> builder)
 		{
-			services.AddSingleton(handler);
-			return services;
-		}
-		
-		public static IServiceCollection AddExceptionHandler(this IServiceCollection services, IExceptionHandler handler)
-		{
-			services.AddSingleton(handler);
+			services.AddSingleton(builder);
 			return services;
 		}
 
-		public static IServiceCollection AddRouteScanner(this IServiceCollection services, IRouteScanner scanner)
+		public static IServiceCollection AddResponseSender(this IServiceCollection services, Func<IServiceProvider, IResponseSender> builder)
 		{
-			services.AddSingleton(scanner);
+			services.AddSingleton(builder);
 			return services;
 		}
 
-		public static IServiceCollection AddLoggerFactory(this IServiceCollection services, ILoggerFactory factory)
+		public static IServiceCollection AddResponseCompressor(this IServiceCollection services, Func<IServiceProvider, IResponseCompressor> builder)
 		{
-			services.AddSingleton(factory);
+			services.AddSingleton(builder);
+			return services;
+		}
+
+		public static IServiceCollection AddResponseCompressor(this IServiceCollection services, Action<ResponseCompressorConfigurator> configurator)
+		{
+			services.AddSingleton<IResponseCompressor>(provider =>
+			{
+				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
+				var compressor = new ResponseCompressor(loggerFactory.CreateLogger<ResponseCompressor>());
+				configurator(new ResponseCompressorConfigurator(compressor, provider));
+
+				return compressor;
+			});
+
+			return services;
+		}
+
+		public static IServiceCollection AddCorsRequestHandler(this IServiceCollection services, Func<IServiceProvider, ICorsRequestHandler> builder)
+		{
+			services.AddSingleton(builder);
+			return services;
+		}
+
+		public static IServiceCollection AddCorsRequestHandler(this IServiceCollection services, Action<CorsRequestHandlerConfigurator> configurator)
+		{
+			services.AddSingleton<ICorsRequestHandler>(provider =>
+			{
+				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
+				var handler = new CorsRequestHandler(loggerFactory.CreateLogger<CorsRequestHandler>());
+				configurator(new CorsRequestHandlerConfigurator(handler, provider));
+
+				return handler;
+			});
+
+			return services;
+		}
+
+		public static IServiceCollection AddExceptionHandler(this IServiceCollection services, Func<IServiceProvider, IExceptionHandler> builder) 
+		{
+			services.AddSingleton(builder);
+			return services;
+		}
+
+		public static IServiceCollection AddRouteScanner(this IServiceCollection services, Func<IServiceProvider, IRouteScanner> builder)
+		{
+			services.AddSingleton(builder);
+			return services;
+		}
+
+		public static IServiceCollection AddLoggerFactory(this IServiceCollection services, Func<IServiceProvider, ILoggerFactory> builder)
+		{
+			services.AddSingleton(builder);
 			return services;
 		}
 
@@ -169,6 +232,8 @@ namespace Everest.Rest
 			return services.AddSingleton(factory);
 		}
 	}
+
+	#region Extensions
 
 	public static class RestServerBuilderExtensions
 	{
@@ -203,29 +268,23 @@ namespace Everest.Rest
 			return builder;
 		}
 
-		public static RestServerBuilder UseResponseCompressionMiddleware(this RestServerBuilder builder, Action<ResponseCompressorBuilder> options = null)
+		public static RestServerBuilder UseResponseCompressionMiddleware(this RestServerBuilder builder)
 		{
 			var compressor = builder.Services.GetRequiredService<IResponseCompressor>();
-
-			options?.Invoke(new ResponseCompressorBuilder(builder.Services));
 			builder.Middleware.Add(new ResponseCompressionMiddleware(compressor));
 			return builder;
 		}
 
-		public static RestServerBuilder UseCorsMiddleware(this RestServerBuilder builder, Action<CorsRequestHandlerBuilder> options = null)
+		public static RestServerBuilder UseCorsMiddleware(this RestServerBuilder builder)
 		{
 			var handler = builder.Services.GetRequiredService<ICorsRequestHandler>();
-
-			options?.Invoke(new CorsRequestHandlerBuilder(builder.Services));
 			builder.Middleware.Add(new CorsMiddleware(handler));
 			return builder;
 		}
 
-		public static RestServerBuilder UseAuthenticationMiddleware(this RestServerBuilder builder, Action<AuthenticatorBuilder> options)
+		public static RestServerBuilder UseAuthenticationMiddleware(this RestServerBuilder builder)
 		{
 			var authenticator = builder.Services.GetRequiredService<IAuthenticator>();
-
-			options?.Invoke(new AuthenticatorBuilder(builder.Services));
 			builder.Middleware.Add(new AuthenticationMiddleware(authenticator));
 			return builder;
 		}
@@ -238,7 +297,7 @@ namespace Everest.Rest
 			builder.Middleware.Add(new ExceptionHandlerMiddleware(handler, sender));
 			return builder;
 		}
-		
+
 		public static RestServerBuilder ScanRoutes(this RestServerBuilder builder, Assembly assembly)
 		{
 			var scanner = builder.Services.GetRequiredService<IRouteScanner>();
@@ -253,90 +312,112 @@ namespace Everest.Rest
 		}
 	}
 
-	public class AuthenticatorBuilder
-	{
-		public IServiceProvider Services { get; }
+	#endregion
 
-		public AuthenticatorBuilder(IServiceProvider services)
+	#region Authentication
+
+	public class AuthenticatorConfigurator : ServiceConfigurator<IAuthenticator>
+	{
+		public IAuthenticator Authenticator => Service;
+
+		public AuthenticatorConfigurator(IAuthenticator authenticator, IServiceProvider services)
+			: base(authenticator, services)
 		{
-			Services = services;
+
 		}
 
 		public void AddAuthentication(IAuthentication authentication)
 		{
-			var authenticator = Services.GetRequiredService<IAuthenticator>();
-			authenticator.Authentications.Add(authentication);
+			Service.Authentications.Add(authentication);
 		}
 	}
 
-	public static class AuthenticatorBuilderExtensions
+	public static class AuthenticatorConfiguratorExtensions
 	{
-		public static AuthenticatorBuilder AddBasicAuthentication(this AuthenticatorBuilder builder, Action<BasicAuthenticationOptions> options = null)
+		public static AuthenticatorConfigurator AddBasicAuthentication(this AuthenticatorConfigurator configurator, Action<BasicAuthenticationOptions> options = null)
 		{
-			var loggerFactory = builder.Services.GetRequiredService<ILoggerFactory>();
-
 			var configureOptions = new BasicAuthenticationOptions();
 			options?.Invoke(configureOptions);
 
+			var loggerFactory = configurator.Services.GetRequiredService<ILoggerFactory>();
 			var authentication = new BasicAuthentication(configureOptions, loggerFactory.CreateLogger<BasicAuthentication>());
-			builder.AddAuthentication(authentication);
-			return builder;
+			configurator.AddAuthentication(authentication);
+			return configurator;
 		}
 
-		public static AuthenticatorBuilder AddJwtTokenAuthentication(this AuthenticatorBuilder builder, Action<JwtAuthenticationOptions> options = null)
+		public static AuthenticatorConfigurator AddJwtTokenAuthentication(this AuthenticatorConfigurator configurator, Action<JwtAuthenticationOptions> options = null)
 		{
-			var loggerFactory = builder.Services.GetRequiredService<ILoggerFactory>();
-
 			var configureOptions = new JwtAuthenticationOptions();
 			options?.Invoke(configureOptions);
 
+			var loggerFactory = configurator.Services.GetRequiredService<ILoggerFactory>();
 			var authentication = new JwtAuthentication(configureOptions, loggerFactory.CreateLogger<JwtAuthentication>());
-			builder.AddAuthentication(authentication);
-			return builder;
+			configurator.AddAuthentication(authentication);
+			return configurator;
 		}
 	}
 
-	public class CorsRequestHandlerBuilder
+	#endregion
+
+	#region Cors
+
+	public class CorsRequestHandlerConfigurator : ServiceConfigurator<ICorsRequestHandler>
 	{
-		public IServiceProvider Services { get; }
-		
-		public CorsRequestHandlerBuilder(IServiceProvider services)
+		public ICorsRequestHandler Handler => Service;
+
+		public CorsRequestHandlerConfigurator(ICorsRequestHandler service, IServiceProvider services) 
+			: base(service, services)
 		{
-			Services = services;
+
 		}
 
-		public CorsRequestHandlerBuilder AddDefaultCorsPolicy()
+		public CorsRequestHandlerConfigurator AddDefaultCorsPolicy()
 		{
-			var handler = Services.GetRequiredService<ICorsRequestHandler>();
-			handler.Policies.Add(CorsPolicy.Default);
-
+			Handler.Policies.Add(CorsPolicy.Default);
 			return this;
 		}
 
-		public CorsRequestHandlerBuilder AddCorsPolicy(CorsPolicy policy)
+		public CorsRequestHandlerConfigurator AddCorsPolicy(CorsPolicy policy)
 		{
-			var handler = Services.GetRequiredService<ICorsRequestHandler>();
-			handler.Policies.Add(policy);
-
+			Handler.Policies.Add(policy);
 			return this;
 		}
 	}
 
-	public class ResponseCompressorBuilder
+	#endregion
+
+	#region Compression
+
+	public class ResponseCompressorConfigurator : ServiceConfigurator<IResponseCompressor>
 	{
-		public IServiceProvider Services { get; }
+		public IResponseCompressor Compressor => Service;
 
-		public ResponseCompressorBuilder(IServiceProvider services)
+		public ResponseCompressorConfigurator(IResponseCompressor service, IServiceProvider services) 
+			: base(service, services)
 		{
-			Services = services;
 		}
 
-		public ResponseCompressorBuilder AddCompressor(string encoding, Func<Stream, Stream> compressor)
+		public ResponseCompressorConfigurator AddCompressor(string encoding, Func<Stream, Stream> compressor)
 		{
-			var responseCompressor = Services.GetRequiredService<IResponseCompressor>();
-			responseCompressor.Compressors.Add(encoding, compressor);
-
+			Compressor.Compressors.Add(encoding, compressor);
 			return this;
 		}
 	}
+
+	#endregion
+
+	#region Routing
+
+	public class RouterConfigurator : ServiceConfigurator<Router>
+	{
+		public Router Router => Service;
+
+		public RouterConfigurator(Router router, IServiceProvider services)
+			: base(router, services)
+		{
+
+		}
+	}
+
+	#endregion
 }

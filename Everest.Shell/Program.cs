@@ -36,15 +36,17 @@ namespace Everest.Shell
 		static void Main()
 		{
 			var services = new ServiceCollection();
-			services.AddSingleton(_ => new GreetingsService())
+			services.AddAuthenticator(configurator => configurator.AddBasicAuthentication())
+				    .AddCorsRequestHandler(configurator => configurator.AddDefaultCorsPolicy())
+				    .AddSingleton(_ => new GreetingsService())
 					.AddConsoleLoggerFactory();
 
 			using var rest = new RestServerBuilder(services)
 				.UsePrefixes("http://localhost:8080/")
 				.UseExceptionHandlerMiddleware()
-				.UseCorsMiddleware(b => b.AddDefaultCorsPolicy())
+				.UseCorsMiddleware()
 				.UseRoutingMiddleware()
-				.UseAuthenticationMiddleware(b => b.AddBasicAuthentication())
+				.UseAuthenticationMiddleware()
 				.UseEndPointMiddleware()
 				.UseResponseCompressionMiddleware()
 				.UseResponseMiddleware()
