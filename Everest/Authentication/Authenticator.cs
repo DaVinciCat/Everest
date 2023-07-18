@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Everest.Http;
+using Everest.Utils;
 using Microsoft.Extensions.Logging;
 
 namespace Everest.Authentication
@@ -23,7 +24,7 @@ namespace Everest.Authentication
 			if (context == null) 
 				throw new ArgumentNullException(nameof(context));
 
-			Logger.LogTrace($"{context.Id} - Try to authenticate. Schemes: [{string.Join(", ", Authentications.Select(authentication => authentication.Scheme))}]");
+			Logger.LogTrace($"{context.Id} - Try to authenticate: {new { Schemes = Authentications.Select(authentication => authentication.Scheme).ToReadableArray()}}");
 
 			foreach (var authentication in Authentications)
 			{

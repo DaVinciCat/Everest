@@ -10,7 +10,7 @@ namespace Everest.Response
 	public class ResponseSender : IResponseSender
 	{
 		public ILogger<ResponseSender> Logger { get; }
-		
+
 		public ResponseSender(ILogger<ResponseSender> logger)
 		{
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -18,12 +18,12 @@ namespace Everest.Response
 
 		public async Task<bool> TrySendResponseAsync(HttpContext context)
 		{
-			if (context == null) 
+			if (context == null)
 				throw new ArgumentNullException(nameof(context));
 
-			Logger.LogTrace($"{context.Id} - Try to send response to: {context.Request.RemoteEndPoint.Description()}");
+			Logger.LogTrace($"{context.Id} - Try to send response: {new { RemoteEndPoint = context.Request.RemoteEndPoint.Description() }}");
 			await context.Response.SendResponceAsync();
-			Logger.LogTrace($"{context.Id} - Successfully sended response to: {context.Request.RemoteEndPoint.Description()} [{context.Response.ContentLength64.ToReadableSize()}]");
+			Logger.LogTrace($"{context.Id} - Successfully sended response: {new { RemoteEndPoint = context.Request.RemoteEndPoint.Description(), Size = context.Response.ContentLength64.ToReadableSize() }}");
 			return true;
 		}
 	}

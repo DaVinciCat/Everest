@@ -12,7 +12,7 @@ namespace Everest.Routing
 	public class RouteScanner : IRouteScanner
 	{
 		public ILogger<RouteScanner> Logger { get; }
-		
+
 		public RouteScanner(ILogger<RouteScanner> logger)
 		{
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -20,17 +20,17 @@ namespace Everest.Routing
 
 		public IEnumerable<RouteDescriptor> Scan(Assembly assembly)
 		{
-			if (assembly == null) 
+			if (assembly == null)
 				throw new ArgumentNullException(nameof(assembly));
 
 			var count = 0;
 
-			Logger.LogTrace($"Scanning assembly {assembly} for routes");
+			Logger.LogTrace($"Scanning assembly for routes: {new { Assembly = assembly }}");
 			foreach (var type in GetRestResourceTypes(assembly))
 			{
 				var routePrefix = GetAttributes<RestResourceAttribute>(type).FirstOrDefault()?.RoutePrefix;
 
-				Logger.LogTrace($"Scanning type {type} for routes");
+				Logger.LogTrace($"Scanning type for routes: {new { Type = type }}");
 				foreach (var method in GetRestRouteMethods(type))
 				{
 					var attribute = GetAttributes<RestRouteAttribute>(method).FirstOrDefault();
@@ -41,7 +41,7 @@ namespace Everest.Routing
 						var endPoint = new EndPoint(type, method, action);
 						var descriptor = new RouteDescriptor(route, endPoint);
 
-						Logger.LogTrace($"Route found - {route.Description} at: {endPoint.Description}");
+						Logger.LogTrace($"Route found: {new { Route = route.Description, EndPoint = endPoint.Description }}");
 						count++;
 
 						yield return descriptor;
@@ -49,18 +49,18 @@ namespace Everest.Routing
 				}
 			}
 
-			Logger.LogTrace($"Scan of assembly {assembly} complete");
-			Logger.LogTrace($"Total routes found: {count}");
+			Logger.LogTrace($"Scan of assembly complete: {new { Assembly = assembly }}");
+			Logger.LogTrace($"Total routes found: {new {Count = count}}");
 		}
 
 		private static IEnumerable<Type> GetRestResourceTypes(Assembly assembly)
 		{
-			if (assembly == null) 
+			if (assembly == null)
 				throw new ArgumentNullException(nameof(assembly));
 
 			foreach (var type in assembly
-				         .GetTypes()
-				         .Where(t => t.IsClass && t.IsDefined(typeof(RestResourceAttribute), false)))
+						 .GetTypes()
+						 .Where(t => t.IsClass && t.IsDefined(typeof(RestResourceAttribute), false)))
 			{
 				yield return type;
 			}
@@ -68,12 +68,12 @@ namespace Everest.Routing
 
 		private static IEnumerable<MethodInfo> GetRestRouteMethods(Type type)
 		{
-			if (type == null) 
+			if (type == null)
 				throw new ArgumentNullException(nameof(type));
 
 			foreach (var method in type
-				         .GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)
-				         .Where(m => !m.IsAbstract && m.IsDefined(typeof(RestRouteAttribute), true)))
+						 .GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)
+						 .Where(m => !m.IsAbstract && m.IsDefined(typeof(RestRouteAttribute), true)))
 			{
 				yield return method;
 			}
@@ -82,7 +82,7 @@ namespace Everest.Routing
 		public static IEnumerable<T> GetAttributes<T>(MethodInfo method)
 			where T : Attribute
 		{
-			if (method == null) 
+			if (method == null)
 				throw new ArgumentNullException(nameof(method));
 
 			foreach (var attribute in method.GetCustomAttributes(typeof(T), false).OfType<T>())
@@ -94,7 +94,7 @@ namespace Everest.Routing
 		public static IEnumerable<T> GetAttributes<T>(Type type)
 			where T : Attribute
 		{
-			if (type == null) 
+			if (type == null)
 				throw new ArgumentNullException(nameof(type));
 
 			foreach (var attribute in type.GetCustomAttributes(typeof(T), false).OfType<T>())

@@ -1,8 +1,10 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace Everest.Utils
 {
-	public static class SizeExtensions
+	public static class ReadableExtensions
 	{
 		public static string ToReadableSize(this Stream stream)
 		{
@@ -30,6 +32,11 @@ namespace Everest.Utils
 			}
 
 			return $"{size:G4} {units[unit]}";
+		}
+
+		public static string ToReadableArray(this IEnumerable<string> enumerable)
+		{
+			return string.Join(", ", enumerable ?? Array.Empty<string>() );
 		}
 	}
 }

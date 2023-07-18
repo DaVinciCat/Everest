@@ -4,6 +4,7 @@ using System.Net;
 using System.Threading;
 using Everest.Collections;
 using Everest.Middleware;
+using Everest.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -66,7 +67,7 @@ namespace Everest.Rest
 
 			try
 			{
-				Logger.LogTrace($"Starting server at {string.Join("; ", Prefixes)}");
+				Logger.LogTrace($"Starting server at {Prefixes.ToReadableArray()}");
 				listener.Start();
 				listenerThread.Start();
 				Logger.LogTrace("Server is started");

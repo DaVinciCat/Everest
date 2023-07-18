@@ -31,7 +31,7 @@ namespace Everest.Routing
 		};
 
 		private readonly Dictionary<string, RouteTrie> methods = new();
-		
+
 		public Router(ILogger<Router> logger)
 		{
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -39,7 +39,7 @@ namespace Everest.Routing
 
 		public void RegisterRoute(RouteDescriptor descriptor)
 		{
-			if (descriptor == null) 
+			if (descriptor == null)
 				throw new ArgumentNullException(nameof(descriptor));
 
 			if (!methods.TryGetValue(descriptor.Route.HttpMethod, out var routes))
@@ -51,7 +51,7 @@ namespace Everest.Routing
 
 				methods[descriptor.Route.HttpMethod] = routes;
 			}
-			
+
 			routes.Insert(descriptor);
 
 			IRouteSegmentParser GetParser(string segment)
@@ -71,25 +71,25 @@ namespace Everest.Routing
 
 		public async Task<bool> TryRouteAsync(HttpContext context)
 		{
-			if (context == null) 
+			if (context == null)
 				throw new ArgumentNullException(nameof(context));
 
-			Logger.LogTrace($"{context.Id} - Try to route request: {context.Request.Description}");
-			
+			Logger.LogTrace($"{context.Id} - Try to match request: {new { Request = context.Request.Description }}");
+
 			if (methods.TryGetValue(context.Request.HttpMethod, out var routes))
 			{
-				var result = (routes.SearchExact(context.Request.Path, out var descriptor, out var parameters) || routes.SearchBreadthFirst(context.Request.Path, out descriptor, out parameters));
+				var result = routes.SearchExact(context.Request.Path, out var descriptor, out var parameters) || routes.SearchBreadthFirst(context.Request.Path, out descriptor, out parameters);
 				if (result)
 				{
 					context.Request.PathParameters = parameters;
 					context.Features.Set<IRouteDescriptorFeature>(new RouteDescriptorFeature(descriptor));
-					Logger.LogTrace($"{context.Id} - Successfully routed from: {context.Request.Description} to: {descriptor.Route.Description}");
+					Logger.LogTrace($"{context.Id} - Successfully matched request: {new { Request = context.Request.Description, RoutePattern = descriptor.Route.Description, EndPoint = descriptor.EndPoint.Description }}");
 					return true;
 				}
 			}
-			
+
 			await OnRouteNotFoundAsync(context);
-			Logger.LogWarning($"{context.Id} - Failed to route request. Requested route not found: {context.Request.Description}");
+			Logger.LogWarning($"{context.Id} - Failed to match request. Requested route not found: {new { Request = context.Request.Description }}");
 			return false;
 		}
 
@@ -100,7 +100,7 @@ namespace Everest.Routing
 
 			context.Response.KeepAlive = false;
 			context.Response.StatusCode = HttpStatusCode.NotFound;
-			await context.Response.WriteJsonAsync($"Requested route not found: {context.Request.Description}");
+			await context.Response.WriteAsync($"Requested route not found: {new { Request = context.Request.Description }}");
 		};
 
 		#region Trie
@@ -116,7 +116,7 @@ namespace Everest.Routing
 			public int Level { get; }
 
 			public bool IsTerminal => RouteDescriptor != null;
-			
+
 			public Dictionary<string, TrieNode> Children { get; } = new();
 
 			public TrieNode()
@@ -140,7 +140,7 @@ namespace Everest.Routing
 			public string[] Delimiters { get; set; } = { "/" };
 
 			private readonly Dictionary<string, RouteDescriptor> routes = new();
-			
+
 			private readonly TrieNode root = new();
 
 			private readonly Func<string, IRouteSegmentParser> getParser;
@@ -167,7 +167,7 @@ namespace Everest.Routing
 				{
 					var segment = segments[i];
 					var isLastSegment = (i == segments.Length - 1);
-					
+
 					if (!currentNode.Children.ContainsKey(segment))
 					{
 						if (isLastSegment)
