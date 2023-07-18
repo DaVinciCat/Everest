@@ -69,19 +69,7 @@ namespace Everest.Rest
 				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
 				return new EndPointInvoker(loggerFactory.CreateLogger<EndPointInvoker>());
 			});
-
-			services.TryAddSingleton<ICorsRequestHandler>(provider =>
-			{
-				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
-				return new CorsRequestHandler(loggerFactory.CreateLogger<CorsRequestHandler>());
-			});
-
-			services.TryAddSingleton<IAuthenticator>(provider =>
-			{
-				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
-				return new Authenticator(loggerFactory.CreateLogger<Authenticator>());
-			});
-
+			
 			Services = services.BuildServiceProvider();
 		}
 
