@@ -43,17 +43,22 @@ namespace Everest.Routing
 
 		public string ParameterName { get; }
 
-		public StringParameterRouteSegmentParser(string segment)
+		public StringParameterRouteSegmentParser(string segment, Func<string> getParameterName = null)
 		{
 			if (string.IsNullOrEmpty(segment))
 				throw new ArgumentException($"Segment required: {nameof(segment)}.");
-
-			var match = Regex.Match(segment, SegmentPattern);
-			if (!match.Success)
-				throw new ArgumentException($"Invalid segment value: {segment}.");
-
+			
 			Segment = segment;
-			ParameterName = match.Groups[1].Value;
+			ParameterName = getParameterName != null ? getParameterName() : GetParameterName();
+
+			string GetParameterName()
+			{
+				var match = Regex.Match(segment, SegmentPattern);
+				if (!match.Success)
+					throw new ArgumentException($"Invalid segment value: {segment}.");
+
+				return	match.Groups[1].Value;
+			}
 		}
 
 		public bool TryParse(string segment, out ParameterCollection parameters)
@@ -81,17 +86,22 @@ namespace Everest.Routing
 
 		public string ParameterName { get; }
 
-		public IntParameterRouteSegmentParser(string segment)
+		public IntParameterRouteSegmentParser(string segment, Func<string> getParameterName = null)
 		{
 			if (string.IsNullOrEmpty(segment))
 				throw new ArgumentException($"Segment required: {nameof(segment)}.");
 
-			var match = Regex.Match(segment, SegmentPattern);
-			if (!match.Success)
-				throw new ArgumentException($"Invalid segment value: {segment}.");
-
 			Segment = segment;
-			ParameterName = match.Groups[1].Value;
+			ParameterName = getParameterName != null ? getParameterName() : GetParameterName();
+
+			string GetParameterName()
+			{
+				var match = Regex.Match(segment, SegmentPattern);
+				if (!match.Success)
+					throw new ArgumentException($"Invalid segment value: {segment}.");
+
+				return match.Groups[1].Value;
+			}
 		}
 
 		public bool TryParse(string segment, out ParameterCollection parameters)
@@ -119,17 +129,22 @@ namespace Everest.Routing
 
 		public string ParameterName { get; }
 
-		public DoubleParameterRouteSegmentParser(string segment)
+		public DoubleParameterRouteSegmentParser(string segment, Func<string> getParameterName = null)
 		{
 			if (string.IsNullOrEmpty(segment))
 				throw new ArgumentException($"Segment required: {nameof(segment)}.");
 
-			var match = Regex.Match(segment, SegmentPattern);
-			if (!match.Success)
-				throw new ArgumentException($"Invalid segment value: {segment}.");
-
 			Segment = segment;
-			ParameterName = match.Groups[1].Value;
+			ParameterName = getParameterName != null ? getParameterName() : GetParameterName();
+
+			string GetParameterName()
+			{
+				var match = Regex.Match(segment, SegmentPattern);
+				if (!match.Success)
+					throw new ArgumentException($"Invalid segment value: {segment}.");
+
+				return match.Groups[1].Value;
+			}
 		}
 
 		public bool TryParse(string segment, out ParameterCollection parameters)
@@ -157,17 +172,22 @@ namespace Everest.Routing
 
 		public string ParameterName { get; }
 
-		public FloatParameterRouteSegmentParser(string segment)
+		public FloatParameterRouteSegmentParser(string segment, Func<string> getParameterName = null)
 		{
 			if (string.IsNullOrEmpty(segment))
 				throw new ArgumentException($"Segment required: {nameof(segment)}.");
 
-			var match = Regex.Match(segment, SegmentPattern);
-			if (!match.Success)
-				throw new ArgumentException($"Invalid segment value: {segment}.");
-
 			Segment = segment;
-			ParameterName = match.Groups[1].Value;
+			ParameterName = getParameterName != null ? getParameterName() : GetParameterName();
+
+			string GetParameterName()
+			{
+				var match = Regex.Match(segment, SegmentPattern);
+				if (!match.Success)
+					throw new ArgumentException($"Invalid segment value: {segment}.");
+
+				return match.Groups[1].Value;
+			}
 		}
 
 		public bool TryParse(string segment, out ParameterCollection parameters)
@@ -195,17 +215,22 @@ namespace Everest.Routing
 
 		public string ParameterName { get; }
 
-		public BoolParameterRouteSegmentParser(string segment)
+		public BoolParameterRouteSegmentParser(string segment, Func<string> getParameterName = null)
 		{
 			if (string.IsNullOrEmpty(segment))
 				throw new ArgumentException($"Segment required: {nameof(segment)}.");
 
-			var match = Regex.Match(segment, SegmentPattern);
-			if (!match.Success)
-				throw new ArgumentException($"Invalid segment value: {segment}.");
-
 			Segment = segment;
-			ParameterName = match.Groups[1].Value;
+			ParameterName = getParameterName != null ? getParameterName() : GetParameterName();
+
+			string GetParameterName()
+			{
+				var match = Regex.Match(segment, SegmentPattern);
+				if (!match.Success)
+					throw new ArgumentException($"Invalid segment value: {segment}.");
+
+				return match.Groups[1].Value;
+			}
 		}
 
 		public bool TryParse(string segment, out ParameterCollection parameters)
@@ -233,17 +258,22 @@ namespace Everest.Routing
 
 		public string ParameterName { get; }
 
-		public GuidParameterRouteSegmentParser(string segment)
+		public GuidParameterRouteSegmentParser(string segment, Func<string> getParameterName = null)
 		{
 			if (string.IsNullOrEmpty(segment))
 				throw new ArgumentException($"Segment required: {nameof(segment)}.");
 
-			var match = Regex.Match(segment, SegmentPattern);
-			if (!match.Success)
-				throw new ArgumentException($"Invalid segment value: {segment}.");
-
 			Segment = segment;
-			ParameterName = match.Groups[1].Value;
+			ParameterName = getParameterName != null ? getParameterName() : GetParameterName();
+
+			string GetParameterName()
+			{
+				var match = Regex.Match(segment, SegmentPattern);
+				if (!match.Success)
+					throw new ArgumentException($"Invalid segment value: {segment}.");
+
+				return match.Groups[1].Value;
+			}
 		}
 
 		public bool TryParse(string segment, out ParameterCollection parameters)
@@ -271,17 +301,22 @@ namespace Everest.Routing
 
 		public string ParameterName { get; }
 
-		public DateTimeParameterRouteSegmentParser(string segment)
+		public DateTimeParameterRouteSegmentParser(string segment, Func<string> getParameterName = null)
 		{
 			if (string.IsNullOrEmpty(segment))
 				throw new ArgumentException($"Segment required: {nameof(segment)}.");
 
-			var match = Regex.Match(segment, SegmentPattern);
-			if (!match.Success)
-				throw new ArgumentException($"Invalid segment value: {segment}.");
-
 			Segment = segment;
-			ParameterName = match.Groups[1].Value;
+			ParameterName = getParameterName != null ? getParameterName() : GetParameterName();
+
+			string GetParameterName()
+			{
+				var match = Regex.Match(segment, SegmentPattern);
+				if (!match.Success)
+					throw new ArgumentException($"Invalid segment value: {segment}.");
+
+				return match.Groups[1].Value;
+			}
 		}
 
 		public bool TryParse(string segment, out ParameterCollection parameters)
