@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Globalization;
 
 namespace Everest.Collections
 {
@@ -24,7 +25,7 @@ namespace Everest.Collections
 			if (!converter.CanConvertFrom(typeof(string)))
 				throw new InvalidOperationException($"Cannot convert {strValue} to {typeof(T)}.");
 
-			return (T)converter.ConvertFrom(strValue);
+			return (T)converter.ConvertFrom(null, CultureInfo.InvariantCulture, strValue);
 		}
 
 		public static T GetValue<T>(this NameValueCollection collection, string key, Func<string, T> parse)
@@ -66,10 +67,10 @@ namespace Everest.Collections
 			var strValue = collection[key];
 			var converter = TypeDescriptor.GetConverter(typeof(T));
 
-			if (!converter.CanConvertFrom(typeof(string)) || !converter.IsValid(strValue))
+			if (!converter.CanConvertFrom(typeof(string))) 
 				return false;
 
-			value = (T)converter.ConvertFrom(strValue);
+			value = (T)converter.ConvertFrom(null, CultureInfo.InvariantCulture, strValue);
 			return true;
 		}
 	}
