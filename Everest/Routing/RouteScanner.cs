@@ -50,7 +50,7 @@ namespace Everest.Routing
 			}
 
 			Logger.LogTrace($"Scan of assembly complete: {new { Assembly = assembly }}");
-			Logger.LogTrace($"Total routes found: {new {Count = count}}");
+			Logger.LogTrace($"Total routes found: {new { RouteCount = count }}");
 		}
 
 		private static IEnumerable<Type> GetRestResourceTypes(Assembly assembly)
