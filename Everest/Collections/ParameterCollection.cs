@@ -16,7 +16,7 @@ namespace Everest.Collections
 			
 		}
 		
-		public bool HasParameters() => Count > 0;
+		public bool HasParameters => Count > 0;
 
 		public bool HasParameter(string parameter) => this[parameter] != null;
 
