@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.Threading.Tasks;
+using Everest.Authentication;
 using Everest.Http;
 using Everest.Rest;
 using Everest.Routing;
