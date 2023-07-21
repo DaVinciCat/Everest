@@ -7,6 +7,7 @@ using Everest.Middleware;
 using Everest.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Everest.Net;
 
 namespace Everest.Rest
 {
@@ -149,7 +150,7 @@ namespace Everest.Rest
 				}
 				catch (Exception ex)
 				{
-					Logger.LogCritical(ex, "Failed to process incoming request");
+					Logger.LogCritical(ex, $"Failed to process incoming request");
 				}
 			}
 		}
@@ -165,13 +166,15 @@ namespace Everest.Rest
 			}
 			catch (Exception ex)
 			{
-				Logger.LogCritical(ex, "Failed to process incoming request");
+				Logger.LogCritical(ex, $"{context.Id} - Failed to process incoming request");
 			}
 			finally
 			{
 				if (!context.Response.ResponseSent)
 				{
+					Logger.LogTrace($"{context.Id} - Try to send response: {new { RemoteEndPoint = context.Request.RemoteEndPoint.Description() }}");
 					await context.Response.SendResponceAsync();
+					Logger.LogTrace($"{context.Id} - Successfully sended response: {new { RemoteEndPoint = context.Request.RemoteEndPoint.Description(), Size = context.Response.ContentLength64.ToReadableSize() }}");
 				}
 			}
 		}

@@ -57,7 +57,6 @@ namespace Everest.Shell
 				.UseAuthenticationMiddleware()
 				.UseEndPointMiddleware()
 				.UseResponseCompressionMiddleware()
-				.UseResponseMiddleware()
 				.ScanRoutes(Assembly.GetExecutingAssembly())
 				.Build();
 

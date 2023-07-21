@@ -8,7 +8,6 @@ using Everest.Cors;
 using Everest.EndPoints;
 using Everest.Exceptions;
 using Everest.Middleware;
-using Everest.Response;
 using Everest.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -48,12 +47,6 @@ namespace Everest.Rest
 			{
 				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
 				return new Router(loggerFactory.CreateLogger<Router>());
-			});
-
-			services.TryAddSingleton<IResponseSender>(provider =>
-			{
-				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
-				return new ResponseSender(loggerFactory.CreateLogger<ResponseSender>());
 			});
 
 			services.TryAddSingleton<IResponseCompressor>(provider =>
@@ -135,13 +128,7 @@ namespace Everest.Rest
 			services.AddSingleton(builder);
 			return services;
 		}
-
-		public static IServiceCollection AddResponseSender(this IServiceCollection services, Func<IServiceProvider, IResponseSender> builder)
-		{
-			services.AddSingleton(builder);
-			return services;
-		}
-
+		
 		public static IServiceCollection AddResponseCompressor(this IServiceCollection services, Func<IServiceProvider, IResponseCompressor> builder)
 		{
 			services.AddSingleton(builder);
@@ -258,14 +245,7 @@ namespace Everest.Rest
 			builder.Middleware.Add(new EndPointMiddleware(invoker));
 			return builder;
 		}
-
-		public static RestServerBuilder UseResponseMiddleware(this RestServerBuilder builder)
-		{
-			var sender = builder.Services.GetRequiredService<IResponseSender>();
-			builder.Middleware.Add(new ResponseMiddleware(sender));
-			return builder;
-		}
-
+		
 		public static RestServerBuilder UseResponseCompressionMiddleware(this RestServerBuilder builder)
 		{
 			var compressor = builder.Services.GetRequiredService<IResponseCompressor>();
@@ -290,9 +270,7 @@ namespace Everest.Rest
 		public static RestServerBuilder UseExceptionHandlerMiddleware(this RestServerBuilder builder)
 		{
 			var handler = builder.Services.GetRequiredService<IExceptionHandler>();
-			var sender = builder.Services.GetRequiredService<IResponseSender>();
-
-			builder.Middleware.Add(new ExceptionHandlerMiddleware(handler, sender));
+			builder.Middleware.Add(new ExceptionHandlerMiddleware(handler));
 			return builder;
 		}
 
