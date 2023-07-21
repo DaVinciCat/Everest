@@ -41,7 +41,7 @@ namespace Everest.Routing
 						var endPoint = new EndPoint(type, method, action);
 						var descriptor = new RouteDescriptor(route, endPoint);
 
-						Logger.LogTrace($"Route found: {new { Route = route.Description, EndPoint = endPoint.Description }}");
+						Logger.LogTrace($"Route found: {new { RoutePattern = route.Description, EndPoint = endPoint.Description }}");
 						count++;
 
 						yield return descriptor;
