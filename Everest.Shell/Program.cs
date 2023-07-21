@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Everest.Shell
 {
-    [RestResource("/api/1.0")]
+	[RestResource("/api/1.0")]
 	public static class Rest
 	{
 		[RestRoute("GET", "/welcome")]
@@ -16,8 +16,15 @@ namespace Everest.Shell
 		{
 			var service = context.GetGreetingsService();
 			var greetings = service.Greet();
-			
-			await context.Response.WriteJsonAsync(new { Message = greetings, From = "Everest", Success = true });
+
+			if (context.Request.QueryParameters.TryGetParameterValue("me", out string me))
+			{
+				await context.Response.WriteJsonAsync(new { Message = greetings, From = "Everest", To = me, Success = true });
+			}
+			else
+			{
+				await context.Response.WriteJsonAsync(new { Message = greetings, From = "Everest", Success = true });
+			}
 		}
 
 		[RestRoute("GET", "/welcome/{me:string}")]
@@ -37,8 +44,8 @@ namespace Everest.Shell
 		{
 			var services = new ServiceCollection();
 			services.AddAuthenticator(configurator => configurator.AddBasicAuthentication())
-				    .AddCorsRequestHandler(configurator => configurator.AddDefaultCorsPolicy())
-				    .AddSingleton(_ => new GreetingsService())
+					.AddCorsRequestHandler(configurator => configurator.AddDefaultCorsPolicy())
+					.AddSingleton(_ => new GreetingsService())
 					.AddConsoleLoggerFactory();
 
 			using var rest = new RestServerBuilder(services)
@@ -71,7 +78,7 @@ namespace Everest.Shell
 			//for test purposes only
 		}
 
-		private readonly string[] greetings = 
+		private readonly string[] greetings =
 		{
 			"Hello!",
 			"Hi!",
