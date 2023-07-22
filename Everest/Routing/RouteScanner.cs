@@ -79,7 +79,7 @@ namespace Everest.Routing
 			}
 		}
 
-		public static IEnumerable<T> GetAttributes<T>(MethodInfo method)
+		private static IEnumerable<T> GetAttributes<T>(MethodInfo method)
 			where T : Attribute
 		{
 			if (method == null)
@@ -91,7 +91,7 @@ namespace Everest.Routing
 			}
 		}
 
-		public static IEnumerable<T> GetAttributes<T>(Type type)
+		private static IEnumerable<T> GetAttributes<T>(Type type)
 			where T : Attribute
 		{
 			if (type == null)
