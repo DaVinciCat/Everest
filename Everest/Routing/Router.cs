@@ -100,7 +100,7 @@ namespace Everest.Routing
 
 			context.Response.KeepAlive = false;
 			context.Response.StatusCode = HttpStatusCode.NotFound;
-			await context.Response.WriteAsync($"Requested route not found: {new { Request = context.Request.Description }}");
+			await context.Response.WriteAsync($"Requested route not found: {context.Request.Description}");
 		};
 
 		#region Trie

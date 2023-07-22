@@ -174,7 +174,7 @@ namespace Everest.Rest
 				{
 					Logger.LogTrace($"{context.Id} - Try to send response: {new { RemoteEndPoint = context.Request.RemoteEndPoint.Description() }}");
 					await context.Response.SendResponceAsync();
-					Logger.LogTrace($"{context.Id} - Successfully sended response: {new { RemoteEndPoint = context.Request.RemoteEndPoint.Description(), Size = context.Response.ContentLength64.ToReadableSize() }}");
+					Logger.LogTrace($"{context.Id} - Successfully sended response: {new { RemoteEndPoint = context.Request.RemoteEndPoint.Description(), StatusCode = context.Response.StatusCode, Size = context.Response.ContentLength64.ToReadableSize() }}");
 				}
 			}
 		}
