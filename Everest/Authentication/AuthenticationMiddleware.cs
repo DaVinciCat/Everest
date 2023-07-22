@@ -7,11 +7,11 @@ namespace Everest.Authentication
 {
 	public class AuthenticationMiddleware : MiddlewareBase
 	{
-		private readonly IAuthenticator handler;
+		private readonly IAuthenticator authenticator;
 
-		public AuthenticationMiddleware(IAuthenticator handler)
+		public AuthenticationMiddleware(IAuthenticator authenticator)
 		{
-			this.handler = handler ?? throw new ArgumentNullException(nameof(handler));
+			this.authenticator = authenticator ?? throw new ArgumentNullException(nameof(authenticator));
 		}
 
 		public override async Task InvokeAsync(HttpContext context)
@@ -19,7 +19,7 @@ namespace Everest.Authentication
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
 
-			await handler.AuthenticateAsync(context);
+			await authenticator.AuthenticateAsync(context);
 
 			if (HasNext)
 				await Next.InvokeAsync(context);
