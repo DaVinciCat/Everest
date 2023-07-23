@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Everest.Http;
 
 namespace Everest.Authentication
@@ -8,7 +7,7 @@ namespace Everest.Authentication
 	{
 		public IAuthentication[] Authentications { get; }
 
-		public void AddAuthentication(IAuthentication authentication);
+		void AddAuthentication(IAuthentication authentication);
 
 		Task AuthenticateAsync(HttpContext context);
 	}
