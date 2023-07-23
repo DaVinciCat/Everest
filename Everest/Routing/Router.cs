@@ -18,16 +18,20 @@ namespace Everest.Routing
 
 		public RouteDescriptor[] Routes => methods.SelectMany(kvp => kvp.Value.Routes).ToArray();
 
-		public Dictionary<string, Func<string, IRouteSegmentParser>> SegmentParsers { get; set; } = new()
+		public delegate IRouteSegmentParser CreateRouteSegmentParser(string segmentPattern);
+
+		public IReadOnlyDictionary<string, Func<string, IRouteSegmentParser>> SegmentParsers => segmentParsers;
+
+		private readonly Dictionary<string, Func<string, IRouteSegmentParser>> segmentParsers = new()
 		{
-			{ AlphaNumericRouteSegmentParser.SegmentPattern, value => new AlphaNumericRouteSegmentParser(value) },
-			{ StringParameterRouteSegmentParser.SegmentPattern, value => new StringParameterRouteSegmentParser(value)},
-			{ IntParameterRouteSegmentParser.SegmentPattern, value => new IntParameterRouteSegmentParser(value)},
-			{ DoubleParameterRouteSegmentParser.SegmentPattern, value => new DoubleParameterRouteSegmentParser(value)},
-			{ FloatParameterRouteSegmentParser.SegmentPattern, value => new FloatParameterRouteSegmentParser(value)},
-			{ BoolParameterRouteSegmentParser.SegmentPattern, value => new BoolParameterRouteSegmentParser(value)},
-			{ GuidParameterRouteSegmentParser.SegmentPattern, value => new GuidParameterRouteSegmentParser(value)},
-			{ DateTimeParameterRouteSegmentParser.SegmentPattern, value => new DateTimeParameterRouteSegmentParser(value)}
+			{ AlphaNumericRouteSegmentParser.SegmentPattern, segment => new AlphaNumericRouteSegmentParser(segment) },
+			{ StringParameterRouteSegmentParser.SegmentPattern, segment => new StringParameterRouteSegmentParser(segment)},
+			{ IntParameterRouteSegmentParser.SegmentPattern, segment => new IntParameterRouteSegmentParser(segment)},
+			{ DoubleParameterRouteSegmentParser.SegmentPattern, segment => new DoubleParameterRouteSegmentParser(segment)},
+			{ FloatParameterRouteSegmentParser.SegmentPattern, segment => new FloatParameterRouteSegmentParser(segment)},
+			{ BoolParameterRouteSegmentParser.SegmentPattern, segment => new BoolParameterRouteSegmentParser(segment)},
+			{ GuidParameterRouteSegmentParser.SegmentPattern, segment => new GuidParameterRouteSegmentParser(segment)},
+			{ DateTimeParameterRouteSegmentParser.SegmentPattern, segment => new DateTimeParameterRouteSegmentParser(segment)}
 		};
 
 		private readonly Dictionary<string, RouteTrie> methods = new();
@@ -35,6 +39,24 @@ namespace Everest.Routing
 		public Router(ILogger<Router> logger)
 		{
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
+		}
+
+		public void AddSegmentParser(string segmentPattern, CreateRouteSegmentParser factory)
+		{
+			segmentParsers[segmentPattern] = factory.Invoke;
+		}
+
+		public void RemoveSegmentParser(string segmentPattern)
+		{
+			if (segmentParsers.ContainsKey(segmentPattern))
+			{
+				segmentParsers.Remove(segmentPattern);
+			}
+		}
+
+		public void ClearSegmentParsers()
+		{
+			segmentParsers.Clear();
 		}
 
 		public void RegisterRoute(RouteDescriptor descriptor)
@@ -56,12 +78,12 @@ namespace Everest.Routing
 
 			IRouteSegmentParser GetParser(string segment)
 			{
-				foreach (var segmentPattern in SegmentParsers.Keys)
+				foreach (var segmentPattern in segmentParsers.Keys)
 				{
 					var match = Regex.Match(segment, segmentPattern);
 					if (match.Success)
 					{
-						return SegmentParsers[segmentPattern](segment);
+						return segmentParsers[segmentPattern](segment);
 					}
 				}
 
