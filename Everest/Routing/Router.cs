@@ -18,7 +18,7 @@ namespace Everest.Routing
 
 		public RouteDescriptor[] Routes => methods.SelectMany(kvp => kvp.Value.Routes).ToArray();
 
-		public Dictionary<string, Func<string, IRouteSegmentParser>> Parsers { get; set; } = new()
+		public Dictionary<string, Func<string, IRouteSegmentParser>> SegmentParsers { get; set; } = new()
 		{
 			{ AlphaNumericRouteSegmentParser.SegmentPattern, value => new AlphaNumericRouteSegmentParser(value) },
 			{ StringParameterRouteSegmentParser.SegmentPattern, value => new StringParameterRouteSegmentParser(value)},
@@ -56,12 +56,12 @@ namespace Everest.Routing
 
 			IRouteSegmentParser GetParser(string segment)
 			{
-				foreach (var segmentPattern in Parsers.Keys)
+				foreach (var segmentPattern in SegmentParsers.Keys)
 				{
 					var match = Regex.Match(segment, segmentPattern);
 					if (match.Success)
 					{
-						return Parsers[segmentPattern](segment);
+						return SegmentParsers[segmentPattern](segment);
 					}
 				}
 
