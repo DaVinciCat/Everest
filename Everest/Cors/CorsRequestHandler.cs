@@ -72,20 +72,17 @@ namespace Everest.Cors
 
 			Logger.LogTrace($"{context.Id} - Try to apply CORS policy: {new { Request = context.Request.Description, Origin = origin, Policies = Policies.Select(p => p.Origin).ToReadableArray() }}");
 
-			foreach (var policy in Policies)
+			if (Policies.TryGetCorsPolicy(origin, out var policy))
 			{
-				if (string.Equals(policy.Origin, origin, StringComparison.Ordinal))
-				{
-					var headers = new Headers(policy.AllowMethods, policy.AllowHeaders, policy.Origin, policy.MaxAge);
-					context.Response.AddHeader("Access-Control-Allow-Methods", headers.AllowMethods);
-					context.Response.AddHeader("Access-Control-Allow-Headers", headers.AllowHeaders);
-					context.Response.AddHeader("Access-Control-Allow-Origin", headers.Origin);
-					context.Response.AddHeader("Access-Control-Max-Age", headers.MaxAge);
-					context.Response.StatusCode = HttpStatusCode.NoContent;
+				var headers = new Headers(policy.AllowMethods, policy.AllowHeaders, policy.Origin, policy.MaxAge);
+				context.Response.AddHeader("Access-Control-Allow-Methods", headers.AllowMethods);
+				context.Response.AddHeader("Access-Control-Allow-Headers", headers.AllowHeaders);
+				context.Response.AddHeader("Access-Control-Allow-Origin", headers.Origin);
+				context.Response.AddHeader("Access-Control-Max-Age", headers.MaxAge);
+				context.Response.StatusCode = HttpStatusCode.NoContent;
 
-					Logger.LogTrace($"{context.Id} - Successfully handled CORS preflight request: {new { Policy = policy, AllowMethods = policy.AllowMethods.ToReadableArray(), AllowHeaders = policy.AllowHeaders.ToReadableArray(), Origin = policy.Origin, MaxAge = policy.MaxAge }}");
-					return Task.FromResult(true);
-				}
+				Logger.LogTrace($"{context.Id} - Successfully handled CORS preflight request: {new { Policy = policy, AllowMethods = policy.AllowMethods.ToReadableArray(), AllowHeaders = policy.AllowHeaders.ToReadableArray(), Origin = policy.Origin, MaxAge = policy.MaxAge }}");
+				return Task.FromResult(true);
 			}
 
 			Logger.LogWarning($"{context.Id} - Failed to handle CORS preflight request. Request contains no supported policy: {new { Origin = origin, Policies = Policies.Select(p => p.Origin).ToReadableArray() }}");

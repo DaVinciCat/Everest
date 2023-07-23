@@ -7,6 +7,11 @@ namespace Everest.Cors
 	{
 		private readonly Dictionary<string, CorsPolicy> policies = new();
 
+		public bool TryGetCorsPolicy(string origin, out CorsPolicy policy)
+		{
+			return policies.TryGetValue(origin, out policy);
+		}
+
 		public void Add(CorsPolicy policy)
 		{
 			policies[policy.Origin] = policy;
