@@ -15,7 +15,7 @@ namespace Everest.Routing
 
 		public RouterConfigurator RegisterRoute(RouteDescriptor descriptor)
 		{
-			Service.RegisterRoute(descriptor);
+			Router.RegisterRoute(descriptor);
 			return this;
 		}
 	}

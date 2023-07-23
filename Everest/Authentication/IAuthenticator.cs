@@ -6,7 +6,9 @@ namespace Everest.Authentication
 {
     public interface IAuthenticator
 	{
-		public IList<IAuthentication> Authentications { get; }
+		public IAuthentication[] Authentications { get; }
+
+		public void AddAuthentication(IAuthentication authentication);
 
 		Task AuthenticateAsync(HttpContext context);
 	}

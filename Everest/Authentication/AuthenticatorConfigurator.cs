@@ -17,7 +17,7 @@ namespace Everest.Authentication
 
 		public void AddAuthentication(IAuthentication authentication)
 		{
-			Service.Authentications.Add(authentication);
+			Authenticator.AddAuthentication(authentication);
 		}
 	}
 

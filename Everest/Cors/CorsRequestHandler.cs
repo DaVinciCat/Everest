@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -11,44 +12,25 @@ namespace Everest.Cors
 	/*
 	   https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request
     */
-
-	public class CorsPolicy
-	{
-		public static CorsPolicy Default { get; } = new();
-
-		public string Origin { get; set; } = "*";
-
-		public string[] AllowMethods { get; set; } = { "GET", "POST", "PUT", "DELETE" };
-
-		public string[] AllowHeaders { get; set; } = { "Content-Type", "Accept", "X-Requested-With" };
-
-		public int MaxAge { get; set; } = 1728000;
-
-		public CorsPolicy(string origin, string[] allowMethods, string[] allowHeaders, int maxAge)
-		{
-			Origin = origin;
-			AllowMethods = allowMethods;
-			AllowHeaders = allowHeaders;
-			MaxAge = maxAge;
-		}
-
-		private CorsPolicy()
-		{
-
-		}
-	}
-
+	
 	public class CorsRequestHandler : ICorsRequestHandler
 	{
 		public ILogger<CorsRequestHandler> Logger { get; }
 
-		public CorsPolicyCollection Policies { get; set; } = new();
+		public CorsPolicy[] Policies => policies.Values.ToArray();
+
+		private readonly Dictionary<string, CorsPolicy> policies = new();
 
 		public string OriginHeader { get; set; } = "Origin";
 
 		public CorsRequestHandler(ILogger<CorsRequestHandler> logger)
 		{
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
+		}
+
+		public void AddCorsPolicy(CorsPolicy policy)
+		{
+			policies[policy.Origin] = policy;
 		}
 
 		public Task<bool> TryHandleCorsRequestAsync(HttpContext context)
@@ -72,7 +54,7 @@ namespace Everest.Cors
 
 			Logger.LogTrace($"{context.Id} - Try to apply CORS policy: {new { Request = context.Request.Description, Origin = origin, Policies = Policies.Select(p => p.Origin).ToReadableArray() }}");
 
-			if (Policies.TryGetCorsPolicy(origin, out var policy))
+			if (policies.TryGetValue(origin, out var policy))
 			{
 				var headers = new Headers(policy.AllowMethods, policy.AllowHeaders, policy.Origin, policy.MaxAge);
 				context.Response.AddHeader("Access-Control-Allow-Methods", headers.AllowMethods);

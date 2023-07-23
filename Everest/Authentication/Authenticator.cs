@@ -12,21 +12,28 @@ namespace Everest.Authentication
 	{
 		public ILogger<Authenticator> Logger { get; }
 
-		public IList<IAuthentication> Authentications { get; set; } = new List<IAuthentication>();
-		
+		public IAuthentication[] Authentications => authentications.ToArray();
+
+		private readonly List<IAuthentication> authentications = new ();
+
 		public Authenticator(ILogger<Authenticator> logger)
 		{
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
-		
+
+		public void AddAuthentication(IAuthentication authentication)
+		{
+			authentications.Add(authentication);
+		}
+
 		public async Task AuthenticateAsync(HttpContext context)
 		{
 			if (context == null) 
 				throw new ArgumentNullException(nameof(context));
 
-			Logger.LogTrace($"{context.Id} - Try to authenticate: {new { Schemes = Authentications.Select(authentication => authentication.Scheme).ToReadableArray()}}");
+			Logger.LogTrace($"{context.Id} - Try to authenticate: {new { Schemes = authentications.Select(authentication => authentication.Scheme).ToReadableArray()}}");
 
-			foreach (var authentication in Authentications)
+			foreach (var authentication in authentications)
 			{
 				await authentication.TryAuthenticateAsync(context);
 			}
