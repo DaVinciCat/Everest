@@ -12,9 +12,9 @@ namespace Everest.Authentication
 	{
 		public ILogger<Authenticator> Logger { get; }
 
-		public IAuthentication[] Authentications => authentications.ToArray();
+		public IAuthentication[] Authentications => authentications.Values.ToArray();
 
-		private readonly List<IAuthentication> authentications = new ();
+		private readonly Dictionary<string, IAuthentication> authentications = new();
 
 		public Authenticator(ILogger<Authenticator> logger)
 		{
@@ -23,17 +23,38 @@ namespace Everest.Authentication
 
 		public void AddAuthentication(IAuthentication authentication)
 		{
-			authentications.Add(authentication);
+			authentications[authentication.Scheme] = authentication;
+		}
+
+		public void RemoveAuthentication(IAuthentication authentication)
+		{
+			if (authentications.ContainsKey(authentication.Scheme))
+			{
+				authentications.Remove(authentication.Scheme);
+			}
+		}
+
+		public void RemoveAuthentication(string scheme)
+		{
+			if (authentications.ContainsKey(scheme))
+			{
+				authentications.Remove(scheme);
+			}
+		}
+
+		public void ClearAuthentications()
+		{
+			authentications.Clear();
 		}
 
 		public async Task AuthenticateAsync(HttpContext context)
 		{
-			if (context == null) 
+			if (context == null)
 				throw new ArgumentNullException(nameof(context));
 
-			Logger.LogTrace($"{context.Id} - Try to authenticate: {new { Schemes = authentications.Select(authentication => authentication.Scheme).ToReadableArray()}}");
+			Logger.LogTrace($"{context.Id} - Try to authenticate: {new { Schemes = authentications.Select(kvp => kvp.Value.Scheme).ToReadableArray() }}");
 
-			foreach (var authentication in authentications)
+			foreach (var authentication in authentications.Values)
 			{
 				await authentication.TryAuthenticateAsync(context);
 			}

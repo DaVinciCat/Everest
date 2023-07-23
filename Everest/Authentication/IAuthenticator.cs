@@ -8,7 +8,13 @@ namespace Everest.Authentication
 		public IAuthentication[] Authentications { get; }
 
 		void AddAuthentication(IAuthentication authentication);
-		
+
+		void RemoveAuthentication(IAuthentication authentication);
+
+		void RemoveAuthentication(string scheme);
+
+		void ClearAuthentications();
+
 		Task AuthenticateAsync(HttpContext context);
 	}
 }
