@@ -1,6 +1,5 @@
 ﻿using Everest.Services;
 using System;
-using System.IO;
 
 namespace Everest.Compression
 {
@@ -12,6 +11,12 @@ namespace Everest.Compression
 			: base(compressor, services)
 		{
 		}
+
+		public ResponseCompressorConfigurator AddCompressor(IStreamCompressor compressor)
+		{
+			Compressor.AddCompressor(compressor);
+			return this;
+		}
 	}
 
 	public class DefaultResponseCompressorConfigurator : ResponseCompressorConfigurator
@@ -22,12 +27,6 @@ namespace Everest.Compression
 			: base(compressor, services)
 		{
 			Compressor = compressor;
-		}
-
-		public ResponseCompressorConfigurator AddCompressor(string encoding, Func<Stream, Stream> compressor)
-		{
-			Compressor.Compressors.Add(encoding, compressor);
-			return this;
 		}
 	}
 }
