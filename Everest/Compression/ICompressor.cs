@@ -2,7 +2,7 @@
 
 namespace Everest.Compression
 {
-	public interface IStreamCompressor
+	public interface ICompressor
 	{
 		string Encoding { get; }
 

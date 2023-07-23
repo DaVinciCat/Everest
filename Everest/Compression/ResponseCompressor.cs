@@ -16,17 +16,17 @@ namespace Everest.Compression
 
 	public class ResponseCompressor : IResponseCompressor
 	{
-		public IStreamCompressor[] Compressors => сompressors.Values.ToArray();
+		public ICompressor[] Compressors => сompressors.Values.ToArray();
 
 		public string AcceptEncodingHeader { get; set; } = "Accept-Encoding";
 
 		public string ContentEncodingHeader { get; set; } = "Content-Encoding";
 
-		private readonly Dictionary<string, IStreamCompressor> сompressors = new()
+		private readonly Dictionary<string, ICompressor> сompressors = new()
 		{
-			{ "gzip", new GZipStreamCompressor() },
-			{ "deflate", new DeflateStreamCompressor() },
-			{ "brotli", new BrotliStreamCompressor() }
+			{ "gzip", new GZipCompressor() },
+			{ "deflate", new DeflateCompressor() },
+			{ "brotli", new BrotliCompressor() }
 		};
 
 		private readonly ResponseCompressionOptions options;
@@ -45,9 +45,36 @@ namespace Everest.Compression
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
-		public void AddCompressor(IStreamCompressor compressor)
+		public void AddCompressor(ICompressor compressor)
 		{
+			if (compressor == null) 
+				throw new ArgumentNullException(nameof(compressor));
+
 			сompressors[compressor.Encoding] = compressor;
+		}
+
+		public void RemoveCompressor(ICompressor compressor)
+		{
+			if (compressor == null) 
+				throw new ArgumentNullException(nameof(compressor));
+
+			if (сompressors.ContainsKey(compressor.Encoding))
+			{
+				сompressors.Remove(compressor.Encoding);
+			}
+		}
+
+		public void RemoveCompressor(string encoding)
+		{
+			if (сompressors.ContainsKey(encoding))
+			{
+				сompressors.Remove(encoding);
+			}
+		}
+
+		public void ClearCompressors()
+		{
+			сompressors.Clear();
 		}
 
 		public async Task<bool> TryCompressResponseAsync(HttpContext context)

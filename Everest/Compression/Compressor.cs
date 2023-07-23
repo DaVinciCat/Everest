@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Everest.Compression
 {
-	public class GZipStreamCompressor : IStreamCompressor
+	public class GZipCompressor : ICompressor
 	{
 		public string Encoding => "gzip";
 
@@ -13,7 +13,7 @@ namespace Everest.Compression
 		}
 	}
 
-	public class DeflateStreamCompressor : IStreamCompressor
+	public class DeflateCompressor : ICompressor
 	{
 		public string Encoding => "deflate";
 
@@ -23,7 +23,7 @@ namespace Everest.Compression
 		}
 	}
 
-	public class BrotliStreamCompressor : IStreamCompressor
+	public class BrotliCompressor : ICompressor
 	{
 		public string Encoding => "brotli";
 
