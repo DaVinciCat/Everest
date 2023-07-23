@@ -33,6 +33,27 @@ namespace Everest.Cors
 			policies[policy.Origin] = policy;
 		}
 
+		public void RemoveCorsPolicy(CorsPolicy policy)
+		{
+			if (policies.ContainsKey(policy.Origin))
+			{
+				policies.Remove(policy.Origin);
+			}
+		}
+
+		public void RemoveCorsPolice(string origin)
+		{
+			if (policies.ContainsKey(origin))
+			{
+				policies.Remove(origin);
+			}
+		}
+
+		public void ClearCorsPolicies()
+		{
+			policies.Clear();
+		}
+
 		public Task<bool> TryHandleCorsRequestAsync(HttpContext context)
 		{
 			if (context == null)

@@ -8,6 +8,12 @@ namespace Everest.Cors
 		CorsPolicy[] Policies { get; }
 
 		void AddCorsPolicy(CorsPolicy policy);
+
+		void RemoveCorsPolicy(CorsPolicy policy);
+
+		void RemoveCorsPolice(string origin);
+
+		void ClearCorsPolicies();
 		
 		public Task<bool> TryHandleCorsRequestAsync(HttpContext context);
 	}
