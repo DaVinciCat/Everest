@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Globalization;
+using Everest.Utils;
 
 namespace Everest.Collections
 {
@@ -72,6 +73,23 @@ namespace Everest.Collections
 
 			value = (T)converter.ConvertFrom(null, CultureInfo.InvariantCulture, strValue);
 			return true;
+		}
+
+		public static bool TryGetValue<T>(this NameValueCollection collection, string key, TryParse<T> tryParse, out T value)
+		{
+			value = default(T);
+
+			if (collection == null)
+				throw new ArgumentNullException(nameof(collection), "Collection required.");
+
+			if (key == null)
+				throw new ArgumentNullException(nameof(key), "Key required.");
+
+			if (collection[key] == null)
+				return false;
+
+			var strValue = collection[key];
+			return tryParse(strValue, out value);
 		}
 	}
 }

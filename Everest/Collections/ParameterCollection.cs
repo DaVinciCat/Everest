@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Everest.Utils;
+using System;
 using System.Collections.Specialized;
 
 namespace Everest.Collections
@@ -38,6 +39,12 @@ namespace Everest.Collections
 		{
 			value = default;
 			return HasParameter(parameter) && this.TryGetValue(parameter, out value);
+		}
+
+		public bool TryGetParameterValue<T>(string parameter, TryParse<T> tryParse, out T value)
+		{
+			value = default;
+			return HasParameter(parameter) && this.TryGetValue(parameter, tryParse, out value);
 		}
 	}
 }
