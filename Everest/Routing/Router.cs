@@ -223,8 +223,9 @@ namespace Everest.Routing
 
 					foreach (var childNode in currentNode.Children.Values)
 					{
-						if (childNode.SegmentParser.TryParse(segment, out parameters))
+						if (childNode.SegmentParser.TryParse(segment, out var segmentParameters))
 						{
+							parameters.Add(segmentParameters);
 							currentNode = childNode;
 							any = true;
 							break;
