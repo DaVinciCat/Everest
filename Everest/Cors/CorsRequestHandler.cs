@@ -41,7 +41,7 @@ namespace Everest.Cors
 			}
 		}
 
-		public void RemoveCorsPolice(string origin)
+		public void RemoveCorsPolicy(string origin)
 		{
 			if (policies.ContainsKey(origin))
 			{

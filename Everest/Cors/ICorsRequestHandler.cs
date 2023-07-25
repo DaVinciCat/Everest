@@ -11,7 +11,7 @@ namespace Everest.Cors
 
 		void RemoveCorsPolicy(CorsPolicy policy);
 
-		void RemoveCorsPolice(string origin);
+		void RemoveCorsPolicy(string origin);
 
 		void ClearCorsPolicies();
 		
