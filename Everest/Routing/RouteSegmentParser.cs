@@ -30,7 +30,7 @@ namespace Everest.Routing
 
 			var segment = segments.Current;
 			if(string.IsNullOrWhiteSpace(segment))
-				throw new ArgumentNullException(nameof(segment));
+				throw new ArgumentException($"Segment required: {nameof(segment)}.");
 
 			parameters = new ParameterCollection();
 			return string.CompareOrdinal(Segment, segment) == 0;
@@ -67,7 +67,7 @@ namespace Everest.Routing
 
 			var segment = segments.Current;
 			if (string.IsNullOrWhiteSpace(segment))
-				throw new ArgumentNullException(nameof(segment));
+				throw new ArgumentException($"Segment required: {nameof(segment)}.");
 
 			parameters = new ParameterCollection();
 
@@ -109,7 +109,7 @@ namespace Everest.Routing
 
 			var segment = segments.Current;
 			if (string.IsNullOrWhiteSpace(segment))
-				throw new ArgumentNullException(nameof(segment));
+				throw new ArgumentException($"Segment required: {nameof(segment)}.");
 
 			parameters = new ParameterCollection();
 
@@ -151,7 +151,7 @@ namespace Everest.Routing
 
 			var segment = segments.Current;
 			if (string.IsNullOrWhiteSpace(segment))
-				throw new ArgumentNullException(nameof(segment));
+				throw new ArgumentException($"Segment required: {nameof(segment)}.");
 
 			parameters = new ParameterCollection();
 
@@ -193,7 +193,7 @@ namespace Everest.Routing
 
 			var segment = segments.Current;
 			if (string.IsNullOrWhiteSpace(segment))
-				throw new ArgumentNullException(nameof(segment));
+				throw new ArgumentException($"Segment required: {nameof(segment)}.");
 
 			parameters = new ParameterCollection();
 
@@ -235,7 +235,7 @@ namespace Everest.Routing
 
 			var segment = segments.Current;
 			if (string.IsNullOrWhiteSpace(segment))
-				throw new ArgumentNullException(nameof(segment));
+				throw new ArgumentException($"Segment required: {nameof(segment)}.");
 
 			parameters = new ParameterCollection();
 
@@ -277,7 +277,7 @@ namespace Everest.Routing
 
 			var segment = segments.Current;
 			if (string.IsNullOrWhiteSpace(segment))
-				throw new ArgumentNullException(nameof(segment));
+				throw new ArgumentException($"Segment required: {nameof(segment)}.");
 
 			parameters = new ParameterCollection();
 
@@ -319,7 +319,7 @@ namespace Everest.Routing
 
 			var segment = segments.Current;
 			if (string.IsNullOrWhiteSpace(segment))
-				throw new ArgumentNullException(nameof(segment));
+				throw new ArgumentException($"Segment required: {nameof(segment)}.");
 
 			parameters = new ParameterCollection();
 
