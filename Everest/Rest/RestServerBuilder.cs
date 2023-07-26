@@ -201,19 +201,20 @@ namespace Everest.Rest
 			return services;
 		}
 
-		public static IServiceCollection AddConsoleLoggerFactory(this IServiceCollection services)
+		public static IServiceCollection AddConsoleLoggerFactory(this IServiceCollection services, Action<ILoggingBuilder> configurator = null)
 		{
 			var factory = LoggerFactory.Create(config =>
 			{
-				config.AddSimpleConsole(options =>
+				config.AddSimpleConsole(opt =>
 				{
-					options.SingleLine = true;
-					options.ColorBehavior = LoggerColorBehavior.Enabled;
-					options.IncludeScopes = false;
-					options.TimestampFormat = "hh:mm:ss:ffff ";
+					opt.SingleLine = true;
+					opt.ColorBehavior = LoggerColorBehavior.Enabled;
+					opt.IncludeScopes = false;
+					opt.TimestampFormat = "hh:mm:ss:ffff ";
 				});
 
 				config.SetMinimumLevel(LogLevel.Trace);
+				configurator?.Invoke(config);
 			});
 
 			return services.AddSingleton(factory);
