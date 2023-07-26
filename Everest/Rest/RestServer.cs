@@ -150,7 +150,7 @@ namespace Everest.Rest
 				}
 				catch (Exception ex)
 				{
-					Logger.LogCritical(ex, $"Failed to process incoming request");
+					Logger.LogCritical(ex, "Failed to process incoming request");
 				}
 			}
 		}
