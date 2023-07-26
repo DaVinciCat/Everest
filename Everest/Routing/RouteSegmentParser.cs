@@ -6,7 +6,7 @@ namespace Everest.Routing
 {
 	public interface IRouteSegmentParser
 	{
-		public bool TryParse(string segment, out ParameterCollection parameters);
+		public bool TryParse(Iterator<string> segments, out ParameterCollection parameters);
 	}
 
 	public class AlphaNumericRouteSegmentParser : IRouteSegmentParser
@@ -17,16 +17,20 @@ namespace Everest.Routing
 
 		public AlphaNumericRouteSegmentParser(string segment)
 		{
-			if (string.IsNullOrEmpty(segment))
+			if (string.IsNullOrWhiteSpace(segment))
 				throw new ArgumentException($"Segment required: {nameof(segment)}.");
 
 			Segment = segment;
 		}
 
-		public bool TryParse(string segment, out ParameterCollection parameters)
+		public bool TryParse(Iterator<string> segments, out ParameterCollection parameters)
 		{
-			if (string.IsNullOrEmpty(segment))
-				throw new ArgumentException($"Segment required: {nameof(segment)}.");
+			if (segments == null) 
+				throw new ArgumentNullException(nameof(segments));
+
+			var segment = segments.Current;
+			if(string.IsNullOrWhiteSpace(segment))
+				throw new ArgumentNullException(nameof(segment));
 
 			parameters = new ParameterCollection();
 			return string.CompareOrdinal(Segment, segment) == 0;
@@ -45,7 +49,7 @@ namespace Everest.Routing
 
 		public StringParameterRouteSegmentParser(string segment)
 		{
-			if (string.IsNullOrEmpty(segment))
+			if (string.IsNullOrWhiteSpace(segment))
 				throw new ArgumentException($"Segment required: {nameof(segment)}.");
 
 			var match = Regex.Match(segment, SegmentPattern);
@@ -56,10 +60,14 @@ namespace Everest.Routing
 			ParameterName = match.Groups[1].Value;
 		}
 
-		public bool TryParse(string segment, out ParameterCollection parameters)
+		public bool TryParse(Iterator<string> segments, out ParameterCollection parameters)
 		{
-			if (string.IsNullOrEmpty(segment))
-				throw new ArgumentException($"Segment required: {nameof(segment)}.");
+			if (segments == null)
+				throw new ArgumentNullException(nameof(segments));
+
+			var segment = segments.Current;
+			if (string.IsNullOrWhiteSpace(segment))
+				throw new ArgumentNullException(nameof(segment));
 
 			parameters = new ParameterCollection();
 
@@ -83,7 +91,7 @@ namespace Everest.Routing
 
 		public IntParameterRouteSegmentParser(string segment)
 		{
-			if (string.IsNullOrEmpty(segment))
+			if (string.IsNullOrWhiteSpace(segment))
 				throw new ArgumentException($"Segment required: {nameof(segment)}.");
 
 			var match = Regex.Match(segment, SegmentPattern);
@@ -94,10 +102,14 @@ namespace Everest.Routing
 			ParameterName = match.Groups[1].Value;
 		}
 
-		public bool TryParse(string segment, out ParameterCollection parameters)
+		public bool TryParse(Iterator<string> segments, out ParameterCollection parameters)
 		{
-			if (string.IsNullOrEmpty(segment))
-				throw new ArgumentException($"Segment required: {nameof(segment)}.");
+			if (segments == null)
+				throw new ArgumentNullException(nameof(segments));
+
+			var segment = segments.Current;
+			if (string.IsNullOrWhiteSpace(segment))
+				throw new ArgumentNullException(nameof(segment));
 
 			parameters = new ParameterCollection();
 
@@ -121,7 +133,7 @@ namespace Everest.Routing
 
 		public DoubleParameterRouteSegmentParser(string segment)
 		{
-			if (string.IsNullOrEmpty(segment))
+			if (string.IsNullOrWhiteSpace(segment))
 				throw new ArgumentException($"Segment required: {nameof(segment)}.");
 
 			var match = Regex.Match(segment, SegmentPattern);
@@ -132,10 +144,14 @@ namespace Everest.Routing
 			ParameterName = match.Groups[1].Value;
 		}
 
-		public bool TryParse(string segment, out ParameterCollection parameters)
+		public bool TryParse(Iterator<string> segments, out ParameterCollection parameters)
 		{
-			if (string.IsNullOrEmpty(segment))
-				throw new ArgumentException($"Segment required: {nameof(segment)}.");
+			if (segments == null)
+				throw new ArgumentNullException(nameof(segments));
+
+			var segment = segments.Current;
+			if (string.IsNullOrWhiteSpace(segment))
+				throw new ArgumentNullException(nameof(segment));
 
 			parameters = new ParameterCollection();
 
@@ -159,7 +175,7 @@ namespace Everest.Routing
 
 		public FloatParameterRouteSegmentParser(string segment)
 		{
-			if (string.IsNullOrEmpty(segment))
+			if (string.IsNullOrWhiteSpace(segment))
 				throw new ArgumentException($"Segment required: {nameof(segment)}.");
 
 			var match = Regex.Match(segment, SegmentPattern);
@@ -170,10 +186,14 @@ namespace Everest.Routing
 			ParameterName = match.Groups[1].Value;
 		}
 
-		public bool TryParse(string segment, out ParameterCollection parameters)
+		public bool TryParse(Iterator<string> segments, out ParameterCollection parameters)
 		{
-			if (string.IsNullOrEmpty(segment))
-				throw new ArgumentException($"Segment required: {nameof(segment)}.");
+			if (segments == null)
+				throw new ArgumentNullException(nameof(segments));
+
+			var segment = segments.Current;
+			if (string.IsNullOrWhiteSpace(segment))
+				throw new ArgumentNullException(nameof(segment));
 
 			parameters = new ParameterCollection();
 
@@ -197,7 +217,7 @@ namespace Everest.Routing
 
 		public BoolParameterRouteSegmentParser(string segment)
 		{
-			if (string.IsNullOrEmpty(segment))
+			if (string.IsNullOrWhiteSpace(segment))
 				throw new ArgumentException($"Segment required: {nameof(segment)}.");
 
 			var match = Regex.Match(segment, SegmentPattern);
@@ -208,10 +228,14 @@ namespace Everest.Routing
 			ParameterName = match.Groups[1].Value;
 		}
 
-		public bool TryParse(string segment, out ParameterCollection parameters)
+		public bool TryParse(Iterator<string> segments, out ParameterCollection parameters)
 		{
-			if (string.IsNullOrEmpty(segment))
-				throw new ArgumentException($"Segment required: {nameof(segment)}.");
+			if (segments == null)
+				throw new ArgumentNullException(nameof(segments));
+
+			var segment = segments.Current;
+			if (string.IsNullOrWhiteSpace(segment))
+				throw new ArgumentNullException(nameof(segment));
 
 			parameters = new ParameterCollection();
 
@@ -235,7 +259,7 @@ namespace Everest.Routing
 
 		public GuidParameterRouteSegmentParser(string segment)
 		{
-			if (string.IsNullOrEmpty(segment))
+			if (string.IsNullOrWhiteSpace(segment))
 				throw new ArgumentException($"Segment required: {nameof(segment)}.");
 
 			var match = Regex.Match(segment, SegmentPattern);
@@ -246,10 +270,14 @@ namespace Everest.Routing
 			ParameterName = match.Groups[1].Value;
 		}
 
-		public bool TryParse(string segment, out ParameterCollection parameters)
+		public bool TryParse(Iterator<string> segments, out ParameterCollection parameters)
 		{
-			if (string.IsNullOrEmpty(segment))
-				throw new ArgumentException($"Segment required: {nameof(segment)}.");
+			if (segments == null)
+				throw new ArgumentNullException(nameof(segments));
+
+			var segment = segments.Current;
+			if (string.IsNullOrWhiteSpace(segment))
+				throw new ArgumentNullException(nameof(segment));
 
 			parameters = new ParameterCollection();
 
@@ -273,7 +301,7 @@ namespace Everest.Routing
 
 		public DateTimeParameterRouteSegmentParser(string segment)
 		{
-			if (string.IsNullOrEmpty(segment))
+			if (string.IsNullOrWhiteSpace(segment))
 				throw new ArgumentException($"Segment required: {nameof(segment)}.");
 
 			var match = Regex.Match(segment, SegmentPattern);
@@ -284,10 +312,14 @@ namespace Everest.Routing
 			ParameterName = match.Groups[1].Value;
 		}
 
-		public bool TryParse(string segment, out ParameterCollection parameters)
+		public bool TryParse(Iterator<string> segments, out ParameterCollection parameters)
 		{
-			if (string.IsNullOrEmpty(segment))
-				throw new ArgumentException($"Segment required: {nameof(segment)}.");
+			if (segments == null)
+				throw new ArgumentNullException(nameof(segments));
+
+			var segment = segments.Current;
+			if (string.IsNullOrWhiteSpace(segment))
+				throw new ArgumentNullException(nameof(segment));
 
 			parameters = new ParameterCollection();
 

@@ -215,15 +215,15 @@ namespace Everest.Routing
 				parameters = new ParameterCollection();
 
 				var currentNode = root;
-				var segments = route.Split(Delimiters, StringSplitOptions.RemoveEmptyEntries);
-
-				foreach (var segment in segments)
+				var segments = route.Split(Delimiters, StringSplitOptions.RemoveEmptyEntries).ToIterator();
+				
+				while (segments.MoveNext())
 				{
 					var any = false;
 
 					foreach (var childNode in currentNode.Children.Values)
 					{
-						if (childNode.SegmentParser.TryParse(segment, out var segmentParameters))
+						if (childNode.SegmentParser.TryParse(segments, out var segmentParameters))
 						{
 							parameters.Add(segmentParameters);
 							currentNode = childNode;
