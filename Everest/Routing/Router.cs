@@ -183,6 +183,11 @@ namespace Everest.Routing
 
 				var currentNode = root;
 				var segments = descriptor.Route.RoutePattern.Split(Delimiters, StringSplitOptions.RemoveEmptyEntries);
+				if (segments.Length == 0)
+				{
+					routes.Add("", descriptor);
+					return;
+				}
 
 				for (var i = 0; i < segments.Length; i++)
 				{
@@ -215,7 +220,6 @@ namespace Everest.Routing
 
 				var currentNode = root;
 				var segments = route.Split(Delimiters, StringSplitOptions.RemoveEmptyEntries).ToIterator();
-				
 				while (segments.MoveNext())
 				{
 					var any = false;
