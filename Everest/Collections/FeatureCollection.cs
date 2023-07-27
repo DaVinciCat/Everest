@@ -16,7 +16,7 @@ namespace Everest.Collections
 	public static class FeatureCollectionExtensions
 	{
 		public static T Get<T>(this IFeatureCollection features) =>
-			features.TryGetValue(typeof(T), out var value) ? (T)value : default(T);
+			features.TryGetValue(typeof(T), out var value) ? (T)value : default;
 
 		public static IFeatureCollection Set<T>(this IFeatureCollection features, T feature)
 		{

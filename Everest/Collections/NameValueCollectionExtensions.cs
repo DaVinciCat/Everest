@@ -54,7 +54,7 @@ namespace Everest.Collections
 
 		public static bool TryGetValue<T>(this NameValueCollection collection, string key, out T value)
 		{
-			value = default(T);
+			value = default;
 
 			if (collection == null)
 				throw new ArgumentNullException(nameof(collection), "Collection required.");
@@ -71,13 +71,16 @@ namespace Everest.Collections
 			if (!converter.CanConvertFrom(typeof(string))) 
 				return false;
 
+			if (!converter.IsValid(strValue))
+				return false;
+
 			value = (T)converter.ConvertFrom(null, CultureInfo.InvariantCulture, strValue);
 			return true;
 		}
 
 		public static bool TryGetValue<T>(this NameValueCollection collection, string key, TryParse<T> tryParse, out T value)
 		{
-			value = default(T);
+			value = default;
 
 			if (collection == null)
 				throw new ArgumentNullException(nameof(collection), "Collection required.");
