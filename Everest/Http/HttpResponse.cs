@@ -124,7 +124,21 @@ namespace Everest.Http
 			await response.WriteAsync(content);
 		}
 
-        public static async Task WriteJsonAsync<T>(this HttpResponse response, T content, JsonSerializerOptions options = null)
+        public static async Task WriteHtmlAsync(this HttpResponse response, string content)
+        {
+	        if (response == null) throw
+		        new ArgumentNullException(nameof(response));
+
+	        if (content == null)
+		        throw new ArgumentNullException(nameof(content));
+
+	        response.RemoveHeader("Content-Type");
+	        response.AppendHeader("Content-Type", "text/html; charset=utf-8");
+
+	        await response.WriteAsync(content);
+        }
+
+		public static async Task WriteJsonAsync<T>(this HttpResponse response, T content, JsonSerializerOptions options = null)
 		{
 			if (response == null)
 				throw new ArgumentNullException(nameof(response));
