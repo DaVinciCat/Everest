@@ -26,6 +26,10 @@ namespace Everest.Collections
 
 		public T[] Items { get; }
 
+		public int Position => position;
+
+		public int Count => Items.Length;
+
 		private int position = -1;
 
 		public Iterator(T[] items)
