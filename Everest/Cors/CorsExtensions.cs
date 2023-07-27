@@ -5,7 +5,7 @@ namespace Everest.Cors
 {
 	public static class CorsHttpRequestExtensions
 	{
-		public static bool IsCorsPreflight(this HttpRequest request)
+		public static bool IsCorsPreflightRequest(this HttpRequest request)
 		{
 			if (request == null) 
 				throw new ArgumentNullException(nameof(request));

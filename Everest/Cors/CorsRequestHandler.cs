@@ -59,8 +59,11 @@ namespace Everest.Cors
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
 
-			if (!context.Request.IsCorsPreflight())
+			Logger.LogTrace($"{context.Id} - Try to check if CORS preflight request");
+
+			if (!context.Request.IsCorsPreflightRequest())
 			{
+				Logger.LogTrace($"{context.Id} - Not a CORS preflight request");
 				return Task.FromResult(false);
 			}
 
