@@ -133,7 +133,7 @@ namespace Everest.Routing
 
 			public string SegmentPattern { get; }
 
-			public RouteDescriptor RouteDescriptor { get; }
+			public RouteDescriptor RouteDescriptor { get; internal set; }
 
 			public int Level { get; }
 
@@ -146,12 +146,11 @@ namespace Everest.Routing
 
 			}
 
-			public TrieNode(IRouteSegmentParser segmentParser, string segmentPattern, int level, RouteDescriptor routeDescriptor = null)
+			public TrieNode(IRouteSegmentParser segmentParser, string segmentPattern, int level)
 			{
 				SegmentParser = segmentParser ?? throw new ArgumentNullException(nameof(segmentParser));
 				SegmentPattern = segmentPattern ?? throw new ArgumentNullException(nameof(segmentPattern));
 				Level = level;
-				RouteDescriptor = routeDescriptor;
 			}
 		}
 
@@ -192,14 +191,14 @@ namespace Everest.Routing
 
 					if (!currentNode.Children.ContainsKey(segment))
 					{
-						if (isLastSegment)
-						{
-							currentNode.Children[segment] = new TrieNode(getParser(segment), segment, currentNode.Level + 1, descriptor);
-							routes.Add(descriptor.Route.Description, descriptor);
-							return;
-						}
-
 						currentNode.Children[segment] = new TrieNode(getParser(segment), segment, currentNode.Level + 1);
+					}
+
+					if (isLastSegment)
+					{
+						routes.Add(descriptor.Route.Description, descriptor);
+						currentNode.Children[segment].RouteDescriptor = descriptor;
+						return;
 					}
 
 					currentNode = currentNode.Children[segment];
