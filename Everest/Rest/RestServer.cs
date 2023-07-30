@@ -111,7 +111,7 @@ namespace Everest.Rest
 			}
 			catch (Exception ex)
 			{
-				Logger.LogCritical(ex, "Failed while stopping server");
+				Logger.LogError(ex, "Failed while stopping server");
 			}
 
 			try
@@ -124,7 +124,7 @@ namespace Everest.Rest
 			}
 			catch (Exception ex)
 			{
-				Logger.LogCritical(ex, "Failed while stopping server");
+				Logger.LogError(ex, "Failed while stopping server");
 			}
 
 			IsStopping = false;
@@ -150,7 +150,7 @@ namespace Everest.Rest
 				}
 				catch (Exception ex)
 				{
-					Logger.LogCritical(ex, "Failed to process incoming request");
+					Logger.LogError(ex, "Failed to process incoming request");
 				}
 			}
 		}
@@ -166,15 +166,22 @@ namespace Everest.Rest
 			}
 			catch (Exception ex)
 			{
-				Logger.LogCritical(ex, $"{context.Id} - Failed to process incoming request");
+				Logger.LogError(ex, $"{context.Id} - Failed to process incoming request");
 			}
 			finally
 			{
-				if (!context.Response.ResponseSent)
+				try
 				{
-					Logger.LogTrace($"{context.Id} - Try to send response: {new { RemoteEndPoint = context.Request.RemoteEndPoint.Description() }}");
-					await context.Response.SendResponseAsync();
-					Logger.LogTrace($"{context.Id} - Successfully sended response: {new { RemoteEndPoint = context.Request.RemoteEndPoint.Description(), StatusCode = context.Response.StatusCode, Size = context.Response.ContentLength64.ToReadableSize() }}");
+					if (!context.Response.ResponseSent)
+					{
+						Logger.LogTrace($"{context.Id} - Try to send response: {new { RemoteEndPoint = context.Request.RemoteEndPoint.Description() }}");
+						await context.Response.SendResponseAsync();
+						Logger.LogTrace($"{context.Id} - Successfully sended response: {new { RemoteEndPoint = context.Request.RemoteEndPoint.Description(), StatusCode = context.Response.StatusCode, Size = context.Response.ContentLength64.ToReadableSize() }}");
+					}
+				}
+				catch (Exception ex)
+				{
+					Logger.LogError(ex, $"{context.Id} - Failed to send response");
 				}
 			}
 		}
