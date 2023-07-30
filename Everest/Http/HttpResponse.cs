@@ -101,11 +101,24 @@ namespace Everest.Http
 	{
 		public static async Task WriteAsync(this HttpResponse response, byte[] content)
 		{
+			if (response == null) 
+				throw new ArgumentNullException(nameof(response));
+			
+			if (content == null) 
+				throw new ArgumentNullException(nameof(content));
+
+
 			await response.OutputStream.WriteAsync(content, 0, content.Length);
 		}
 
         public static async Task WriteAsync(this HttpResponse response, string content)
 		{
+			if (response == null) 
+				throw new ArgumentNullException(nameof(response));
+			
+			if (content == null) 
+				throw new ArgumentNullException(nameof(content));
+
 			var bytes = response.ContentEncoding.GetBytes(content);
 			await response.WriteAsync(bytes);
 		}
