@@ -82,6 +82,12 @@ namespace Everest.Compression
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
 
+			if (!context.Response.HasBody)
+			{
+				Logger.LogTrace($"{context.Id} - No response compression required. Response has no body");
+				return false;
+			}
+
 			Logger.LogTrace($"{context.Id} - Try to compress response: {new { Size = context.Response.Body.ToReadableSize() }}");
 
 			if (context.Response.Body.Length < options.CompressionMinLength)

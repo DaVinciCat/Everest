@@ -48,6 +48,8 @@ namespace Everest.Http
             }
         }
 		
+		public bool HasBody => Body != null && Body.Length > 0;
+
         public Stream Body { get; } = new MemoryStream();
 
         public Stream OutputStream => response.OutputStream;
