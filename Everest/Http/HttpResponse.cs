@@ -90,8 +90,6 @@ namespace Everest.Http
 							await OutputStream.WriteAsync(buffer, 0, read);
 							await OutputStream.FlushAsync();
 						}
-						
-						OutputStream.Close();
 					}
 				}
 			}
@@ -99,6 +97,7 @@ namespace Everest.Http
 			{
 				try
 				{
+					OutputStream.Close();
 					Close();
 				}
 				finally
