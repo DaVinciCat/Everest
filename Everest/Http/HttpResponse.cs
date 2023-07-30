@@ -66,7 +66,7 @@ namespace Everest.Http
 
         public void RemoveHeader(string name) => response.Headers.Remove(name);
 		
-        public async Task SendResponceAsync()
+        public async Task SendResponseAsync()
         {
 			try
 			{
