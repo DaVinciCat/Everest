@@ -48,7 +48,9 @@ namespace Everest.Http
             }
         }
 		
-        public Stream OutputStream { get; } = new MemoryStream();
+        public Stream Body { get; } = new MemoryStream();
+
+        public Stream OutputStream => response.OutputStream;
 
         private readonly HttpListenerResponse response;
 
@@ -70,12 +72,12 @@ namespace Everest.Http
         {
 			try
 			{
-				if (OutputStream != null)
+				if (Body != null)
 				{
-					OutputStream.Position = 0;
-					using (var reader = new BinaryReader(OutputStream, ContentEncoding))
+					Body.Position = 0;
+					using (var reader = new BinaryReader(Body, ContentEncoding))
 					{
-						var bytes = reader.ReadBytes((int)OutputStream.Length);
+						var bytes = reader.ReadBytes((int)Body.Length);
 						response.ContentLength64 = bytes.Length;
 						await response.OutputStream.WriteAsync(bytes, 0, bytes.Length);
 						await response.OutputStream.FlushAsync();
@@ -108,7 +110,7 @@ namespace Everest.Http
 				throw new ArgumentNullException(nameof(content));
 
 
-			await response.OutputStream.WriteAsync(content, 0, content.Length);
+			await response.Body.WriteAsync(content, 0, content.Length);
 		}
 
         public static async Task WriteAsync(this HttpResponse response, string content)

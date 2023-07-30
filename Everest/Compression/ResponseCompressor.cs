@@ -82,11 +82,11 @@ namespace Everest.Compression
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
 
-			Logger.LogTrace($"{context.Id} - Try to compress response: {new { Size = context.Response.OutputStream.ToReadableSize() }}");
+			Logger.LogTrace($"{context.Id} - Try to compress response: {new { Size = context.Response.Body.ToReadableSize() }}");
 
-			if (context.Response.OutputStream.Length < options.CompressionMinLength)
+			if (context.Response.Body.Length < options.CompressionMinLength)
 			{
-				Logger.LogTrace($"{context.Id} - No response compression required: {new { Size = context.Response.OutputStream.ToReadableSize(), CompressionMinLength = options.CompressionMinLength.ToReadableSize() }}");
+				Logger.LogTrace($"{context.Id} - No response compression required: {new { Size = context.Response.Body.ToReadableSize(), CompressionMinLength = options.CompressionMinLength.ToReadableSize() }}");
 				return false;
 			}
 
@@ -114,16 +114,16 @@ namespace Everest.Compression
 					var compressed = new MemoryStream();
 					using (var stream = compressor.Compress(compressed))
 					{
-						context.Response.OutputStream.Position = 0;
-						await context.Response.OutputStream.CopyToAsync(stream);
+						context.Response.Body.Position = 0;
+						await context.Response.Body.CopyToAsync(stream);
 					}
 					compressed.Position = 0;
-					Logger.LogTrace($"{context.Id} - Successfully compressed response: {new { Size = context.Response.OutputStream.ToReadableSize(), CompressedSize = compressed.ToReadableSize(), Encoding = encoding }}");
+					Logger.LogTrace($"{context.Id} - Successfully compressed response: {new { Size = context.Response.Body.ToReadableSize(), CompressedSize = compressed.ToReadableSize(), Encoding = encoding }}");
 
-					context.Response.OutputStream.SetLength(0);
-					context.Response.OutputStream.Position = 0;
-					await compressed.CopyToAsync(context.Response.OutputStream);
-					context.Response.OutputStream.Position = 0;
+					context.Response.Body.SetLength(0);
+					context.Response.Body.Position = 0;
+					await compressed.CopyToAsync(context.Response.Body);
+					context.Response.Body.Position = 0;
 
 					context.Response.RemoveHeader(ContentEncodingHeader);
 					context.Response.AddHeader(ContentEncodingHeader, encoding);
