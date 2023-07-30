@@ -11,6 +11,8 @@ namespace Everest.Http
 	{
 		public bool ResponseSent { get; private set; }
 
+		public bool ResponseClosed { get; private set; }
+
 		/*https://learn.microsoft.com/ru-ru/dotnet/api/system.net.httplistenerresponse.contentlength64?view=net-7.0*/
 		public long ContentLength64
 		{
@@ -30,6 +32,8 @@ namespace Everest.Http
 			set => response.ContentType = value;
 		}
 
+		public string ContentDisposition { get; set; }
+
 		public Encoding ContentEncoding
 		{
 			get => response.ContentEncoding ?? Encoding.UTF8;
@@ -47,9 +51,7 @@ namespace Everest.Http
 				response.StatusDescription = value.ToString();
 			}
 		}
-
-		public bool HasBody => Body != null && Body.Length > 0;
-
+		
 		public Stream Body { get; } = new MemoryStream();
 
 		public Stream OutputStream => response.OutputStream;
@@ -70,40 +72,55 @@ namespace Everest.Http
 
 		public void RemoveHeader(string name) => response.Headers.Remove(name);
 
-		public void Close() => response.Close();
- 
-		public async Task SendResponseAsync()
+		public void Close()
+		{
+			Body.Close();
+			response.OutputStream.Close();
+			response.Close();
+		}
+
+		public async Task SendFileAsync(string filename, string contentType, string contentDisposition)
+		{
+			var info = new FileInfo(filename);
+			using (var fs = info.OpenRead())
+			{
+				await SendFileAsync(fs, contentType, contentDisposition);
+				fs.Close();
+			}
+		}
+
+		public async Task SendFileAsync(Stream stream, string contentType, string contentDisposition)
+		{
+			ContentType = contentType;
+			ContentDisposition = contentDisposition;
+			RemoveHeader("Content-disposition");
+			AddHeader("Content-disposition", contentDisposition);
+
+			await SendResponseAsync(stream);
+		}
+
+		public async Task SendResponseAsync(Stream stream)
 		{
 			try
 			{
-				if (HasBody)
-				{
-					Body.Position = 0;
-					ContentLength64 = Body.Length;
+				stream.Position = 0;
+				ContentLength64 = stream.Length;
 
-					using (var br = new BinaryReader(Body, ContentEncoding))
+				using (var br = new BinaryReader(stream, ContentEncoding, true))
+				{
+					var buffer = new byte[4 * 1024];
+					int read;
+					while ((read = br.Read(buffer, 0, buffer.Length)) > 0)
 					{
-						var buffer = new byte[4 * 1024];
-						int read;
-						while ((read = br.Read(buffer, 0, buffer.Length)) > 0)
-						{
-							await OutputStream.WriteAsync(buffer, 0, read);
-							await OutputStream.FlushAsync();
-						}
+						await response.OutputStream.WriteAsync(buffer, 0, read);
+						await response.OutputStream.FlushAsync();
 					}
 				}
 			}
 			finally
 			{
-				try
-				{
-					OutputStream.Close();
-					Close();
-				}
-				finally
-				{
-					ResponseSent = true;
-				}
+				ResponseSent = true;
+				ResponseClosed = true;
 			}
 		}
 	}
@@ -178,6 +195,33 @@ namespace Everest.Http
 				JsonSerializer.Serialize(content, options);
 
 			await response.WriteAsync(json);
+		}
+
+		public static async Task WriteFileAsync(this HttpResponse response, string filename, string contentType, string contentDisposition)
+		{
+			var file = new FileInfo(filename);
+			using (var fs = file.OpenRead())
+			{
+				using (var bw = new BinaryWriter(response.Body, response.ContentEncoding, true))
+				{
+					var buffer = new byte[4 * 1024];
+					int read;
+					while ((read = await fs.ReadAsync(buffer, 0, buffer.Length)) > 0)
+					{
+						await response.Body.WriteAsync(buffer, 0, read);
+						await response.Body.FlushAsync();
+					}
+
+					bw.Close();
+				}
+
+				fs.Close();
+			}
+
+			response.ContentType = contentType;
+			response.ContentDisposition = contentDisposition;
+			response.RemoveHeader("Content-disposition");
+			response.AddHeader("Content-disposition", contentDisposition);
 		}
 	}
 }

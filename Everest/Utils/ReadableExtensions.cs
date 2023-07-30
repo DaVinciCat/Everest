@@ -11,6 +11,11 @@ namespace Everest.Utils
 			return ToReadableSize(stream?.Length ?? 0);
 		}
 
+		public static string ToReadableSize(this FileInfo file)
+		{
+			return ToReadableSize(file?.Length ?? 0);
+		}
+
 		public static string ToReadableSize(this byte[] bytes)
 		{
 			return ToReadableSize(bytes?.Length ?? 0);
