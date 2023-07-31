@@ -77,7 +77,7 @@ namespace Everest.Http
 				OutputStream.Position = 0;
 				ContentLength64 = OutputStream.Length;
 
-				using (var br = new BinaryReader(OutputStream, ContentEncoding, true))
+				using (var br = new BinaryReader(OutputStream, ContentEncoding))
 				{
 					var buffer = new byte[4 * 1024];
 					int read;
@@ -86,6 +86,8 @@ namespace Everest.Http
 						await response.OutputStream.WriteAsync(buffer, 0, read);
 						await response.OutputStream.FlushAsync();
 					}
+					
+					br.Close();
 				}
 			}
 			finally
@@ -114,8 +116,7 @@ namespace Everest.Http
 
 			if (content == null)
 				throw new ArgumentNullException(nameof(content));
-
-
+			
 			await response.OutputStream.WriteAsync(content, 0, content.Length);
 		}
 

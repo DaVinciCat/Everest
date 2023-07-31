@@ -117,6 +117,7 @@ namespace Everest.Compression
 					{
 						context.Response.OutputStream.Position = 0;
 						await context.Response.OutputStream.CopyToAsync(stream);
+						stream.Close();
 					}
 					compressed.Position = 0;
 					Logger.LogTrace($"{context.Id} - Successfully compressed response: {new { Size = context.Response.OutputStream.ToReadableSize(), CompressedSize = compressed.ToReadableSize(), Encoding = encoding }}");
