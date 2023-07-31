@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net;
+using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -12,6 +13,12 @@ namespace Everest.Http
 		public bool ResponseSent { get; private set; }
 
 		public bool ResponseClosed { get; private set; }
+
+		public bool SendChunked
+		{
+			get => response.SendChunked;
+			set => response.SendChunked = value;
+		}
 
 		/*https://learn.microsoft.com/ru-ru/dotnet/api/system.net.httplistenerresponse.contentlength64?view=net-7.0*/
 		public long ContentLength64
@@ -32,7 +39,21 @@ namespace Everest.Http
 			set => response.ContentType = value;
 		}
 
-		public string ContentDisposition { get; set; }
+		public string ContentDisposition
+		{
+			get => Headers["Content-Disposition"];
+			set
+			{
+				if (string.IsNullOrEmpty(value))
+				{
+					Headers.Remove("Content-Disposition");
+				}
+				else
+				{
+					Headers.Set("Content-Disposition", value);
+				}
+			}
+		}
 
 		public Encoding ContentEncoding
 		{
@@ -51,8 +72,12 @@ namespace Everest.Http
 				response.StatusDescription = value.ToString();
 			}
 		}
-		
-		public Stream OutputStream { get; } = new MemoryStream();
+
+		public Stream Input { get; set; } = new MemoryStream();
+
+		public Stream Output { get; set; }
+
+		public Stream OutputStream => response.OutputStream;
 
 		private readonly HttpListenerResponse response;
 
@@ -60,6 +85,7 @@ namespace Everest.Http
 		{
 			this.response = response ?? throw new ArgumentNullException(nameof(response));
 
+			Output = new BufferedStream(response.OutputStream);
 			StatusCode = HttpStatusCode.OK;
 			AppendHeader("Server", "Everest");
 		}
@@ -70,82 +96,26 @@ namespace Everest.Http
 
 		public void RemoveHeader(string name) => response.Headers.Remove(name);
 
-		public async Task WriteAsync(byte[] content)
-		{
-			if (content == null)
-				throw new ArgumentNullException(nameof(content));
-
-			await OutputStream.WriteAsync(content, 0, content.Length);
-		}
-
-		public async Task SendResponseAsync(Stream stream)
+		public async Task SendResponseAsync()
 		{
 			try
 			{
-				stream.Position = 0;
-				ContentLength64 = stream.Length;
-
-				using (var br = new BinaryReader(stream, ContentEncoding, true))
+				Input.Position = 0;
+		
+				var buffer = new byte[4 * 1024];
+				int read;
+				while ((read = await Input.ReadAsync(buffer, 0, buffer.Length)) > 0)
 				{
-					var buffer = new byte[4 * 1024];
-					int read;
-					while ((read = br.Read(buffer, 0, buffer.Length)) > 0)
-					{
-						await response.OutputStream.WriteAsync(buffer, 0, read);
-						await response.OutputStream.FlushAsync();
-					}
-					
-					br.Close();
+					await Output.WriteAsync(buffer, 0, read);
+					await Output.FlushAsync();
 				}
 			}
 			finally
 			{
 				try
 				{
-					stream.Close();
-					response.OutputStream.Close();
-					response.Close();
-				}
-				finally
-				{
-					ResponseSent = true;
-					ResponseClosed = true;
-				}
-			}
-		}
-
-		public async Task SendFileAsync(string filename, string contentType, string contentDisposition)
-		{
-			try
-			{
-				var file = new FileInfo(filename);
-				using (var fs = file.OpenRead())
-				{
-					ContentType = contentType;
-					ContentDisposition = contentDisposition;
-					RemoveHeader("Content-disposition");
-					AddHeader("Content-disposition", contentDisposition);
-
-					using (var bw = new BinaryWriter(response.OutputStream, ContentEncoding, true))
-					{
-						var buffer = new byte[4 * 1024];
-						int read;
-						while ((read = await fs.ReadAsync(buffer, 0, buffer.Length)) > 0)
-						{
-							await response.OutputStream.WriteAsync(buffer, 0, read);
-							await response.OutputStream.FlushAsync();
-						}
-
-						bw.Close();
-					}
-
-					fs.Close();
-				}
-			}
-			finally
-			{
-				try
-				{
+					Input.Close();
+					Output.Close();
 					response.OutputStream.Close();
 					response.Close();
 				}
@@ -160,6 +130,14 @@ namespace Everest.Http
 
 	public static class HttpResponseExtensions
 	{
+		public static async Task WriteAsync(this HttpResponse response, byte[] content)
+		{
+			if (content == null)
+				throw new ArgumentNullException(nameof(content));
+
+			await response.Input.WriteAsync(content, 0, content.Length);
+		}
+
 		public static async Task WriteAsync(this HttpResponse response, string content)
 		{
 			if (response == null)
@@ -174,29 +152,25 @@ namespace Everest.Http
 
 		public static async Task WriteTextAsync(HttpResponse response, string content)
 		{
-			if (response == null) throw
-				new ArgumentNullException(nameof(response));
+			if (response == null) 
+				throw new ArgumentNullException(nameof(response));
 
 			if (content == null)
 				throw new ArgumentNullException(nameof(content));
 
-			response.RemoveHeader("Content-Type");
-			response.AppendHeader("Content-Type", "text/plain; charset=utf-8");
-
+			response.ContentType = "text/plain; charset=utf-8";
 			await response.WriteAsync(content);
 		}
 
 		public static async Task WriteHtmlAsync(this HttpResponse response, string content)
 		{
-			if (response == null) throw
-				new ArgumentNullException(nameof(response));
+			if (response == null)
+				throw new ArgumentNullException(nameof(response));
 
 			if (content == null)
 				throw new ArgumentNullException(nameof(content));
-
-			response.RemoveHeader("Content-Type");
-			response.AppendHeader("Content-Type", "text/html; charset=utf-8");
-
+			
+			response.ContentType = "text/html; charset=utf-8";
 			await response.WriteAsync(content);
 		}
 
@@ -208,41 +182,32 @@ namespace Everest.Http
 			if (content == null)
 				throw new ArgumentNullException(nameof(content));
 
-			response.RemoveHeader("Content-Type");
-			response.AddHeader("Content-Type", "application/json");
-
 			var json = options == null ?
 				JsonSerializer.Serialize(content) :
 				JsonSerializer.Serialize(content, options);
 
+			response.ContentType = "application/json";
 			await response.WriteAsync(json);
+		}
+
+		public static async Task WriteFileAsync(this HttpResponse response, string filename, ContentType contentType, ContentDisposition contentDisposition)
+		{
+			var file = new FileInfo(filename);
+			response.ContentType = contentType.MediaType;
+			response.ContentDisposition = contentDisposition.DispositionType;
+			response.Input = file.OpenRead();
+
+			await Task.CompletedTask;
 		}
 
 		public static async Task WriteFileAsync(this HttpResponse response, string filename, string contentType, string contentDisposition)
 		{
 			var file = new FileInfo(filename);
-			using (var fs = file.OpenRead())
-			{
-				response.ContentType = contentType;
-				response.ContentDisposition = contentDisposition;
-				response.RemoveHeader("Content-disposition");
-				response.AddHeader("Content-disposition", contentDisposition);
+			response.ContentType = contentType;
+			response.ContentDisposition = contentDisposition;
+			response.Input = file.OpenRead();
 
-				using (var bw = new BinaryWriter(response.OutputStream, response.ContentEncoding, true))
-				{
-					var buffer = new byte[4 * 1024];
-					int read;
-					while ((read = await fs.ReadAsync(buffer, 0, buffer.Length)) > 0)
-					{
-						await response.OutputStream.WriteAsync(buffer, 0, read);
-						await response.OutputStream.FlushAsync();
-					}
-
-					bw.Close();
-				}
-
-				fs.Close();
-			}
+			await Task.CompletedTask;
 		}
 	}
 }

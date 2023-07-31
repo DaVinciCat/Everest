@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Everest.Utils;
@@ -83,11 +82,11 @@ namespace Everest.Compression
 				throw new ArgumentNullException(nameof(context));
 
 			
-			Logger.LogTrace($"{context.Id} - Try to compress response: {new { Size = context.Response.OutputStream.ToReadableSize() }}");
+			Logger.LogTrace($"{context.Id} - Try to compress response: {new { Size = context.Response.Input.ToReadableSize() }}");
 
-			if (context.Response.OutputStream.Length < options.CompressionMinLength)
+			if (context.Response.Input.Length < options.CompressionMinLength)
 			{
-				Logger.LogTrace($"{context.Id} - No response compression required: {new { Size = context.Response.OutputStream.ToReadableSize(), CompressionMinLength = options.CompressionMinLength.ToReadableSize() }}");
+				Logger.LogTrace($"{context.Id} - No response compression required: {new { Size = context.Response.Input.ToReadableSize(), CompressionMinLength = options.CompressionMinLength.ToReadableSize() }}");
 				return false;
 			}
 
@@ -112,20 +111,7 @@ namespace Everest.Compression
 			{
 				if (сompressors.TryGetValue(encoding, out var compressor))
 				{
-					var compressed = new MemoryStream();
-					using (var stream = compressor.Compress(compressed))
-					{
-						context.Response.OutputStream.Position = 0;
-						await context.Response.OutputStream.CopyToAsync(stream);
-						stream.Close();
-					}
-					compressed.Position = 0;
-					Logger.LogTrace($"{context.Id} - Successfully compressed response: {new { Size = context.Response.OutputStream.ToReadableSize(), CompressedSize = compressed.ToReadableSize(), Encoding = encoding }}");
-
-					context.Response.OutputStream.SetLength(0);
-					context.Response.OutputStream.Position = 0;
-					await compressed.CopyToAsync(context.Response.OutputStream);
-					context.Response.OutputStream.Position = 0;
+					context.Response.Output = compressor.Compress(context.Response.OutputStream);
 
 					context.Response.RemoveHeader(ContentEncodingHeader);
 					context.Response.AddHeader(ContentEncodingHeader, encoding);
