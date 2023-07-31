@@ -70,14 +70,14 @@ namespace Everest.Http
 
 		public void RemoveHeader(string name) => response.Headers.Remove(name);
 
-		public async Task SendResponseAsync()
+		public async Task SendResponseAsync(Stream stream)
 		{
 			try
 			{
-				OutputStream.Position = 0;
-				ContentLength64 = OutputStream.Length;
+				stream.Position = 0;
+				ContentLength64 = stream.Length;
 
-				using (var br = new BinaryReader(OutputStream, ContentEncoding))
+				using (var br = new BinaryReader(stream, ContentEncoding, true))
 				{
 					var buffer = new byte[4 * 1024];
 					int read;
@@ -94,7 +94,50 @@ namespace Everest.Http
 			{
 				try
 				{
-					OutputStream.Close();
+					stream.Close();
+					response.OutputStream.Close();
+					response.Close();
+				}
+				finally
+				{
+					ResponseSent = true;
+					ResponseClosed = true;
+				}
+			}
+		}
+
+		public async Task SendFileAsync(string filename, string contentType, string contentDisposition)
+		{
+			try
+			{
+				var file = new FileInfo(filename);
+				using (var fs = file.OpenRead())
+				{
+					ContentType = contentType;
+					ContentDisposition = contentDisposition;
+					RemoveHeader("Content-disposition");
+					AddHeader("Content-disposition", contentDisposition);
+
+					using (var bw = new BinaryWriter(response.OutputStream, ContentEncoding, true))
+					{
+						var buffer = new byte[4 * 1024];
+						int read;
+						while ((read = await fs.ReadAsync(buffer, 0, buffer.Length)) > 0)
+						{
+							await response.OutputStream.WriteAsync(buffer, 0, read);
+							await response.OutputStream.FlushAsync();
+						}
+
+						bw.Close();
+					}
+
+					fs.Close();
+				}
+			}
+			finally
+			{
+				try
+				{
 					response.OutputStream.Close();
 					response.Close();
 				}
@@ -183,6 +226,11 @@ namespace Everest.Http
 			var file = new FileInfo(filename);
 			using (var fs = file.OpenRead())
 			{
+				response.ContentType = contentType;
+				response.ContentDisposition = contentDisposition;
+				response.RemoveHeader("Content-disposition");
+				response.AddHeader("Content-disposition", contentDisposition);
+
 				using (var bw = new BinaryWriter(response.OutputStream, response.ContentEncoding, true))
 				{
 					var buffer = new byte[4 * 1024];
@@ -198,11 +246,6 @@ namespace Everest.Http
 
 				fs.Close();
 			}
-
-			response.ContentType = contentType;
-			response.ContentDisposition = contentDisposition;
-			response.RemoveHeader("Content-disposition");
-			response.AddHeader("Content-disposition", contentDisposition);
 		}
 	}
 }
