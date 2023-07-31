@@ -173,9 +173,7 @@ namespace Everest.Rest
 				{
 					if (!context.Response.ResponseSent)
 					{
-						//Logger.LogTrace($"{context.Id} - Try to send response: {new { RemoteEndPoint = context.Request.RemoteEndPoint.Description(), StatusCode = context.Response.StatusCode, ContentType = context.Response.ContentType, Size = context.Response.InputStream.ToReadableSize() }}");
 						await context.Response.SendResponseAsync();
-						//Logger.LogTrace($"{context.Id} - Successfully sended response: {new { RemoteEndPoint = context.Request.RemoteEndPoint.Description(), ResponseSent = context.Response.ResponseSent }}");
 					}
 				}
 				catch (Exception ex)

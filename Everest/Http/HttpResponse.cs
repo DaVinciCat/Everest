@@ -192,6 +192,18 @@ namespace Everest.Http
 
 		public static async Task WriteFileAsync(this HttpResponse response, string filename, ContentType contentType, ContentDisposition contentDisposition)
 		{
+			if (response == null) 
+				throw new ArgumentNullException(nameof(response));
+			
+			if (filename == null) 
+				throw new ArgumentNullException(nameof(filename));
+			
+			if (contentType == null) 
+				throw new ArgumentNullException(nameof(contentType));
+
+			if (contentDisposition == null) 
+				throw new ArgumentNullException(nameof(contentDisposition));
+
 			var file = new FileInfo(filename);
 			response.ContentType = contentType.MediaType;
 			response.ContentDisposition = contentDisposition.DispositionType;
@@ -202,6 +214,12 @@ namespace Everest.Http
 
 		public static async Task WriteFileAsync(this HttpResponse response, string filename, string contentType, string contentDisposition)
 		{
+			if (response == null) 
+				throw new ArgumentNullException(nameof(response));
+			
+			if (filename == null) 
+				throw new ArgumentNullException(nameof(filename));
+
 			var file = new FileInfo(filename);
 			response.ContentType = contentType;
 			response.ContentDisposition = contentDisposition;
