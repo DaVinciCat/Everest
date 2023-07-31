@@ -172,12 +172,12 @@ namespace Everest.Rest
 			{
 				try
 				{
-					Logger.LogTrace($"{context.Id} - Try to send response: {new { RemoteEndPoint = context.Request.RemoteEndPoint.Description(), StatusCode = context.Response.StatusCode, ContentType = context.Response.ContentType, Body = context.Response.Body.ToReadableSize(), ContentLength64 = context.Response.ContentLength64.ToReadableSize() }}");
 					if (!context.Response.ResponseSent)
 					{
-						await context.Response.SendResponseAsync(context.Response.Body);
+						Logger.LogTrace($"{context.Id} - Try to send response: {new { RemoteEndPoint = context.Request.RemoteEndPoint.Description(), StatusCode = context.Response.StatusCode, ContentType = context.Response.ContentType, Size = context.Response.OutputStream.ToReadableSize() }}");
+						await context.Response.SendResponseAsync();
+						Logger.LogTrace($"{context.Id} - Successfully sended response: {new { RemoteEndPoint = context.Request.RemoteEndPoint.Description(), ResponseSent = context.Response.ResponseSent }}");
 					}
-					Logger.LogTrace($"{context.Id} - Successfully sended response: {new { RemoteEndPoint = context.Request.RemoteEndPoint.Description(), ResponseSent = context.Response.ResponseSent, ContentLength64 = context.Response.ContentLength64.ToReadableSize() }}");
 				}
 				catch (Exception ex)
 				{
@@ -185,7 +185,6 @@ namespace Everest.Rest
 				}
 				finally
 				{
-					context.Response.Close();
 					Logger.LogTrace($"{context.Id} - Response closed");
 				}
 			}

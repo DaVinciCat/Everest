@@ -52,9 +52,7 @@ namespace Everest.Http
 			}
 		}
 		
-		public Stream Body { get; } = new MemoryStream();
-
-		public Stream OutputStream => response.OutputStream;
+		public Stream OutputStream { get; } = new MemoryStream();
 
 		private readonly HttpListenerResponse response;
 
@@ -72,41 +70,14 @@ namespace Everest.Http
 
 		public void RemoveHeader(string name) => response.Headers.Remove(name);
 
-		public void Close()
-		{
-			Body.Close();
-			response.OutputStream.Close();
-			response.Close();
-		}
-
-		public async Task SendFileAsync(string filename, string contentType, string contentDisposition)
-		{
-			var info = new FileInfo(filename);
-			using (var fs = info.OpenRead())
-			{
-				await SendFileAsync(fs, contentType, contentDisposition);
-				fs.Close();
-			}
-		}
-
-		public async Task SendFileAsync(Stream stream, string contentType, string contentDisposition)
-		{
-			ContentType = contentType;
-			ContentDisposition = contentDisposition;
-			RemoveHeader("Content-disposition");
-			AddHeader("Content-disposition", contentDisposition);
-
-			await SendResponseAsync(stream);
-		}
-
-		public async Task SendResponseAsync(Stream stream)
+		public async Task SendResponseAsync()
 		{
 			try
 			{
-				stream.Position = 0;
-				ContentLength64 = stream.Length;
+				OutputStream.Position = 0;
+				ContentLength64 = OutputStream.Length;
 
-				using (var br = new BinaryReader(stream, ContentEncoding, true))
+				using (var br = new BinaryReader(OutputStream, ContentEncoding, true))
 				{
 					var buffer = new byte[4 * 1024];
 					int read;
@@ -119,8 +90,17 @@ namespace Everest.Http
 			}
 			finally
 			{
-				ResponseSent = true;
-				ResponseClosed = true;
+				try
+				{
+					OutputStream.Close();
+					response.OutputStream.Close();
+					response.Close();
+				}
+				finally
+				{
+					ResponseSent = true;
+					ResponseClosed = true;
+				}
 			}
 		}
 	}
@@ -136,7 +116,7 @@ namespace Everest.Http
 				throw new ArgumentNullException(nameof(content));
 
 
-			await response.Body.WriteAsync(content, 0, content.Length);
+			await response.OutputStream.WriteAsync(content, 0, content.Length);
 		}
 
 		public static async Task WriteAsync(this HttpResponse response, string content)
@@ -202,14 +182,14 @@ namespace Everest.Http
 			var file = new FileInfo(filename);
 			using (var fs = file.OpenRead())
 			{
-				using (var bw = new BinaryWriter(response.Body, response.ContentEncoding, true))
+				using (var bw = new BinaryWriter(response.OutputStream, response.ContentEncoding, true))
 				{
 					var buffer = new byte[4 * 1024];
 					int read;
 					while ((read = await fs.ReadAsync(buffer, 0, buffer.Length)) > 0)
 					{
-						await response.Body.WriteAsync(buffer, 0, read);
-						await response.Body.FlushAsync();
+						await response.OutputStream.WriteAsync(buffer, 0, read);
+						await response.OutputStream.FlushAsync();
 					}
 
 					bw.Close();
