@@ -70,6 +70,14 @@ namespace Everest.Http
 
 		public void RemoveHeader(string name) => response.Headers.Remove(name);
 
+		public async Task WriteAsync(byte[] content)
+		{
+			if (content == null)
+				throw new ArgumentNullException(nameof(content));
+
+			await OutputStream.WriteAsync(content, 0, content.Length);
+		}
+
 		public async Task SendResponseAsync(Stream stream)
 		{
 			try
@@ -147,14 +155,6 @@ namespace Everest.Http
 					ResponseClosed = true;
 				}
 			}
-		}
-
-		public async Task WriteAsync(byte[] content)
-		{
-			if (content == null)
-				throw new ArgumentNullException(nameof(content));
-
-			await OutputStream.WriteAsync(content, 0, content.Length);
 		}
 	}
 
