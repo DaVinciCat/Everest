@@ -88,7 +88,7 @@ namespace Everest.Compression
 			var encodings = acceptEncoding.Split(',');
 			if (encodings.Length == 0)
 			{
-				Logger.LogTrace($"{context.TraceIdentifier} - No response compression required. Empty header:  {new { Header = AcceptEncodingHeader }}");
+				Logger.LogTrace($"{context.TraceIdentifier} - No response compression required. Empty header: {new { Header = AcceptEncodingHeader }}");
 				return Task.FromResult(false);
 			}
 
@@ -103,7 +103,7 @@ namespace Everest.Compression
 					context.Response.RemoveHeader(ContentEncodingHeader);
 					context.Response.AddHeader(ContentEncodingHeader, encoding);
 
-					Logger.LogTrace($"{context.TraceIdentifier} - Successfully created response compression stream:  {new { Encoding = encoding }}");
+					Logger.LogTrace($"{context.TraceIdentifier} - Successfully created response compression stream: {new { Encoding = encoding }}");
 					return Task.FromResult(true);
 				}
 			}

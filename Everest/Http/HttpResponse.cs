@@ -164,7 +164,7 @@ namespace Everest.Http
 			await response.WriteAsync(bytes);
 		}
 
-		public static async Task WriteTextAsync(HttpResponse response, string content)
+		public static async Task WriteTextAsync(this HttpResponse response, string content)
 		{
 			if (response == null)
 				throw new ArgumentNullException(nameof(response));
