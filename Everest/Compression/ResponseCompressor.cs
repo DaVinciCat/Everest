@@ -81,9 +81,9 @@ namespace Everest.Compression
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
 			
-			if (context.Response.Input.Length < options.CompressionMinLength)
+			if (context.Response.ContentLength < options.CompressionMinLength)
 			{
-				Logger.LogTrace($"{context.TraceIdentifier} - No response compression required: {new { Length = context.Response.Input.ToReadableSize(), CompressionMinLength = options.CompressionMinLength.ToReadableSize() }}");
+				Logger.LogTrace($"{context.TraceIdentifier} - No response compression required: {new { Length = context.Response.ContentLength.ToReadableSize(), CompressionMinLength = options.CompressionMinLength.ToReadableSize() }}");
 				return Task.FromResult(false);
 			}
 
@@ -108,7 +108,7 @@ namespace Everest.Compression
 			{
 				if (сompressors.TryGetValue(encoding, out var compressor))
 				{
-					context.Response.Output = compressor.Compress(context.Response.OutputStream);
+					context.Response.PipeTo(to => compressor.Compress(to));
 
 					context.Response.RemoveHeader(ContentEncodingHeader);
 					context.Response.AddHeader(ContentEncodingHeader, encoding);

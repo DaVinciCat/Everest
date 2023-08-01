@@ -26,13 +26,15 @@ namespace Everest.Http
 			set => response.SendChunked = value;
 		}
 
-		/*https://learn.microsoft.com/ru-ru/dotnet/api/system.net.httplistenerresponse.contentlength64?view=net-7.0*/
-		public long ContentLength64
-		{
-			get => response.ContentLength64;
-			set => response.ContentLength64 = value;
-		}
+		///*https://learn.microsoft.com/ru-ru/dotnet/api/system.net.httplistenerresponse.contentlength64?view=net-7.0*/
+		//public long ContentLength64
+		//{
+		//	get => response.ContentLength64;
+		//	set => response.ContentLength64 = value;
+		//}
 
+		public long ContentLength => pipe.Length;
+		
 		public bool KeepAlive
 		{
 			get => response.KeepAlive;
@@ -78,24 +80,19 @@ namespace Everest.Http
 				response.StatusDescription = value.ToString();
 			}
 		}
-
-		public Stream Input { get; set; } = new MemoryStream();
-
-		public Stream Output { get; set; }
-
-		public Stream OutputStream => response.OutputStream;
-
+		
 		private readonly HttpListenerContext context;
 
 		private readonly HttpListenerResponse response;
+
+		private readonly Pipe pipe;
 
 		public HttpResponse(HttpListenerContext context, ILogger<HttpResponse> logger)
 		{
 			this.context = context ?? throw new ArgumentNullException(nameof(context));
 			response = context.Response;
-
+			pipe = new(response.OutputStream);
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
-			Output = new BufferedStream(response.OutputStream);
 			StatusCode = HttpStatusCode.OK;
 			ContentEncoding = Encoding.UTF8;
 			
@@ -108,28 +105,18 @@ namespace Everest.Http
 
 		public void RemoveHeader(string name) => response.Headers.Remove(name);
 
+		public void PipeTo(Func<Stream, Stream> to) => pipe.PipeTo(to);
+		
+		public void PipeFrom(Stream from) => pipe.PipeFrom(from);
+
+		public void PipeFrom(Func<Stream, Stream> from) => pipe.PipeFrom(from);
+
 		public async Task SendResponseAsync()
 		{
 			try
 			{
-				if (!Input.CanRead)
-					throw new InvalidOperationException("Input stream does not support read operation");
-
-				if (!Output.CanWrite)
-					throw new InvalidOperationException("Output stream does not support write operation");
-
-				Logger.LogTrace($"{TraceIdentifier} - Try to send response: {new { RemoteEndPoint = context.Request.RemoteEndPoint, Length = Input.Length.ToReadableSize() }}");
-				
-				Input.Position = 0;
-				var buffer = new byte[4 * 1024];
-				
-				int read;
-				while ((read = await Input.ReadAsync(buffer, 0, buffer.Length)) > 0)
-				{
-					await Output.WriteAsync(buffer, 0, read);
-					await Output.FlushAsync();
-				}
-				
+				Logger.LogTrace($"{TraceIdentifier} - Try to send response: {new { RemoteEndPoint = context.Request.RemoteEndPoint, ContentLength = ContentLength.ToReadableSize() }}");
+				await pipe.FlushAsync();
 				Logger.LogTrace($"{TraceIdentifier} - Successfully sended response: {new { RemoteEndPoint = context.Request.RemoteEndPoint, StatusCode = response.StatusCode, ContentType = response.ContentType, ContentEncoding = response.ContentEncoding?.EncodingName }}");
 			}
 			catch (Exception ex)
@@ -140,8 +127,7 @@ namespace Everest.Http
 			{
 				try
 				{
-					Input.Close();
-					Output.Close();
+					pipe.Dispose();
 					response.OutputStream.Close();
 					response.Close();
 				}
@@ -157,12 +143,13 @@ namespace Everest.Http
 
 	public static class HttpResponseExtensions
 	{
-		public static async Task WriteAsync(this HttpResponse response, byte[] content)
+		public static Task WriteAsync(this HttpResponse response, byte[] content)
 		{
 			if (content == null)
 				throw new ArgumentNullException(nameof(content));
 
-			await response.Input.WriteAsync(content, 0, content.Length);
+			response.PipeFrom(new MemoryStream(content));
+			return Task.CompletedTask;
 		}
 
 		public static async Task WriteAsync(this HttpResponse response, string content)
@@ -217,7 +204,7 @@ namespace Everest.Http
 			await response.WriteAsync(json);
 		}
 
-		public static async Task WriteFileAsync(this HttpResponse response, string filename, ContentType contentType, ContentDisposition contentDisposition)
+		public static Task WriteFileAsync(this HttpResponse response, string filename, ContentType contentType, ContentDisposition contentDisposition)
 		{
 			if (response == null)
 				throw new ArgumentNullException(nameof(response));
@@ -234,25 +221,31 @@ namespace Everest.Http
 			var file = new FileInfo(filename);
 			response.ContentType = contentType.MediaType;
 			response.ContentDisposition = contentDisposition.DispositionType;
-			response.Input = file.OpenRead();
+			response.PipeFrom(file.OpenRead());
 
-			await Task.CompletedTask;
+			return Task.CompletedTask;
 		}
 
-		public static async Task WriteFileAsync(this HttpResponse response, string filename, string contentType, string contentDisposition)
+		public static Task WriteFileAsync(this HttpResponse response, string filename, string contentType, string contentDisposition)
 		{
 			if (response == null)
 				throw new ArgumentNullException(nameof(response));
 
 			if (filename == null)
 				throw new ArgumentNullException(nameof(filename));
+			
+			if (contentType == null) 
+				throw new ArgumentNullException(nameof(contentType));
+
+			if (contentDisposition == null) 
+				throw new ArgumentNullException(nameof(contentDisposition));
 
 			var file = new FileInfo(filename);
 			response.ContentType = contentType;
 			response.ContentDisposition = contentDisposition;
-			response.Input = file.OpenRead();
+			response.PipeFrom(file.OpenRead());
 
-			await Task.CompletedTask;
+			return Task.CompletedTask;
 		}
 	}
 }
