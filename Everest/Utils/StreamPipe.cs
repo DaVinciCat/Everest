@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Everest.Utils
 {
-	public class Pipe : IDisposable
+	public class StreamPipe : IDisposable
 	{
 		public long Length => input.Length;
 
@@ -12,7 +12,7 @@ namespace Everest.Utils
 
 		private Stream output;
 
-		public Pipe(Stream to)
+		public StreamPipe(Stream to)
 		{
 			if (to == null) 
 				throw new ArgumentNullException(nameof(to));
@@ -23,7 +23,7 @@ namespace Everest.Utils
 			output = to;
 		}
 
-		public Pipe PipeFrom(Stream from)
+		public StreamPipe PipeFrom(Stream from)
 		{
 			if (from == null) 
 				throw new ArgumentNullException(nameof(from));
@@ -34,7 +34,7 @@ namespace Everest.Utils
 			return this;
 		}
 
-		public Pipe PipeFrom(Func<Stream, Stream> from)
+		public StreamPipe PipeFrom(Func<Stream, Stream> from)
 		{
 			if (from == null)
 				throw new ArgumentNullException(nameof(from));
@@ -46,7 +46,7 @@ namespace Everest.Utils
 			return this;
 		}
 
-		public Pipe PipeTo(Func<Stream, Stream> to)
+		public StreamPipe PipeTo(Func<Stream, Stream> to)
 		{
 			if (to == null) 
 				throw new ArgumentNullException(nameof(to));
@@ -58,7 +58,7 @@ namespace Everest.Utils
 			return this;
 		}
 
-		public Pipe PipeTo(Stream to)
+		public StreamPipe PipeTo(Stream to)
 		{
 			if (to == null)
 				throw new ArgumentNullException(nameof(to));

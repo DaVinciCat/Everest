@@ -85,7 +85,7 @@ namespace Everest.Http
 
 		private readonly HttpListenerResponse response;
 
-		private readonly Pipe pipe;
+		private readonly StreamPipe pipe;
 
 		public HttpResponse(HttpListenerContext context, ILogger<HttpResponse> logger)
 		{
