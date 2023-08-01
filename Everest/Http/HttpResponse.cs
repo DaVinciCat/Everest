@@ -5,11 +5,17 @@ using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Everest.Utils;
+using Microsoft.Extensions.Logging;
 
 namespace Everest.Http
 {
 	public class HttpResponse
 	{
+		public ILogger<HttpResponse> Logger { get; }
+
+		public Guid TraceIdentifier => context.Request.RequestTraceIdentifier;
+
 		public bool ResponseSent { get; private set; }
 
 		public bool ResponseClosed { get; private set; }
@@ -79,14 +85,20 @@ namespace Everest.Http
 
 		public Stream OutputStream => response.OutputStream;
 
+		private readonly HttpListenerContext context;
+
 		private readonly HttpListenerResponse response;
 
-		public HttpResponse(HttpListenerResponse response)
+		public HttpResponse(HttpListenerContext context, ILogger<HttpResponse> logger)
 		{
-			this.response = response ?? throw new ArgumentNullException(nameof(response));
+			this.context = context ?? throw new ArgumentNullException(nameof(context));
+			response = context.Response;
 
+			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			Output = new BufferedStream(response.OutputStream);
 			StatusCode = HttpStatusCode.OK;
+			ContentEncoding = Encoding.UTF8;
+			
 			AppendHeader("Server", "Everest");
 		}
 
@@ -100,15 +112,29 @@ namespace Everest.Http
 		{
 			try
 			{
+				if (!Input.CanRead)
+					throw new InvalidOperationException("Input stream does not support read operation");
+
+				if (!Output.CanWrite)
+					throw new InvalidOperationException("Output stream does not support write operation");
+
+				Logger.LogTrace($"{TraceIdentifier} - Try to send response: {new { RemoteEndPoint = context.Request.RemoteEndPoint, Length = Input.Length.ToReadableSize() }}");
+				
 				Input.Position = 0;
-		
 				var buffer = new byte[4 * 1024];
+				
 				int read;
 				while ((read = await Input.ReadAsync(buffer, 0, buffer.Length)) > 0)
 				{
 					await Output.WriteAsync(buffer, 0, read);
 					await Output.FlushAsync();
 				}
+				
+				Logger.LogTrace($"{TraceIdentifier} - Successfully sended response: {new { RemoteEndPoint = context.Request.RemoteEndPoint, StatusCode = response.StatusCode, ContentType = response.ContentType, ContentEncoding = response.ContentEncoding?.EncodingName }}");
+			}
+			catch (Exception ex)
+			{
+				Logger.LogError(ex, $"{TraceIdentifier} - Failed to send response");
 			}
 			finally
 			{
@@ -123,6 +149,7 @@ namespace Everest.Http
 				{
 					ResponseSent = true;
 					ResponseClosed = true;
+					Logger.LogTrace($"{TraceIdentifier} - Response closed");
 				}
 			}
 		}
@@ -152,7 +179,7 @@ namespace Everest.Http
 
 		public static async Task WriteTextAsync(HttpResponse response, string content)
 		{
-			if (response == null) 
+			if (response == null)
 				throw new ArgumentNullException(nameof(response));
 
 			if (content == null)
@@ -169,7 +196,7 @@ namespace Everest.Http
 
 			if (content == null)
 				throw new ArgumentNullException(nameof(content));
-			
+
 			response.ContentType = "text/html; charset=utf-8";
 			await response.WriteAsync(content);
 		}
@@ -192,16 +219,16 @@ namespace Everest.Http
 
 		public static async Task WriteFileAsync(this HttpResponse response, string filename, ContentType contentType, ContentDisposition contentDisposition)
 		{
-			if (response == null) 
+			if (response == null)
 				throw new ArgumentNullException(nameof(response));
-			
-			if (filename == null) 
+
+			if (filename == null)
 				throw new ArgumentNullException(nameof(filename));
-			
-			if (contentType == null) 
+
+			if (contentType == null)
 				throw new ArgumentNullException(nameof(contentType));
 
-			if (contentDisposition == null) 
+			if (contentDisposition == null)
 				throw new ArgumentNullException(nameof(contentDisposition));
 
 			var file = new FileInfo(filename);
@@ -214,10 +241,10 @@ namespace Everest.Http
 
 		public static async Task WriteFileAsync(this HttpResponse response, string filename, string contentType, string contentDisposition)
 		{
-			if (response == null) 
+			if (response == null)
 				throw new ArgumentNullException(nameof(response));
-			
-			if (filename == null) 
+
+			if (filename == null)
 				throw new ArgumentNullException(nameof(filename));
 
 			var file = new FileInfo(filename);

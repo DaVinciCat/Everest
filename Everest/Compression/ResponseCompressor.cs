@@ -76,36 +76,33 @@ namespace Everest.Compression
 			сompressors.Clear();
 		}
 
-		public async Task<bool> TryCompressResponseAsync(HttpContext context)
+		public Task<bool> TryCompressResponseAsync(HttpContext context)
 		{
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
-
 			
-			Logger.LogTrace($"{context.Id} - Try to compress response: {new { Size = context.Response.Input.ToReadableSize() }}");
-
 			if (context.Response.Input.Length < options.CompressionMinLength)
 			{
-				Logger.LogTrace($"{context.Id} - No response compression required: {new { Size = context.Response.Input.ToReadableSize(), CompressionMinLength = options.CompressionMinLength.ToReadableSize() }}");
-				return false;
+				Logger.LogTrace($"{context.TraceIdentifier} - No response compression required: {new { Length = context.Response.Input.ToReadableSize(), CompressionMinLength = options.CompressionMinLength.ToReadableSize() }}");
+				return Task.FromResult(false);
 			}
 
 			//TODO: super naive implementation, should replace it with q values support
 			var acceptEncoding = context.Request.Headers[AcceptEncodingHeader];
 			if (acceptEncoding == null)
 			{
-				Logger.LogTrace($"{context.Id} - No response compression required. Missing header: {new { Header = AcceptEncodingHeader }}");
-				return false;
+				Logger.LogTrace($"{context.TraceIdentifier} - No response compression required. Missing header: {new { Header = AcceptEncodingHeader }}");
+				return Task.FromResult(false);
 			}
 
 			var encodings = acceptEncoding.Split(',');
 			if (encodings.Length == 0)
 			{
-				Logger.LogTrace($"{context.Id} - No response compression required. Empty header:  {new { Header = AcceptEncodingHeader }}");
-				return false;
+				Logger.LogTrace($"{context.TraceIdentifier} - No response compression required. Empty header:  {new { Header = AcceptEncodingHeader }}");
+				return Task.FromResult(false);
 			}
 
-			Logger.LogTrace($"{context.Id} - Try to encode response: {new { AcceptEncodings = encodings.ToReadableArray(), SupportedEncodings = Compressors.Select(compressor => compressor.Encoding).ToReadableArray() }}");
+			Logger.LogTrace($"{context.TraceIdentifier} - Try to match requested encoding: {new { AcceptEncodings = encodings.ToReadableArray(), SupportedEncodings = Compressors.Select(compressor => compressor.Encoding).ToReadableArray() }}");
 
 			foreach (var encoding in encodings)
 			{
@@ -116,12 +113,13 @@ namespace Everest.Compression
 					context.Response.RemoveHeader(ContentEncodingHeader);
 					context.Response.AddHeader(ContentEncodingHeader, encoding);
 
-					return true;
+					Logger.LogTrace($"{context.TraceIdentifier} - Successfully matched request encoding:  {new { Encoding = encoding }}");
+					return Task.FromResult(true);
 				}
 			}
 
-			Logger.LogWarning($"{context.Id} - Failed to compress response. Header contains no supported encodings: {new { Header = AcceptEncodingHeader, Encodings = encodings.ToReadableArray(), SupportedEncodings = Compressors.Select(compressor => compressor.Encoding).ToReadableArray() }}");
-			return false;
+			Logger.LogWarning($"{context.TraceIdentifier} - Failed to compress response. Header contains no supported encodings: {new { Header = AcceptEncodingHeader, Encodings = encodings.ToReadableArray(), SupportedEncodings = Compressors.Select(compressor => compressor.Encoding).ToReadableArray() }}");
+			return Task.FromResult(false);
 		}
 	}
 }

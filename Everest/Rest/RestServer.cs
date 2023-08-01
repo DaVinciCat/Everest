@@ -32,20 +32,24 @@ namespace Everest.Rest
 
 		private readonly IServiceProvider serviceProvider;
 
-		public RestServer(IServiceProvider serviceProvider, IMiddleware[] middleware, ILogger<RestServer> logger)
+		private readonly ILoggerFactory loggerFactory;
+
+		public RestServer(IMiddleware[] middleware, IServiceProvider serviceProvider, ILoggerFactory loggerFactory)
 		{
 			if (!HttpListener.IsSupported)
 			{
 				throw new NotSupportedException($"This OS does not support {nameof(HttpListener)}.");
 			}
 
-			this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-
 			if (middleware == null)
 				throw new ArgumentNullException(nameof(middleware));
+			
+			this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+			this.loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
+
 			aggregateMiddleware = new AggregateMiddleware(middleware);
 
-			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
+			Logger = loggerFactory.CreateLogger<RestServer>();
 
 			listener = new HttpListener();
 			listenerThread = new Thread(ListenAsync);
@@ -139,7 +143,7 @@ namespace Everest.Rest
 					var context = await listener.GetContextAsync();
 					var features = new FeatureCollection();
 					var services = serviceProvider.CreateScope().ServiceProvider;
-					var httpContext = new HttpContext(context, features, services);
+					var httpContext = new HttpContext(context, features, services, loggerFactory);
 
 					ThreadPool.QueueUserWorkItem(ProcessRequestAsync, httpContext, false);
 				}
@@ -162,28 +166,15 @@ namespace Everest.Rest
 			try
 			{
 				await aggregateMiddleware.InvokeAsync(context);
+				
+				if (!context.Response.ResponseSent)
+				{
+					await context.Response.SendResponseAsync();
+				}
 			}
 			catch (Exception ex)
 			{
-				Logger.LogError(ex, $"{context.Id} - Failed to process incoming request");
-			}
-			finally
-			{
-				try
-				{
-					if (!context.Response.ResponseSent)
-					{
-						await context.Response.SendResponseAsync();
-					}
-				}
-				catch (Exception ex)
-				{
-					Logger.LogError(ex, $"{context.Id} - Failed to send response");
-				}
-				finally
-				{
-					Logger.LogTrace($"{context.Id} - Response closed");
-				}
+				Logger.LogError(ex, $"{context.TraceIdentifier} - Failed to process incoming request");
 			}
 		}
 

@@ -46,19 +46,19 @@ namespace Everest.Authentication
 			var header = context.Request.Headers[options.AuthorizationHeader];
 			if (string.IsNullOrEmpty(header))
 			{
-				Logger.LogWarning($"{context.Id} - Failed to authenticate. Missing header: {new { Header = options.AuthorizationHeader, Scheme = Scheme }}");
+				Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. Missing header: {new { Header = options.AuthorizationHeader, Scheme = Scheme }}");
 				return Task.FromResult(false);
 			}
 
 			if (header == Scheme)
 			{
-				Logger.LogWarning($"{context.Id} - Failed to authenticate. No credentials supplied: {new { Scheme = Scheme }}");
+				Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. No credentials supplied: {new { Scheme = Scheme }}");
 				return Task.FromResult(false);
 			}
 
 			if (!header.StartsWith(Scheme + ' ', StringComparison.OrdinalIgnoreCase))
 			{
-				Logger.LogWarning($"{context.Id} - Failed to authenticate. Incorrect header: {new { Header = options.AuthorizationHeader, Scheme = Scheme }}");
+				Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. Incorrect header: {new { Header = options.AuthorizationHeader, Scheme = Scheme }}");
 				return Task.FromResult(false);
 			}
 
@@ -70,7 +70,7 @@ namespace Everest.Authentication
 			}
 			catch (Exception ex)
 			{
-				Logger.LogError(ex, $"{context.Id} - Failed to authenticate. Failed to convert credentials from Base64: {new { Scheme = Scheme }}");
+				Logger.LogError(ex, $"{context.TraceIdentifier} - Failed to authenticate. Failed to convert credentials from Base64: {new { Scheme = Scheme }}");
 				return Task.FromResult(false);
 			}
 
@@ -81,14 +81,14 @@ namespace Everest.Authentication
 			}
 			catch (Exception ex)
 			{
-				Logger.LogError(ex, $"{context.Id} - Failed to authenticate. Failed to decode Base64 credentials: {new { Encoding = options.Encoding.EncodingName, Scheme = Scheme }}");
+				Logger.LogError(ex, $"{context.TraceIdentifier} - Failed to authenticate. Failed to decode Base64 credentials: {new { Encoding = options.Encoding.EncodingName, Scheme = Scheme }}");
 				return Task.FromResult(false);
 			}
 
 			var delimiterIndex = decodedCredentials.IndexOf(options.CredentialsDelimiter, StringComparison.OrdinalIgnoreCase);
 			if (delimiterIndex == -1)
 			{
-				Logger.LogWarning($"{context.Id} - Failed to authenticate. Missing credentials delimiter: {new { Delimiter = options.CredentialsDelimiter, Scheme = Scheme }}");
+				Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. Missing credentials delimiter: {new { Delimiter = options.CredentialsDelimiter, Scheme = Scheme }}");
 				return Task.FromResult(false);
 			}
 
@@ -97,7 +97,7 @@ namespace Everest.Authentication
 			var identity = new BasicIdentity(username, password);
 			context.User.AddIdentity(identity);
 
-			Logger.LogTrace($"{context.Id} - Successfully authenticated: {new { Scheme = Scheme }}");
+			Logger.LogTrace($"{context.TraceIdentifier} - Successfully authenticated: {new { Scheme = Scheme }}");
 			return Task.FromResult(true);
 		}
 	}

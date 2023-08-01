@@ -50,19 +50,19 @@ namespace Everest.Authentication
 			var header = context.Request.Headers[options.AuthorizationHeader];
 			if (string.IsNullOrEmpty(header))
 			{
-				Logger.LogWarning($"{context.Id} - Failed to authenticate. Missing header: {new { Header = options.AuthorizationHeader, Scheme = Scheme }}");
+				Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. Missing header: {new { Header = options.AuthorizationHeader, Scheme = Scheme }}");
 				return false;
 			}
 
 			if (Scheme == options.AuthorizationHeader)
 			{
-				Logger.LogWarning($"{context.Id} - Failed to authenticate. No token supplied: {new { Scheme = Scheme }}");
+				Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. No token supplied: {new { Scheme = Scheme }}");
 				return false;
 			}
 
 			if (!header.StartsWith(Scheme + ' ', StringComparison.OrdinalIgnoreCase))
 			{
-				Logger.LogWarning($"{context.Id} - Failed to authenticate. Incorrect header: {new { Header = options.AuthorizationHeader, Scheme = Scheme }}");
+				Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. Incorrect header: {new { Header = options.AuthorizationHeader, Scheme = Scheme }}");
 				return false;
 			}
 
@@ -75,12 +75,12 @@ namespace Everest.Authentication
 				var identity = new JwtTokenIdentity(jwtToken, validationResult.ClaimsIdentity);
 				context.User.AddIdentity(identity);
 
-				Logger.LogTrace($"{context.Id} - Successfully authenticated: {new { Scheme = Scheme }}");
+				Logger.LogTrace($"{context.TraceIdentifier} - Successfully authenticated: {new { Scheme = Scheme }}");
 				return true;
 			}
 			catch (Exception ex)
 			{
-				Logger.LogError(ex, $"{context.Id} - Failed to authenticate. Failed to validate token: {new { Scheme = Scheme }}");
+				Logger.LogError(ex, $"{context.TraceIdentifier} - Failed to authenticate. Failed to validate token: {new { Scheme = Scheme }}");
 				return false;
 			}
 		}

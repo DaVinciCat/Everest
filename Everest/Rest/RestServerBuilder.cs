@@ -68,7 +68,7 @@ namespace Everest.Rest
 		{
 			var loggerFactory = Services.GetRequiredService<ILoggerFactory>();
 
-			var server = new RestServer(Services, Middleware.ToArray(), loggerFactory.CreateLogger<RestServer>());
+			var server = new RestServer(Middleware.ToArray(), Services, loggerFactory);
 			server.AddPrefixes(Prefixes.ToArray());
 
 			return server;

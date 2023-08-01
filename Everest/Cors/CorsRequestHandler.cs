@@ -59,24 +59,24 @@ namespace Everest.Cors
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
 
-			Logger.LogTrace($"{context.Id} - Try to check if CORS preflight request");
+			Logger.LogTrace($"{context.TraceIdentifier} - Try to check if CORS preflight request");
 
 			if (!context.Request.IsCorsPreflightRequest())
 			{
-				Logger.LogTrace($"{context.Id} - Not a CORS preflight request");
+				Logger.LogTrace($"{context.TraceIdentifier} - Not a CORS preflight request");
 				return Task.FromResult(false);
 			}
 
-			Logger.LogTrace($"{context.Id} - Try to handle CORS preflight request");
+			Logger.LogTrace($"{context.TraceIdentifier} - Try to handle CORS preflight request");
 
 			var origin = context.Request.Headers[OriginHeader];
 			if (origin == null)
 			{
-				Logger.LogWarning($"{context.Id} - Failed to handle CORS preflight request. Missing header: {new { Header = OriginHeader }}");
+				Logger.LogWarning($"{context.TraceIdentifier} - Failed to handle CORS preflight request. Missing header: {new { Header = OriginHeader }}");
 				return Task.FromResult(true);
 			}
 
-			Logger.LogTrace($"{context.Id} - Try to apply CORS policy: {new { Request = context.Request.Description, Origin = origin, Policies = Policies.Select(p => p.Origin).ToReadableArray() }}");
+			Logger.LogTrace($"{context.TraceIdentifier} - Try to apply CORS policy: {new { Request = context.Request.Description, Origin = origin, Policies = Policies.Select(p => p.Origin).ToReadableArray() }}");
 
 			if (policies.TryGetValue(origin, out var policy))
 			{
@@ -87,11 +87,11 @@ namespace Everest.Cors
 				context.Response.AddHeader("Access-Control-Max-Age", headers.MaxAge);
 				context.Response.StatusCode = HttpStatusCode.NoContent;
 
-				Logger.LogTrace($"{context.Id} - Successfully handled CORS preflight request: {new { Policy = policy, AllowMethods = policy.AllowMethods.ToReadableArray(), AllowHeaders = policy.AllowHeaders.ToReadableArray(), Origin = policy.Origin, MaxAge = policy.MaxAge }}");
+				Logger.LogTrace($"{context.TraceIdentifier} - Successfully handled CORS preflight request: {new { Policy = policy, AllowMethods = policy.AllowMethods.ToReadableArray(), AllowHeaders = policy.AllowHeaders.ToReadableArray(), Origin = policy.Origin, MaxAge = policy.MaxAge }}");
 				return Task.FromResult(true);
 			}
 
-			Logger.LogWarning($"{context.Id} - Failed to handle CORS preflight request. Request contains no supported policy: {new { Origin = origin, Policies = Policies.Select(p => p.Origin).ToReadableArray() }}");
+			Logger.LogWarning($"{context.TraceIdentifier} - Failed to handle CORS preflight request. Request contains no supported policy: {new { Origin = origin, Policies = Policies.Select(p => p.Origin).ToReadableArray() }}");
 			return Task.FromResult(true);
 		}
 

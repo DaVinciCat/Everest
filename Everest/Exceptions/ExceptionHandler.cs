@@ -23,7 +23,7 @@ namespace Everest.Exceptions
 			if (ex == null)
 				throw new ArgumentNullException(nameof(ex));
 
-			Logger.LogError(ex, $"{context.Id} - {new { ExceptionMessage = ex.Message }}");
+			Logger.LogError(ex, $"{context.TraceIdentifier} - {new { ExceptionMessage = ex.Message }}");
 			await OnExceptionAsync(context, ex);
 		}
 

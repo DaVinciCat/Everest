@@ -5,11 +5,16 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Everest.Collections;
+using Microsoft.Extensions.Logging;
 
 namespace Everest.Http
 {
 	public class HttpRequest
 	{
+		public ILogger<HttpRequest> Logger { get; }
+
+		public Guid TraceIdentifier => request.RequestTraceIdentifier;
+
 		public string HttpMethod => request.HttpMethod;
 
 		public bool HasPayload => request.HasEntityBody;
@@ -32,9 +37,14 @@ namespace Everest.Http
 
 		private readonly HttpListenerRequest request;
 
-		public HttpRequest(HttpListenerRequest request)
+		public HttpRequest(HttpListenerContext context, ILogger<HttpRequest> logger)
 		{
-			this.request = request ?? throw new ArgumentNullException(nameof(request));
+			if (context == null) 
+				throw new ArgumentNullException(nameof(context));
+
+			request = context.Request;
+
+			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			QueryParameters = new ParameterCollection(request.QueryString);
 			PathParameters = new ParameterCollection();
 		}
