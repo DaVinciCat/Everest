@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 using Everest.Utils;
@@ -15,17 +17,17 @@ namespace Everest.Compression
 
 	public class ResponseCompressor : IResponseCompressor
 	{
-		public ICompressor[] Compressors => сompressors.Values.ToArray();
+		public string[] Encodings => compressions.Keys.ToArray();
 
 		public string AcceptEncodingHeader { get; set; } = "Accept-Encoding";
 
 		public string ContentEncodingHeader { get; set; } = "Content-Encoding";
 
-		private readonly Dictionary<string, ICompressor> сompressors = new()
+		private readonly Dictionary<string, Func<Stream, Stream>> compressions = new()
 		{
-			{ "gzip", new GZipCompressor() },
-			{ "deflate", new DeflateCompressor() },
-			{ "brotli", new BrotliCompressor() }
+			{ "gzip", input => new GZipStream(input, CompressionLevel.Fastest) },
+			{ "deflate", input => new DeflateStream(input, CompressionLevel.Fastest) },
+			{ "brotli", input => new BrotliStream(input, CompressionLevel.Fastest) }
 		};
 
 		private readonly ResponseCompressionOptions options;
@@ -44,43 +46,31 @@ namespace Everest.Compression
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
-		public void AddCompressor(ICompressor compressor)
+		public void AddCompression(string encoding, Func<Stream, Stream> compression)
 		{
-			if (compressor == null) 
-				throw new ArgumentNullException(nameof(compressor));
-
-			сompressors[compressor.Encoding] = compressor;
+			compressions[encoding] = compression ?? throw new ArgumentNullException(nameof(compression));
 		}
 
-		public void RemoveCompressor(ICompressor compressor)
+		public void RemoveCompression(string encoding)
 		{
-			if (compressor == null) 
-				throw new ArgumentNullException(nameof(compressor));
-
-			if (сompressors.ContainsKey(compressor.Encoding))
+			if (compressions.ContainsKey(encoding))
 			{
-				сompressors.Remove(compressor.Encoding);
+				compressions.Remove(encoding);
 			}
 		}
 
-		public void RemoveCompressor(string encoding)
+		public void ClearCompressions()
 		{
-			if (сompressors.ContainsKey(encoding))
-			{
-				сompressors.Remove(encoding);
-			}
+			compressions.Clear();
 		}
 
-		public void ClearCompressors()
-		{
-			сompressors.Clear();
-		}
-
-		public Task<bool> TryCompressResponseAsync(HttpContext context)
+		public Task<bool> TryCreateResponseCompressionAsync(HttpContext context)
 		{
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
-			
+
+			Logger.LogTrace($"{context.TraceIdentifier} - Try to check if response compression required");
+
 			if (context.Response.ContentLength < options.CompressionMinLength)
 			{
 				Logger.LogTrace($"{context.TraceIdentifier} - No response compression required: {new { Length = context.Response.ContentLength.ToReadableSize(), CompressionMinLength = options.CompressionMinLength.ToReadableSize() }}");
@@ -102,23 +92,23 @@ namespace Everest.Compression
 				return Task.FromResult(false);
 			}
 
-			Logger.LogTrace($"{context.TraceIdentifier} - Try to match requested encoding: {new { AcceptEncodings = encodings.ToReadableArray(), SupportedEncodings = Compressors.Select(compressor => compressor.Encoding).ToReadableArray() }}");
+			Logger.LogTrace($"{context.TraceIdentifier} - Try to create response compression stream: {new { AcceptEncodings = encodings.ToReadableArray(), SupportedEncodings = compressions.Keys.ToReadableArray() }}");
 
 			foreach (var encoding in encodings)
 			{
-				if (сompressors.TryGetValue(encoding, out var compressor))
+				if (compressions.TryGetValue(encoding, out var compression))
 				{
-					context.Response.PipeTo(to => compressor.Compress(to));
+					context.Response.PipeTo(to => compression(to));
 
 					context.Response.RemoveHeader(ContentEncodingHeader);
 					context.Response.AddHeader(ContentEncodingHeader, encoding);
 
-					Logger.LogTrace($"{context.TraceIdentifier} - Successfully matched request encoding:  {new { Encoding = encoding }}");
+					Logger.LogTrace($"{context.TraceIdentifier} - Successfully created response compression stream:  {new { Encoding = encoding }}");
 					return Task.FromResult(true);
 				}
 			}
 
-			Logger.LogWarning($"{context.TraceIdentifier} - Failed to compress response. Header contains no supported encodings: {new { Header = AcceptEncodingHeader, Encodings = encodings.ToReadableArray(), SupportedEncodings = Compressors.Select(compressor => compressor.Encoding).ToReadableArray() }}");
+			Logger.LogWarning($"{context.TraceIdentifier} - Failed to create response compression stream. Header contains no supported encodings: {new { Header = AcceptEncodingHeader, Encodings = encodings.ToReadableArray(), SupportedEncodings = compressions.Keys.ToReadableArray() }}");
 			return Task.FromResult(false);
 		}
 	}

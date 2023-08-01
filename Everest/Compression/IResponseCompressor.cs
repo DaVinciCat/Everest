@@ -1,20 +1,20 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.IO;
+using System.Threading.Tasks;
 using Everest.Http;
 
 namespace Everest.Compression
 {
 	public interface IResponseCompressor
 	{
-		public ICompressor[] Compressors { get; }
+		public string[] Encodings { get; }
 
-		void AddCompressor(ICompressor compressor);
+		void AddCompression(string encoding, Func<Stream, Stream> compression);
 
-		void RemoveCompressor(ICompressor compressor);
+		void RemoveCompression(string encoding);
 
-		void RemoveCompressor(string encoding);
+		void ClearCompressions();
 
-		void ClearCompressors();
-
-		Task<bool> TryCompressResponseAsync(HttpContext context);
+		Task<bool> TryCreateResponseCompressionAsync(HttpContext context);
 	}
 }
