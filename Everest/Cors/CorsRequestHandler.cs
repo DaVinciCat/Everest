@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Everest.Http;
+using Everest.Routing;
 using Everest.Utils;
 using Microsoft.Extensions.Logging;
 
@@ -64,13 +65,19 @@ namespace Everest.Cors
 
 			if (context.Response.ResponseSent)
 			{
-				Logger.LogTrace($"{context.TraceIdentifier} - No CORS policy required. Response is already sent");
+				Logger.LogTrace($"{context.TraceIdentifier} - No CORS policy handling required. Response is already sent");
 				return Task.FromResult(false);
 			}
 
 			if (!context.Request.IsCorsPreflightRequest())
 			{
 				Logger.LogTrace($"{context.TraceIdentifier} - Not a CORS preflight request");
+				return Task.FromResult(false);
+			}
+
+			if (context.TryGetRouteDescriptor(out var descriptor))
+			{
+				Logger.LogTrace($"{context.TraceIdentifier} - No CORS policy handling required. CORS request was handled by: {new { Route = descriptor.Route.Description, EndPoint = descriptor.EndPoint.Description }}");
 				return Task.FromResult(false);
 			}
 			
@@ -83,7 +90,7 @@ namespace Everest.Cors
 				return Task.FromResult(true);
 			}
 
-			Logger.LogTrace($"{context.TraceIdentifier} - Try to apply CORS policy: {new { Request = context.Request.Description, Origin = origin, Policies = Policies.Select(p => p.Origin).ToReadableArray() }}");
+			Logger.LogTrace($"{context.TraceIdentifier} - Try to match CORS policy: {new { Request = context.Request.Description, Origin = origin, Policies = Policies.Select(p => p.Origin).ToReadableArray() }}");
 
 			if (policies.TryGetValue(origin, out var policy))
 			{
