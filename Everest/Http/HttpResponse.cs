@@ -105,6 +105,8 @@ namespace Everest.Http
 
 		public void RemoveHeader(string name) => response.Headers.Remove(name);
 
+		public void WriteTo(Stream to) => pipe.PipeTo(to);
+
 		public void WriteTo(Func<Stream, Stream> to) => pipe.PipeTo(to);
 		
 		public void ReadFrom(Stream from) => pipe.PipeFrom(from);
@@ -148,7 +150,7 @@ namespace Everest.Http
 			if (content == null)
 				throw new ArgumentNullException(nameof(content));
 
-			response.ReadFrom(new MemoryStream(content));
+			response.ReadFrom(new MemoryStream(content, 0, content.Length));
 			return Task.CompletedTask;
 		}
 
