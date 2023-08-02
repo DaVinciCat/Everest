@@ -1,4 +1,6 @@
-﻿namespace Everest.Cors
+﻿using Everest.Headers;
+
+namespace Everest.Cors
 {
 	public class CorsPolicy
 	{
@@ -8,7 +10,7 @@
 
 		public string[] AllowMethods { get; set; } = { "GET", "POST", "PUT", "DELETE" };
 
-		public string[] AllowHeaders { get; set; } = { "Content-Type", "Accept", "X-Requested-With" };
+		public string[] AllowHeaders { get; set; } = { HeaderNames.ContentType, HeaderNames.Accept, HeaderNames.XRequestedWith };
 
 		public int MaxAge { get; set; } = 1728000;
 

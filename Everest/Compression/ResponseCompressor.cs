@@ -7,10 +7,11 @@ using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 using Everest.Utils;
+using Everest.Headers;
 
 namespace Everest.Compression
 {
-	public class ResponseCompressionOptions
+    public class ResponseCompressionOptions
 	{
 		public int CompressionMinLength { get; set; } = 2048;
 	}
@@ -18,11 +19,7 @@ namespace Everest.Compression
 	public class ResponseCompressor : IResponseCompressor
 	{
 		public string[] Encodings => compressions.Keys.ToArray();
-
-		public string AcceptEncodingHeader { get; set; } = "Accept-Encoding";
-
-		public string ContentEncodingHeader { get; set; } = "Content-Encoding";
-
+		
 		private readonly Dictionary<string, Func<Stream, Stream>> compressions = new()
 		{
 			{ "gzip", input => new GZipStream(input, CompressionLevel.Fastest) },
@@ -84,17 +81,17 @@ namespace Everest.Compression
 			}
 
 			//TODO: super naive implementation, should replace it with q values support
-			var acceptEncoding = context.Request.Headers[AcceptEncodingHeader];
+			var acceptEncoding = context.Request.Headers[HeaderNames.AcceptEncoding];
 			if (acceptEncoding == null)
 			{
-				Logger.LogTrace($"{context.TraceIdentifier} - No response compression required. Missing header: {new { Header = AcceptEncodingHeader }}");
+				Logger.LogTrace($"{context.TraceIdentifier} - No response compression required. Missing header: {new { Header = HeaderNames.AcceptEncoding }}");
 				return Task.FromResult(false);
 			}
 
 			var encodings = acceptEncoding.Split(',');
 			if (encodings.Length == 0)
 			{
-				Logger.LogTrace($"{context.TraceIdentifier} - No response compression required. Empty header: {new { Header = AcceptEncodingHeader }}");
+				Logger.LogTrace($"{context.TraceIdentifier} - No response compression required. Empty header: {new { Header = HeaderNames.AcceptEncoding }}");
 				return Task.FromResult(false);
 			}
 
@@ -106,15 +103,15 @@ namespace Everest.Compression
 				{
 					context.Response.WriteTo(to => compression(to));
 
-					context.Response.RemoveHeader(ContentEncodingHeader);
-					context.Response.AddHeader(ContentEncodingHeader, encoding);
+					context.Response.RemoveHeader(HeaderNames.ContentEncoding);
+					context.Response.AddHeader(HeaderNames.ContentEncoding, encoding);
 
 					Logger.LogTrace($"{context.TraceIdentifier} - Successfully created response compression stream: {new { Encoding = encoding }}");
 					return Task.FromResult(true);
 				}
 			}
 
-			Logger.LogWarning($"{context.TraceIdentifier} - Failed to create response compression stream. Header contains no supported encodings: {new { Header = AcceptEncodingHeader, Encodings = encodings.ToReadableArray(), SupportedEncodings = compressions.Keys.ToReadableArray() }}");
+			Logger.LogWarning($"{context.TraceIdentifier} - Failed to create response compression stream. Header contains no supported encodings: {new { Header = HeaderNames.AcceptEncoding, Encodings = encodings.ToReadableArray(), SupportedEncodings = compressions.Keys.ToReadableArray() }}");
 			return Task.FromResult(false);
 		}
 	}

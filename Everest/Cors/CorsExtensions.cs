@@ -1,9 +1,10 @@
 ﻿using System;
+using Everest.Headers;
 using Everest.Http;
 
 namespace Everest.Cors
 {
-	public static class CorsHttpRequestExtensions
+    public static class CorsHttpRequestExtensions
 	{
 		public static bool IsCorsPreflightRequest(this HttpRequest request)
 		{
@@ -11,9 +12,9 @@ namespace Everest.Cors
 				throw new ArgumentNullException(nameof(request));
 			
 			return request.HttpMethod == "OPTIONS" &&
-			       request.Headers["Access-Control-Request-Method"] != null &&
-			       request.Headers["Access-Control-Request-Headers"] != null &&
-			       request.Headers["Origin"] != null;
+			       request.Headers[HeaderNames.AccessControlRequestMethod] != null &&
+			       request.Headers[HeaderNames.AccessControlRequestHeaders] != null &&
+			       request.Headers[HeaderNames.Origin] != null;
 		}
 	}
 }

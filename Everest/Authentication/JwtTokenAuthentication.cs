@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Threading.Tasks;
+using Everest.Headers;
 using Everest.Http;
 using Everest.Security;
 using Microsoft.Extensions.Logging;
@@ -8,12 +9,10 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Everest.Authentication
 {
-	public class JwtAuthenticationOptions
+    public class JwtAuthenticationOptions
 	{
 		public string Scheme { get; set; } = "Bearer";
-
-		public string AuthorizationHeader { get; set; } = "Authorization";
-
+		
 		public TokenValidationParameters TokenValidationParameters { get; set; }
 
 		public JwtAuthenticationOptions()
@@ -47,14 +46,14 @@ namespace Everest.Authentication
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
 
-			var header = context.Request.Headers[options.AuthorizationHeader];
+			var header = context.Request.Headers[HeaderNames.Authorization];
 			if (string.IsNullOrEmpty(header))
 			{
-				Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. Missing header: {new { Header = options.AuthorizationHeader, Scheme = Scheme }}");
+				Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. Missing header: {new { Header = HeaderNames.Authorization, Scheme = Scheme }}");
 				return false;
 			}
 
-			if (Scheme == options.AuthorizationHeader)
+			if (Scheme == HeaderNames.Authorization)
 			{
 				Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. No token supplied: {new { Scheme = Scheme }}");
 				return false;
@@ -62,7 +61,7 @@ namespace Everest.Authentication
 
 			if (!header.StartsWith(Scheme + ' ', StringComparison.OrdinalIgnoreCase))
 			{
-				Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. Incorrect header: {new { Header = options.AuthorizationHeader, Scheme = Scheme }}");
+				Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. Incorrect header: {new { Header = HeaderNames.Authorization, Scheme = Scheme }}");
 				return false;
 			}
 

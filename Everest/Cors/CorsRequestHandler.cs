@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Everest.Headers;
 using Everest.Http;
 using Everest.Routing;
 using Everest.Utils;
@@ -22,9 +23,7 @@ namespace Everest.Cors
 		public CorsPolicy[] Policies => policies.Values.ToArray();
 
 		private readonly Dictionary<string, CorsPolicy> policies = new();
-
-		public string OriginHeader { get; set; } = "Origin";
-
+		
 		public CorsRequestHandler(ILogger<CorsRequestHandler> logger)
 		{
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -83,10 +82,10 @@ namespace Everest.Cors
 			
 			Logger.LogTrace($"{context.TraceIdentifier} - Try to handle CORS preflight request");
 
-			var origin = context.Request.Headers[OriginHeader];
+			var origin = context.Request.Headers[HeaderNames.Origin];
 			if (origin == null)
 			{
-				Logger.LogWarning($"{context.TraceIdentifier} - Failed to handle CORS preflight request. Missing header: {new { Header = OriginHeader }}");
+				Logger.LogWarning($"{context.TraceIdentifier} - Failed to handle CORS preflight request. Missing header: {new { Header = HeaderNames.Origin }}");
 				return Task.FromResult(true);
 			}
 
@@ -95,10 +94,10 @@ namespace Everest.Cors
 			if (policies.TryGetValue(origin, out var policy))
 			{
 				var headers = new Headers(policy.AllowMethods, policy.AllowHeaders, policy.Origin, policy.MaxAge);
-				context.Response.AddHeader("Access-Control-Allow-Methods", headers.AllowMethods);
-				context.Response.AddHeader("Access-Control-Allow-Headers", headers.AllowHeaders);
-				context.Response.AddHeader("Access-Control-Allow-Origin", headers.Origin);
-				context.Response.AddHeader("Access-Control-Max-Age", headers.MaxAge);
+				context.Response.AddHeader(HeaderNames.AccessControlAllowMethods, headers.AllowMethods);
+				context.Response.AddHeader(HeaderNames.AccessControlAllowHeaders, headers.AllowHeaders);
+				context.Response.AddHeader(HeaderNames.AccessControlAllowOrigin, headers.Origin);
+				context.Response.AddHeader(HeaderNames.AccessControlMaxAge, headers.MaxAge);
 				context.Response.StatusCode = HttpStatusCode.NoContent;
 				context.Response.ReadFrom(new MemoryStream());
 

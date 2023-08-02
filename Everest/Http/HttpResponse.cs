@@ -5,6 +5,7 @@ using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Everest.Headers;
 using Everest.Utils;
 using Microsoft.Extensions.Logging;
 
@@ -49,16 +50,16 @@ namespace Everest.Http
 
 		public string ContentDisposition
 		{
-			get => Headers["Content-Disposition"];
+			get => Headers[HeaderNames.ContentDisposition];
 			set
 			{
 				if (string.IsNullOrEmpty(value))
 				{
-					Headers.Remove("Content-Disposition");
+					Headers.Remove(HeaderNames.ContentDisposition);
 				}
 				else
 				{
-					Headers.Set("Content-Disposition", value);
+					Headers.Set(HeaderNames.ContentDisposition, value);
 				}
 			}
 		}
@@ -97,7 +98,7 @@ namespace Everest.Http
 			StatusCode = HttpStatusCode.OK;
 			ContentEncoding = Encoding.UTF8;
 			
-			AppendHeader("Server", "Everest");
+			AppendHeader(HeaderNames.Server, "Everest");
 		}
 
 		public void AddHeader(string name, string value) => response.AddHeader(name, value);

@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Text;
 using System.Threading.Tasks;
+using Everest.Headers;
 using Everest.Http;
 using Everest.Security;
 using Microsoft.Extensions.Logging;
 
 namespace Everest.Authentication
 {
-	public class BasicAuthenticationOptions
+    public class BasicAuthenticationOptions
 	{
 		public string Scheme { get; set; } = "Basic";
-
-		public string AuthorizationHeader { get; set; } = "Authorization";
 
 		public string CredentialsDelimiter { get; set; } = ":";
 
@@ -43,10 +42,10 @@ namespace Everest.Authentication
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
 
-			var header = context.Request.Headers[options.AuthorizationHeader];
+			var header = context.Request.Headers[HeaderNames.Authorization];
 			if (string.IsNullOrEmpty(header))
 			{
-				Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. Missing header: {new { Header = options.AuthorizationHeader, Scheme = Scheme }}");
+				Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. Missing header: {new { Header = HeaderNames.Authorization, Scheme = Scheme }}");
 				return Task.FromResult(false);
 			}
 
@@ -58,7 +57,7 @@ namespace Everest.Authentication
 
 			if (!header.StartsWith(Scheme + ' ', StringComparison.OrdinalIgnoreCase))
 			{
-				Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. Incorrect header: {new { Header = options.AuthorizationHeader, Scheme = Scheme }}");
+				Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. Incorrect header: {new { Header = HeaderNames.Authorization, Scheme = Scheme }}");
 				return Task.FromResult(false);
 			}
 
