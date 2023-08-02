@@ -19,12 +19,9 @@ namespace Everest.Cors
 	        if (context == null) 
 		        throw new ArgumentNullException(nameof(context));
 
-	        if (context.Request.IsCorsPreflightRequest())
-	        {
-		        if (await handler.TryHandleCorsRequestAsync(context))
-			        return;
-			}
-			
+	        if(await handler.TryHandleCorsRequestAsync(context))
+                return;
+	        
             if (HasNext)
                 await Next.InvokeAsync(context);
         }
