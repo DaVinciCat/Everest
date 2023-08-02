@@ -105,11 +105,11 @@ namespace Everest.Http
 
 		public void RemoveHeader(string name) => response.Headers.Remove(name);
 
-		public void PipeTo(Func<Stream, Stream> to) => pipe.PipeTo(to);
+		public void WriteTo(Func<Stream, Stream> to) => pipe.PipeTo(to);
 		
-		public void PipeFrom(Stream from) => pipe.PipeFrom(from);
+		public void ReadFrom(Stream from) => pipe.PipeFrom(from);
 
-		public void PipeFrom(Func<Stream, Stream> from) => pipe.PipeFrom(from);
+		public void ReadFrom(Func<Stream, Stream> from) => pipe.PipeFrom(from);
 
 		public async Task SendResponseAsync()
 		{
@@ -148,7 +148,7 @@ namespace Everest.Http
 			if (content == null)
 				throw new ArgumentNullException(nameof(content));
 
-			response.PipeFrom(new MemoryStream(content));
+			response.ReadFrom(new MemoryStream(content));
 			return Task.CompletedTask;
 		}
 
@@ -221,7 +221,7 @@ namespace Everest.Http
 			var file = new FileInfo(filename);
 			response.ContentType = contentType.MediaType;
 			response.ContentDisposition = contentDisposition.DispositionType;
-			response.PipeFrom(file.OpenRead());
+			response.ReadFrom(file.OpenRead());
 
 			return Task.CompletedTask;
 		}
@@ -243,7 +243,7 @@ namespace Everest.Http
 			var file = new FileInfo(filename);
 			response.ContentType = contentType;
 			response.ContentDisposition = contentDisposition;
-			response.PipeFrom(file.OpenRead());
+			response.ReadFrom(file.OpenRead());
 
 			return Task.CompletedTask;
 		}

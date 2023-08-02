@@ -98,7 +98,7 @@ namespace Everest.Compression
 			{
 				if (compressions.TryGetValue(encoding, out var compression))
 				{
-					context.Response.PipeTo(to => compression(to));
+					context.Response.WriteTo(to => compression(to));
 
 					context.Response.RemoveHeader(ContentEncodingHeader);
 					context.Response.AddHeader(ContentEncodingHeader, encoding);
