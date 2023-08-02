@@ -1,5 +1,4 @@
 ﻿using System;
-using Everest.Headers;
 using Everest.Http;
 
 namespace Everest.Cors
@@ -12,9 +11,9 @@ namespace Everest.Cors
 				throw new ArgumentNullException(nameof(request));
 			
 			return request.HttpMethod == "OPTIONS" &&
-			       request.Headers[HeaderNames.AccessControlRequestMethod] != null &&
-			       request.Headers[HeaderNames.AccessControlRequestHeaders] != null &&
-			       request.Headers[HeaderNames.Origin] != null;
+			       request.Headers[HttpHeaders.AccessControlRequestMethod] != null &&
+			       request.Headers[HttpHeaders.AccessControlRequestHeaders] != null &&
+			       request.Headers[HttpHeaders.Origin] != null;
 		}
 	}
 }

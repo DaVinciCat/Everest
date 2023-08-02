@@ -1,6 +1,6 @@
-﻿namespace Everest.Headers
+﻿namespace Everest.Http
 {
-    public static class HeaderNames
+    public static class HttpHeaders
     {
         public static readonly string Accept = "Accept";
 

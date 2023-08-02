@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Everest.Headers;
 using Everest.Http;
 using Everest.Routing;
 using Everest.Utils;
@@ -12,11 +11,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Everest.Cors
 {
-	/*
+    /*
 	   https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request
     */
-	
-	public class CorsRequestHandler : ICorsRequestHandler
+
+    public class CorsRequestHandler : ICorsRequestHandler
 	{
 		public ILogger<CorsRequestHandler> Logger { get; }
 
@@ -82,10 +81,10 @@ namespace Everest.Cors
 			
 			Logger.LogTrace($"{context.TraceIdentifier} - Try to handle CORS preflight request");
 
-			var origin = context.Request.Headers[HeaderNames.Origin];
+			var origin = context.Request.Headers[HttpHeaders.Origin];
 			if (origin == null)
 			{
-				Logger.LogWarning($"{context.TraceIdentifier} - Failed to handle CORS preflight request. Missing header: {new { Header = HeaderNames.Origin }}");
+				Logger.LogTrace($"{context.TraceIdentifier} - Failed to handle CORS preflight request. Missing header: {new { Header = HttpHeaders.Origin }}");
 				return Task.FromResult(true);
 			}
 
@@ -94,10 +93,10 @@ namespace Everest.Cors
 			if (policies.TryGetValue(origin, out var policy))
 			{
 				var headers = new Headers(policy.AllowMethods, policy.AllowHeaders, policy.Origin, policy.MaxAge);
-				context.Response.AddHeader(HeaderNames.AccessControlAllowMethods, headers.AllowMethods);
-				context.Response.AddHeader(HeaderNames.AccessControlAllowHeaders, headers.AllowHeaders);
-				context.Response.AddHeader(HeaderNames.AccessControlAllowOrigin, headers.Origin);
-				context.Response.AddHeader(HeaderNames.AccessControlMaxAge, headers.MaxAge);
+				context.Response.AddHeader(HttpHeaders.AccessControlAllowMethods, headers.AllowMethods);
+				context.Response.AddHeader(HttpHeaders.AccessControlAllowHeaders, headers.AllowHeaders);
+				context.Response.AddHeader(HttpHeaders.AccessControlAllowOrigin, headers.Origin);
+				context.Response.AddHeader(HttpHeaders.AccessControlMaxAge, headers.MaxAge);
 				context.Response.StatusCode = HttpStatusCode.NoContent;
 				context.Response.ReadFrom(new MemoryStream());
 
@@ -105,7 +104,7 @@ namespace Everest.Cors
 				return Task.FromResult(true);
 			}
 
-			Logger.LogWarning($"{context.TraceIdentifier} - Failed to handle CORS preflight request. Request contains no supported policy: {new { Origin = origin, Policies = Policies.Select(p => p.Origin).ToReadableArray() }}");
+			Logger.LogTrace($"{context.TraceIdentifier} - Failed to handle CORS preflight request. Request contains no supported policy: {new { Origin = origin, Policies = Policies.Select(p => p.Origin).ToReadableArray() }}");
 			return Task.FromResult(true);
 		}
 

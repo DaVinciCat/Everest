@@ -1,4 +1,5 @@
 ﻿using System;
+using Everest.Http;
 
 namespace Everest.Routing
 {
@@ -20,7 +21,7 @@ namespace Everest.Routing
     public class HttpGetAttribute : RestRouteAttribute
     {
         public HttpGetAttribute(string routePattern)
-            : base("GET", routePattern)
+            : base(HttpMethods.Get, routePattern)
         {
 
         }
@@ -30,7 +31,7 @@ namespace Everest.Routing
     public class HttpPostAttribute : RestRouteAttribute
     {
         public HttpPostAttribute(string routePattern)
-            : base("POST", routePattern)
+            : base(HttpMethods.Post, routePattern)
         {
 
         }
@@ -40,7 +41,7 @@ namespace Everest.Routing
     public class HttpPutAttribute : RestRouteAttribute
     {
         public HttpPutAttribute(string routePattern)
-            : base("PUT", routePattern)
+            : base(HttpMethods.Put, routePattern)
         {
 
         }
@@ -50,7 +51,7 @@ namespace Everest.Routing
     public class HttpDeleteAttribute : RestRouteAttribute
     {
         public HttpDeleteAttribute(string routePattern)
-            : base("DELETE", routePattern)
+            : base(HttpMethods.Delete, routePattern)
         {
 
         }
@@ -60,7 +61,7 @@ namespace Everest.Routing
     public class HttpHeadAttribute : RestRouteAttribute
     {
         public HttpHeadAttribute(string routePattern)
-            : base("HEAD", routePattern)
+            : base(HttpMethods.Head, routePattern)
         {
 
         }
@@ -70,7 +71,7 @@ namespace Everest.Routing
     public class HttpPatchAttribute : RestRouteAttribute
     {
         public HttpPatchAttribute(string routePattern)
-            : base("PATCH", routePattern)
+            : base(HttpMethods.Patch, routePattern)
         {
 
         }
@@ -80,7 +81,7 @@ namespace Everest.Routing
     public class HttpOptionsAttribute : RestRouteAttribute
     {
         public HttpOptionsAttribute(string routePattern)
-            : base("OPTIONS", routePattern)
+            : base(HttpMethods.Options, routePattern)
         {
 
         }

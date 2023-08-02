@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Threading.Tasks;
-using Everest.Headers;
 using Everest.Http;
 using Everest.Security;
 using Microsoft.Extensions.Logging;
@@ -46,22 +45,22 @@ namespace Everest.Authentication
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
 
-			var header = context.Request.Headers[HeaderNames.Authorization];
+			var header = context.Request.Headers[HttpHeaders.Authorization];
 			if (string.IsNullOrEmpty(header))
 			{
-				Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. Missing header: {new { Header = HeaderNames.Authorization, Scheme = Scheme }}");
+				Logger.LogTrace($"{context.TraceIdentifier} - Failed to authenticate. Missing header: {new { Header = HttpHeaders.Authorization, Scheme = Scheme }}");
 				return false;
 			}
 
-			if (Scheme == HeaderNames.Authorization)
+			if (Scheme == HttpHeaders.Authorization)
 			{
-				Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. No token supplied: {new { Scheme = Scheme }}");
+				Logger.LogTrace($"{context.TraceIdentifier} - Failed to authenticate. No token supplied: {new { Scheme = Scheme }}");
 				return false;
 			}
 
 			if (!header.StartsWith(Scheme + ' ', StringComparison.OrdinalIgnoreCase))
 			{
-				Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. Incorrect header: {new { Header = HeaderNames.Authorization, Scheme = Scheme }}");
+				Logger.LogTrace($"{context.TraceIdentifier} - Failed to authenticate. Incorrect header: {new { Header = HttpHeaders.Authorization, Scheme = Scheme }}");
 				return false;
 			}
 

@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Everest.Io
+namespace Everest.Utils
 {
     public class StreamPipe : IDisposable
     {

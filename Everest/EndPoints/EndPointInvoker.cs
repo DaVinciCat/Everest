@@ -22,7 +22,7 @@ namespace Everest.EndPoints
 
 			if (!context.TryGetRouteDescriptor(out var descriptor))
 			{
-				Logger.LogWarning($"{context.TraceIdentifier} - Failed to invoke endpoint. No route descriptor");
+				Logger.LogTrace($"{context.TraceIdentifier} - Failed to invoke endpoint. No route descriptor");
 				return false;
 			}
 

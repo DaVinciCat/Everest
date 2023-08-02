@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Text;
 using System.Threading.Tasks;
-using Everest.Headers;
 using Everest.Http;
 using Everest.Security;
 using Microsoft.Extensions.Logging;
@@ -42,22 +41,22 @@ namespace Everest.Authentication
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
 
-			var header = context.Request.Headers[HeaderNames.Authorization];
+			var header = context.Request.Headers[HttpHeaders.Authorization];
 			if (string.IsNullOrEmpty(header))
 			{
-				Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. Missing header: {new { Header = HeaderNames.Authorization, Scheme = Scheme }}");
+				Logger.LogTrace($"{context.TraceIdentifier} - Failed to authenticate. Missing header: {new { Header = HttpHeaders.Authorization, Scheme = Scheme }}");
 				return Task.FromResult(false);
 			}
 
 			if (header == Scheme)
 			{
-				Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. No credentials supplied: {new { Scheme = Scheme }}");
+				Logger.LogTrace($"{context.TraceIdentifier} - Failed to authenticate. No credentials supplied: {new { Scheme = Scheme }}");
 				return Task.FromResult(false);
 			}
 
 			if (!header.StartsWith(Scheme + ' ', StringComparison.OrdinalIgnoreCase))
 			{
-				Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. Incorrect header: {new { Header = HeaderNames.Authorization, Scheme = Scheme }}");
+				Logger.LogTrace($"{context.TraceIdentifier} - Failed to authenticate. Incorrect header: {new { Header = HttpHeaders.Authorization, Scheme = Scheme }}");
 				return Task.FromResult(false);
 			}
 
@@ -87,7 +86,7 @@ namespace Everest.Authentication
 			var delimiterIndex = decodedCredentials.IndexOf(options.CredentialsDelimiter, StringComparison.OrdinalIgnoreCase);
 			if (delimiterIndex == -1)
 			{
-				Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. Missing credentials delimiter: {new { Delimiter = options.CredentialsDelimiter, Scheme = Scheme }}");
+				Logger.LogTrace($"{context.TraceIdentifier} - Failed to authenticate. Missing credentials delimiter: {new { Delimiter = options.CredentialsDelimiter, Scheme = Scheme }}");
 				return Task.FromResult(false);
 			}
 

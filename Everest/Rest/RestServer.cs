@@ -169,7 +169,7 @@ namespace Everest.Rest
 				
 				if (!context.Response.ResponseSent)
 				{
-					await context.Response.SendResponseAsync();
+					await context.Response.SendAsync();
 				}
 			}
 			catch (Exception ex)

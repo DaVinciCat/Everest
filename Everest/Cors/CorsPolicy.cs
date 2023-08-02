@@ -1,16 +1,16 @@
-﻿using Everest.Headers;
+﻿using Everest.Http;
 
 namespace Everest.Cors
 {
-	public class CorsPolicy
+    public class CorsPolicy
 	{
 		public static CorsPolicy Default { get; } = new();
 
 		public string Origin { get; set; } = "*";
 
-		public string[] AllowMethods { get; set; } = { "GET", "POST", "PUT", "DELETE" };
+		public string[] AllowMethods { get; set; } = { HttpMethods.Get, HttpMethods.Post, HttpMethods.Put, HttpMethods.Delete };
 
-		public string[] AllowHeaders { get; set; } = { HeaderNames.ContentType, HeaderNames.Accept, HeaderNames.XRequestedWith };
+		public string[] AllowHeaders { get; set; } = { HttpHeaders.ContentType, HttpHeaders.Accept, HttpHeaders.XRequestedWith };
 
 		public int MaxAge { get; set; } = 1728000;
 
