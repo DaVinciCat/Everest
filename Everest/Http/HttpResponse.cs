@@ -146,13 +146,14 @@ namespace Everest.Http
 
 	public static class HttpResponseExtensions
 	{
-		public static Task WriteAsync(this HttpResponse response, byte[] content)
+		public static async Task WriteAsync(this HttpResponse response, byte[] content)
 		{
 			if (content == null)
 				throw new ArgumentNullException(nameof(content));
 
-			response.ReadFrom(new MemoryStream(content, 0, content.Length));
-			return Task.CompletedTask;
+			var ms = new MemoryStream();
+			await ms.WriteAsync(content, 0, content.Length);
+			response.ReadFrom(ms);
 		}
 
 		public static async Task WriteAsync(this HttpResponse response, string content)
