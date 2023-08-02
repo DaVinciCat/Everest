@@ -114,6 +114,8 @@ namespace Everest.Http
 
 		public void ReadFrom(Func<Stream, Stream> from) => pipe.PipeFrom(from);
 
+		public Stream OutputSream => response.OutputStream;
+
 		public async Task SendResponseAsync()
 		{
 			try
