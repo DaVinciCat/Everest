@@ -19,10 +19,10 @@ namespace Everest.Compression
 	        if (context == null) 
 		        throw new ArgumentNullException(nameof(context));
 
-	        await compressor.TryCreateResponseCompressionAsync(context);
-            
-            if (HasNext)
-                await Next.InvokeAsync(context);
+	        if (HasNext)
+		        await Next.InvokeAsync(context);
+
+			await compressor.TryCreateResponseCompressionAsync(context);
         }
     }
 }

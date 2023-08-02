@@ -71,6 +71,12 @@ namespace Everest.Compression
 
 			Logger.LogTrace($"{context.TraceIdentifier} - Try to check if response compression required");
 
+			if (context.Response.ResponseSent)
+			{
+				Logger.LogTrace($"{context.TraceIdentifier} - No response compression required. Response is already sent");
+				return Task.FromResult(false);
+			}
+
 			if (context.Response.ContentLength < options.CompressionMinLength)
 			{
 				Logger.LogTrace($"{context.TraceIdentifier} - No response compression required: {new { Length = context.Response.ContentLength.ToReadableSize(), CompressionMinLength = options.CompressionMinLength.ToReadableSize() }}");

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -61,12 +62,18 @@ namespace Everest.Cors
 
 			Logger.LogTrace($"{context.TraceIdentifier} - Try to check if CORS preflight request");
 
+			if (context.Response.ResponseSent)
+			{
+				Logger.LogTrace($"{context.TraceIdentifier} - No CORS policy required. Response is already sent");
+				return Task.FromResult(false);
+			}
+
 			if (!context.Request.IsCorsPreflightRequest())
 			{
 				Logger.LogTrace($"{context.TraceIdentifier} - Not a CORS preflight request");
 				return Task.FromResult(false);
 			}
-
+			
 			Logger.LogTrace($"{context.TraceIdentifier} - Try to handle CORS preflight request");
 
 			var origin = context.Request.Headers[OriginHeader];
@@ -86,6 +93,7 @@ namespace Everest.Cors
 				context.Response.AddHeader("Access-Control-Allow-Origin", headers.Origin);
 				context.Response.AddHeader("Access-Control-Max-Age", headers.MaxAge);
 				context.Response.StatusCode = HttpStatusCode.NoContent;
+				context.Response.ReadFrom(new MemoryStream());
 
 				Logger.LogTrace($"{context.TraceIdentifier} - Successfully handled CORS preflight request: {new { Policy = policy, AllowMethods = policy.AllowMethods.ToReadableArray(), AllowHeaders = policy.AllowHeaders.ToReadableArray(), Origin = policy.Origin, MaxAge = policy.MaxAge }}");
 				return Task.FromResult(true);

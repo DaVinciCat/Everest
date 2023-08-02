@@ -52,11 +52,11 @@ namespace Everest.Shell
 			using var rest = new RestServerBuilder(services)
 				.UsePrefixes("http://localhost:8080/")
 				.UseExceptionHandlerMiddleware()
-				.UseCorsMiddleware()
 				.UseRoutingMiddleware()
+				.UseResponseCompressionMiddleware()
+				.UseCorsMiddleware()
 				.UseAuthenticationMiddleware()
 				.UseEndPointMiddleware()
-				.UseResponseCompressionMiddleware()
 				.ScanRoutes(Assembly.GetExecutingAssembly())
 				.Build();
 

@@ -122,7 +122,7 @@ namespace Everest.Http
 			{
 				Logger.LogTrace($"{TraceIdentifier} - Try to send response: {new { RemoteEndPoint = context.Request.RemoteEndPoint, ContentLength = ContentLength.ToReadableSize() }}");
 				await pipe.FlushAsync();
-				Logger.LogTrace($"{TraceIdentifier} - Successfully sended response: {new { RemoteEndPoint = context.Request.RemoteEndPoint, StatusCode = response.StatusCode, ContentType = response.ContentType, ContentEncoding = response.ContentEncoding?.EncodingName }}");
+				Logger.LogTrace($"{TraceIdentifier} - Successfully sent response: {new { RemoteEndPoint = context.Request.RemoteEndPoint, StatusCode = response.StatusCode, ContentType = response.ContentType, ContentEncoding = response.ContentEncoding?.EncodingName }}");
 			}
 			catch (Exception ex)
 			{
