@@ -6,12 +6,13 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Everest.Headers;
+using Everest.Io;
 using Everest.Utils;
 using Microsoft.Extensions.Logging;
 
 namespace Everest.Http
 {
-	public class HttpResponse
+    public class HttpResponse
 	{
 		public ILogger<HttpResponse> Logger { get; }
 
