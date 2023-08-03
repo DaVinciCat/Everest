@@ -165,11 +165,21 @@ namespace Everest.Rest
 
 			try
 			{
-				await aggregateMiddleware.InvokeAsync(context);
-				
-				if (!context.Response.ResponseSent)
+				try
 				{
-					await context.Response.SendAsync();
+					await aggregateMiddleware.InvokeAsync(context);
+
+					if (!context.Response.ResponseSent)
+					{
+						await context.Response.SendAsync();
+					}
+				}
+				finally
+				{
+					if (!context.Response.ResponseClosed)
+					{
+						await context.Response.OutputStream.DisposeAsync();
+					}
 				}
 			}
 			catch (Exception ex)

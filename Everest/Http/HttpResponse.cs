@@ -124,16 +124,17 @@ namespace Everest.Http
 				await pipe.FlushAsync();
 				Logger.LogTrace($"{TraceIdentifier} - Successfully sent response: {new { RemoteEndPoint = context.Request.RemoteEndPoint, StatusCode = response.StatusCode, ContentType = response.ContentType, ContentEncoding = response.ContentEncoding?.EncodingName }}");
 			}
-			catch (Exception ex)
+			catch
 			{
-				Logger.LogError(ex, $"{TraceIdentifier} - Failed to send response");
+				StatusCode = HttpStatusCode.InternalServerError;
+				throw;
 			}
 			finally
 			{
 				try
 				{
 					pipe.Dispose();
-					response.OutputStream.Close();
+					await response.OutputStream.DisposeAsync();
 					response.Close();
 				}
 				finally

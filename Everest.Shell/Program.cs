@@ -83,6 +83,18 @@ namespace Everest.Shell
 			await context.Response.WriteJsonAsync(new { Message = greetings, From = "Everest", Success = true });
 			await context.Response.SendAsync();
 		}
+
+		[HttpGet("/get/empty-response")]
+		public static async Task GetEmptyResponse(HttpContext context)
+		{
+			await Task.CompletedTask;
+		}
+
+		[HttpGet("/get/exception-response")]
+		public static Task GetExceptionResponse(HttpContext context)
+		{
+			throw new InvalidOperationException("Something went wrong ;(");
+		}
 	}
 
 	class Program
