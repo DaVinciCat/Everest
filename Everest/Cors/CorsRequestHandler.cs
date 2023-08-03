@@ -63,12 +63,6 @@ namespace Everest.Cors
 				Logger.LogWarning($"{context.TraceIdentifier} - Not a CORS preflight request");
 				return Task.FromResult(false);
 			}
-
-			if (context.Response.ResponseSent)
-			{
-				Logger.LogTrace($"{context.TraceIdentifier} - No CORS policy handling required. Response is already sent");
-				return Task.FromResult(false);
-			}
 			
 			Logger.LogTrace($"{context.TraceIdentifier} - Try to handle CORS preflight request");
 

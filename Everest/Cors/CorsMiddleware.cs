@@ -26,7 +26,7 @@ namespace Everest.Cors
 				return;
 	        }
 
-	        if (context.Request.IsCorsPreflightRequest())
+	        if (!context.Response.ResponseSent && context.Request.IsCorsPreflightRequest())
 	        {
 		        await handler.TryHandleCorsRequestAsync(context);
 	        }
