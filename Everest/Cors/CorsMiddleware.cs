@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Everest.Http;
 using Everest.Middleware;
+using Everest.Routing;
 
 namespace Everest.Cors
 {
@@ -19,10 +20,16 @@ namespace Everest.Cors
 	        if (context == null) 
 		        throw new ArgumentNullException(nameof(context));
 
-	        if (HasNext)
+	        if (HasNext && context.TryGetRouteDescriptor(out _))
+	        {
 		        await Next.InvokeAsync(context);
+				return;
+	        }
 
-	        await handler.TryHandleCorsRequestAsync(context);
+	        if (context.Request.IsCorsPreflightRequest())
+	        {
+		        await handler.TryHandleCorsRequestAsync(context);
+	        }
         }
     }
 }

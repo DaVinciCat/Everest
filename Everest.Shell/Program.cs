@@ -74,7 +74,7 @@ namespace Everest.Shell
 			context.Response.AddHeader(HttpHeaders.AccessControlAllowHeaders, string.Join(" ", HttpHeaders.ContentType, HttpHeaders.Accept, HttpHeaders.XRequestedWith));
 			context.Response.AddHeader(HttpHeaders.AccessControlAllowMethods, string.Join(" ", HttpMethods.Get, HttpMethods.Post, HttpMethods.Put, HttpMethods.Delete));
 			context.Response.StatusCode = HttpStatusCode.NoContent;
-			await context.Response.WriteTextAsync(string.Empty);
+			await context.Response.SendAsync();
 		}
 
 		[HttpGet("/get/compressed-response")]
