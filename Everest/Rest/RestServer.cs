@@ -168,17 +168,17 @@ namespace Everest.Rest
 				try
 				{
 					await aggregateMiddleware.InvokeAsync(context);
-
-					if (!context.Response.ResponseSent)
-					{
-						await context.Response.SendAsync();
-					}
+				}
+				catch(Exception ex) 
+				{
+					Logger.LogError(ex, $"{context.TraceIdentifier} - Failed to process incoming request");
+					context.Response.StatusCode = HttpStatusCode.InternalServerError;
 				}
 				finally
 				{
-					if (!context.Response.ResponseClosed)
+					if (!context.Response.ResponseSent)
 					{
-						await context.Response.OutputStream.DisposeAsync();
+						await context.Response.SendAsync();
 					}
 				}
 			}

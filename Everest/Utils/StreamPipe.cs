@@ -33,8 +33,8 @@ namespace Everest.Utils
             input = from;
             return this;
         }
-
-        public StreamPipe PipeFrom(Func<Stream, Stream> from)
+        
+		public StreamPipe PipeFrom(Func<Stream, Stream> from)
         {
             if (from == null)
                 throw new ArgumentNullException(nameof(from));
@@ -46,7 +46,43 @@ namespace Everest.Utils
             return this;
         }
 
-        public StreamPipe PipeTo(Func<Stream, Stream> to)
+		public async Task<StreamPipe> PipeFromAsync(Task<Stream> from)
+		{
+			if (from == null)
+				throw new ArgumentNullException(nameof(from));
+
+			var stream = await from;
+			CheckInputStream(stream);
+
+			input = stream;
+			return this;
+		}
+
+		public async Task<StreamPipe> PipeFromAsync(Func<Stream, Task<Stream>> from)
+        {
+			if (from == null)
+				throw new ArgumentNullException(nameof(from));
+
+			var stream = await from(input);
+			CheckInputStream(stream);
+			input = stream;
+
+			return this;
+		}
+
+		public StreamPipe PipeTo(Stream to)
+		{
+			if (to == null)
+				throw new ArgumentNullException(nameof(to));
+
+			CheckOutputStream(to);
+
+			output = to;
+
+			return this;
+		}
+
+		public StreamPipe PipeTo(Func<Stream, Stream> to)
         {
             if (to == null)
                 throw new ArgumentNullException(nameof(to));
@@ -57,20 +93,33 @@ namespace Everest.Utils
 
             return this;
         }
-
-        public StreamPipe PipeTo(Stream to)
+        
+        public async Task<StreamPipe> PipeToAsync(Task<Stream> to)
         {
-            if (to == null)
-                throw new ArgumentNullException(nameof(to));
+			if (to == null)
+				throw new ArgumentNullException(nameof(to));
 
-            CheckOutputStream(to);
+			var stream = await to;
+			CheckOutputStream(stream);
 
-            output = to;
+			output = stream;
 
-            return this;
-        }
+			return this;
+		}
 
-        public async Task FlushAsync()
+        public async Task<StreamPipe> PipeToAsync(Func<Stream, Task<Stream>> to)
+        {
+			if (to == null)
+				throw new ArgumentNullException(nameof(to));
+
+			var stream = await to(output);
+			CheckOutputStream(stream);
+			output = stream;
+
+			return this;
+		}
+
+		public async Task FlushAsync()
         {
             input.Position = 0;
 
@@ -124,7 +173,5 @@ namespace Everest.Utils
         }
 
         #endregion
-
-
     }
 }

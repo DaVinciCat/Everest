@@ -107,42 +107,51 @@ namespace Everest.Http
 		public void RemoveHeader(string name) => response.Headers.Remove(name);
 
 		public void WriteTo(Stream to) => pipe.PipeTo(to);
-
-		public void WriteTo(Func<Stream, Stream> to) => pipe.PipeTo(to);
 		
+		public void WriteTo(Func<Stream, Stream> to) => pipe.PipeTo(to);
+
+		public Task WriteToAsync(Task<Stream> to) => pipe.PipeToAsync(to);
+
+		public Task WriteToAsync(Func<Stream, Task<Stream>> to) => pipe.PipeToAsync(to);
+
 		public void ReadFrom(Stream from) => pipe.PipeFrom(from);
 
 		public void ReadFrom(Func<Stream, Stream> from) => pipe.PipeFrom(from);
 
-		public Stream OutputStream => response.OutputStream;
+		public Task ReadFromAsync(Task<Stream> from) => pipe.PipeFromAsync(from);
+		
+		public Task ReadFromAsync(Func<Stream, Task<Stream>> from) => pipe.PipeFromAsync(from);
 
+		public Stream OutputStream => response.OutputStream;
+		
 		public async Task SendAsync()
 		{
 			try
 			{
-				Logger.LogTrace($"{TraceIdentifier} - Try to send response: {new { RemoteEndPoint = context.Request.RemoteEndPoint, ContentLength = ContentLength.ToReadableSize() }}");
-				await pipe.FlushAsync();
-				Logger.LogTrace($"{TraceIdentifier} - Successfully sent response: {new { RemoteEndPoint = context.Request.RemoteEndPoint, StatusCode = response.StatusCode, ContentType = response.ContentType, ContentEncoding = response.ContentEncoding?.EncodingName }}");
-			}
-			catch
-			{
-				StatusCode = HttpStatusCode.InternalServerError;
-				throw;
-			}
-			finally
-			{
 				try
 				{
-					pipe.Dispose();
-					await response.OutputStream.DisposeAsync();
-					response.Close();
+					Logger.LogTrace($"{TraceIdentifier} - Sending response: {new { RemoteEndPoint = context.Request.RemoteEndPoint, ContentLength = ContentLength.ToReadableSize(), StatusCode = response.StatusCode, ContentType = response.ContentType, ContentEncoding = response.ContentEncoding?.EncodingName }}");
+					await pipe.FlushAsync();
+				}
+				catch
+				{
+					StatusCode = HttpStatusCode.InternalServerError;
+					throw;
 				}
 				finally
 				{
+					await response.OutputStream.DisposeAsync();
 					ResponseSent = true;
-					ResponseClosed = true;
-					Logger.LogTrace($"{TraceIdentifier} - Response closed");
+					Logger.LogTrace($"{TraceIdentifier} - Response sent");
 				}
+			}
+			finally
+			{
+				Logger.LogTrace($"{TraceIdentifier} - Closing response");
+				response.Close();
+				pipe.Dispose();
+				ResponseClosed = true;
+				Logger.LogTrace($"{TraceIdentifier} - Response closed");
 			}
 		}
 	}
@@ -153,10 +162,12 @@ namespace Everest.Http
 		{
 			if (content == null)
 				throw new ArgumentNullException(nameof(content));
-
-			var ms = new MemoryStream();
-			await ms.WriteAsync(content, 0, content.Length);
-			response.ReadFrom(ms);
+			
+			await response.ReadFromAsync(async ms =>
+			{
+			 	await ms.WriteAsync(content, 0, content.Length);
+			    return ms;
+			});
 		}
 
 		public static async Task WriteAsync(this HttpResponse response, string content)

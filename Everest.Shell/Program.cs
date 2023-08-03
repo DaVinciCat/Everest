@@ -22,6 +22,18 @@ namespace Everest.Shell
 			await context.Response.WriteJsonAsync(new { Message = greetings, From = "Everest", Success = true });
 		}
 
+
+		[HttpGet("/get/static-route-text")]
+		public static async Task GetStaticRouteText(HttpContext context)
+		{
+			var service = context.GetGreetingsService();
+			var greetings = service.Greet();
+			
+			await context.Response.WriteTextAsync("lorem\n");
+			await context.Response.WriteTextAsync("ipsum\n");
+			await context.Response.WriteTextAsync("dolor\n");
+		}
+
 		[HttpGet("/get/static-route-with-query-parameter-me")]
 		public static async Task GetStaticRouteWithQueryParamaterMe(HttpContext context)
 		{
@@ -87,7 +99,7 @@ namespace Everest.Shell
 		[HttpGet("/get/empty-response")]
 		public static async Task GetEmptyResponse(HttpContext context)
 		{
-			await Task.CompletedTask;
+			await context.Response.SendAsync();
 		}
 
 		[HttpGet("/get/exception-response")]
