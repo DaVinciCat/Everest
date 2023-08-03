@@ -64,15 +64,7 @@ namespace Everest.Compression
 		{
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
-
-			Logger.LogTrace($"{context.TraceIdentifier} - Try to check if response compression required");
-
-			if (context.Response.ResponseSent)
-			{
-				Logger.LogTrace($"{context.TraceIdentifier} - No response compression required. Response is already sent");
-				return Task.FromResult(false);
-			}
-
+			
 			if (context.Response.ContentLength < options.CompressionMinLength)
 			{
 				Logger.LogTrace($"{context.TraceIdentifier} - No response compression required: {new { Length = context.Response.ContentLength.ToReadableSize(), CompressionMinLength = options.CompressionMinLength.ToReadableSize() }}");
@@ -83,14 +75,14 @@ namespace Everest.Compression
 			var acceptEncoding = context.Request.Headers[HttpHeaders.AcceptEncoding];
 			if (acceptEncoding == null)
 			{
-				Logger.LogTrace($"{context.TraceIdentifier} - No response compression required. Missing header: {new { Header = HttpHeaders.AcceptEncoding }}");
+				Logger.LogWarning($"{context.TraceIdentifier} - Failed to compress response. Missing header: {new { Header = HttpHeaders.AcceptEncoding }}");
 				return Task.FromResult(false);
 			}
 
 			var encodings = acceptEncoding.Split(',');
 			if (encodings.Length == 0)
 			{
-				Logger.LogTrace($"{context.TraceIdentifier} - No response compression required. Empty header: {new { Header = HttpHeaders.AcceptEncoding }}");
+				Logger.LogWarning($"{context.TraceIdentifier} - Failed to compress response. Empty header: {new { Header = HttpHeaders.AcceptEncoding }}");
 				return Task.FromResult(false);
 			}
 
@@ -110,7 +102,7 @@ namespace Everest.Compression
 				}
 			}
 
-			Logger.LogTrace($"{context.TraceIdentifier} - Failed to create response compression stream. Header contains no supported encodings: {new { Header = HttpHeaders.AcceptEncoding, Encodings = encodings.ToReadableArray(), SupportedEncodings = compressions.Keys.ToReadableArray() }}");
+			Logger.LogWarning($"{context.TraceIdentifier} - Failed to create response compression stream. Header contains no supported encodings: {new { Header = HttpHeaders.AcceptEncoding, Encodings = encodings.ToReadableArray(), SupportedEncodings = compressions.Keys.ToReadableArray() }}");
 			return Task.FromResult(false);
 		}
 	}

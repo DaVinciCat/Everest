@@ -64,8 +64,6 @@ namespace Everest.Cors
 				return Task.FromResult(false);
 			}
 			
-			Logger.LogTrace($"{context.TraceIdentifier} - Try to handle CORS preflight request");
-
 			var origin = context.Request.Headers[HttpHeaders.Origin];
 			if (origin == null)
 			{
@@ -89,7 +87,7 @@ namespace Everest.Cors
 				context.Response.AddHeader(HttpHeaders.AccessControlAllowMethods, "");
 				context.Response.AddHeader(HttpHeaders.AccessControlAllowOrigin, "");
 				context.Response.AddHeader(HttpHeaders.AccessControlMaxAge, "");
-				Logger.LogTrace($"{context.TraceIdentifier} - Failed to match CORS policy. Request contains no supported policy: {new { Origin = origin, Policies = Policies.Select(p => p.Origin).ToReadableArray() }}");
+				Logger.LogWarning($"{context.TraceIdentifier} - Failed to match CORS policy. Request contains no supported policy: {new { Origin = origin, Policies = Policies.Select(p => p.Origin).ToReadableArray() }}");
 			}
 
 			context.Response.StatusCode = HttpStatusCode.NoContent;

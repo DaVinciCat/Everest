@@ -22,7 +22,10 @@ namespace Everest.Compression
 	        if (HasNext)
 		        await Next.InvokeAsync(context);
 
-			await compressor.TryCreateResponseCompressionAsync(context);
+	        if (!context.Response.ResponseSent && context.Request.SupportsContentCompression())
+	        {
+		        await compressor.TryCreateResponseCompressionAsync(context);
+	        }
         }
     }
 }
