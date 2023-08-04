@@ -121,7 +121,10 @@ namespace Everest.Utils
 
 		public async Task FlushAsync()
         {
-            input.Position = 0;
+	        if (input.CanSeek)
+	        {
+		        input.Position = 0;
+	        }
 
             var buffer = new byte[4096];
             int read;
@@ -147,11 +150,6 @@ namespace Everest.Utils
             if (!from.CanRead)
             {
                 throw new InvalidOperationException("Input stream is not readable");
-            }
-
-            if (!from.CanSeek)
-            {
-                throw new InvalidOperationException("Input stream is not seekable");
             }
         }
 

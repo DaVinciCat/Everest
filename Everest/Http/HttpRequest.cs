@@ -5,6 +5,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Everest.Collections;
+using Everest.Utils;
 using Microsoft.Extensions.Logging;
 
 namespace Everest.Http
@@ -37,12 +38,17 @@ namespace Everest.Http
 
 		private readonly HttpListenerRequest request;
 
+		private readonly StreamPipe pipe;
+
+		private readonly MemoryStream outputStream = new();
+
 		public HttpRequest(HttpListenerContext context, ILogger<HttpRequest> logger)
 		{
 			if (context == null) 
 				throw new ArgumentNullException(nameof(context));
 
 			request = context.Request;
+			pipe = new StreamPipe(outputStream).PipeFrom(request.InputStream);
 
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			QueryParameters = new ParameterCollection(request.QueryString);
@@ -56,23 +62,17 @@ namespace Everest.Http
 		{
 			if (!request.HasEntityBody)
 				return null;
+			
+			if(outputStream.Length == 0)
+				await pipe.FlushAsync();
 
-			if (requestData != null)
-				return requestData;
-
-			await using (request.InputStream)
+			outputStream.Position = 0;
+			using (var reader = new StreamReader(outputStream, ContentEncoding, leaveOpen: true))
 			{
-				using (var reader = new StreamReader(request.InputStream, request.ContentEncoding))
-				{
-					requestData = await reader.ReadToEndAsync();
-				}
+				return await reader.ReadToEndAsync();
 			}
-
-			return requestData;
 		}
-
-		private string requestData;
-
+		
 		#endregion
 	}
 }

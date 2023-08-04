@@ -107,6 +107,13 @@ namespace Everest.Shell
 		{
 			throw new InvalidOperationException("Something went wrong ;(");
 		}
+
+		[HttpGet("/get/request-with-payload")]
+		public static async Task GetRequestWithPayload(HttpContext context)
+		{
+			var payload = await context.Request.ReadRequestDataAsync();
+			await context.Response.WriteTextAsync(payload);
+		}
 	}
 
 	class Program
