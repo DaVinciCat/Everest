@@ -44,19 +44,19 @@ namespace Everest.Authentication
 			var header = context.Request.Headers[HttpHeaders.Authorization];
 			if (string.IsNullOrEmpty(header))
 			{
-				Logger.LogTrace($"{context.TraceIdentifier} - Failed to authenticate. Missing header: {new { Header = HttpHeaders.Authorization, Scheme = Scheme }}");
+				Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. Missing header: {new { Header = HttpHeaders.Authorization, Scheme = Scheme }}");
 				return Task.FromResult(false);
 			}
 
 			if (header == Scheme)
 			{
-				Logger.LogTrace($"{context.TraceIdentifier} - Failed to authenticate. No credentials supplied: {new { Scheme = Scheme }}");
+				Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. No credentials supplied: {new { Scheme = Scheme }}");
 				return Task.FromResult(false);
 			}
 
 			if (!header.StartsWith(Scheme + ' ', StringComparison.OrdinalIgnoreCase))
 			{
-				Logger.LogTrace($"{context.TraceIdentifier} - Failed to authenticate. Incorrect header: {new { Header = HttpHeaders.Authorization, Scheme = Scheme }}");
+				Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. Incorrect header: {new { Header = HttpHeaders.Authorization, Scheme = Scheme }}");
 				return Task.FromResult(false);
 			}
 
@@ -86,7 +86,7 @@ namespace Everest.Authentication
 			var delimiterIndex = decodedCredentials.IndexOf(options.CredentialsDelimiter, StringComparison.OrdinalIgnoreCase);
 			if (delimiterIndex == -1)
 			{
-				Logger.LogTrace($"{context.TraceIdentifier} - Failed to authenticate. Missing credentials delimiter: {new { Delimiter = options.CredentialsDelimiter, Scheme = Scheme }}");
+				Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. Missing credentials delimiter: {new { Delimiter = options.CredentialsDelimiter, Scheme = Scheme }}");
 				return Task.FromResult(false);
 			}
 

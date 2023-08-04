@@ -48,19 +48,19 @@ namespace Everest.Authentication
 			var header = context.Request.Headers[HttpHeaders.Authorization];
 			if (string.IsNullOrEmpty(header))
 			{
-				Logger.LogTrace($"{context.TraceIdentifier} - Failed to authenticate. Missing header: {new { Header = HttpHeaders.Authorization, Scheme = Scheme }}");
+				Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. Missing header: {new { Header = HttpHeaders.Authorization, Scheme = Scheme }}");
 				return false;
 			}
 
 			if (Scheme == HttpHeaders.Authorization)
 			{
-				Logger.LogTrace($"{context.TraceIdentifier} - Failed to authenticate. No token supplied: {new { Scheme = Scheme }}");
+				Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. No token supplied: {new { Scheme = Scheme }}");
 				return false;
 			}
 
 			if (!header.StartsWith(Scheme + ' ', StringComparison.OrdinalIgnoreCase))
 			{
-				Logger.LogTrace($"{context.TraceIdentifier} - Failed to authenticate. Incorrect header: {new { Header = HttpHeaders.Authorization, Scheme = Scheme }}");
+				Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. Incorrect header: {new { Header = HttpHeaders.Authorization, Scheme = Scheme }}");
 				return false;
 			}
 

@@ -19,7 +19,10 @@ namespace Everest.Authentication
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
 
-			await authenticator.AuthenticateAsync(context);
+			if (context.Request.HasAuthentication())
+			{
+				await authenticator.AuthenticateAsync(context);
+			}
 
 			if (HasNext)
 				await Next.InvokeAsync(context);
