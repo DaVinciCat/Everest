@@ -163,10 +163,10 @@ namespace Everest.Http
 			if (content == null)
 				throw new ArgumentNullException(nameof(content));
 			
-			await response.ReadFromAsync(async ms =>
+			await response.ReadFromAsync(async output =>
 			{
-			 	await ms.WriteAsync(content, 0, content.Length);
-			    return ms;
+			 	await output.WriteAsync(content, 0, content.Length);
+			    return output;
 			});
 		}
 
