@@ -60,7 +60,7 @@ namespace Everest.Compression
 			compressions.Clear();
 		}
 
-		public Task<bool> TryCreateResponseCompressionAsync(HttpContext context)
+		public Task<bool> TryComressResponseAsync(HttpContext context)
 		{
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
@@ -93,7 +93,6 @@ namespace Everest.Compression
 				if (compressions.TryGetValue(encoding, out var compression))
 				{
 					context.Response.WriteTo(to => compression(to));
-
 					context.Response.RemoveHeader(HttpHeaders.ContentEncoding);
 					context.Response.AddHeader(HttpHeaders.ContentEncoding, encoding);
 
