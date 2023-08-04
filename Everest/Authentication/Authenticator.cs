@@ -51,19 +51,16 @@ namespace Everest.Authentication
 		{
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
-			
-			if (!authentications.Any(authentication => context.Request.SupportsAuthenticationScheme(authentication.Value.Scheme)))
-			{
-				context.Request.TryGetAuthenticationScheme(out var scheme);
-				Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. No supported authentication schemes {new {Scheme = scheme, SupportedSchemes = authentications.Keys.ToReadableArray()}}");
-			}
 
-			foreach (var authentication in authentications.Values)
+			if (context.Request.TryGetAuthenticationScheme(out var scheme))
 			{
-				if(context.Request.SupportsAuthenticationScheme(authentication.Scheme))
+				if (authentications.TryGetValue(scheme, out var authentication))
 				{
 					await authentication.TryAuthenticateAsync(context);
+					return;
 				}
+
+				Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. No supported authentication schemes {new { Scheme = scheme, SupportedSchemes = authentications.Keys.ToReadableArray() }}");
 			}
 		}
 	}
