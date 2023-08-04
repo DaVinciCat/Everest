@@ -35,7 +35,7 @@ namespace Everest.Shell
 		}
 
 		[HttpGet("/get/static-route-with-query-parameter-me")]
-		public static async Task GetStaticRouteWithQueryParamaterMe(HttpContext context)
+		public static async Task GetStaticRouteWithQueryParameterMe(HttpContext context)
 		{
 			var service = context.GetGreetingsService();
 			var greetings = service.Greet();
