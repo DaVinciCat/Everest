@@ -46,7 +46,7 @@ namespace Everest.Authentication
 				throw new ArgumentNullException(nameof(context));
 
 			var header = context.Request.Headers[HttpHeaders.Authorization];
-			if (string.IsNullOrEmpty(header))
+			if (string.IsNullOrWhiteSpace(header))
 			{
 				Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. Missing header: {new { Header = HttpHeaders.Authorization, Scheme = Scheme }}");
 				return false;
