@@ -108,11 +108,18 @@ namespace Everest.Shell
 			throw new InvalidOperationException("Something went wrong ;(");
 		}
 
-		[HttpGet("/get/request-with-payload")]
-		public static async Task GetRequestWithPayload(HttpContext context)
+		[HttpGet("/get/request-with-text-payload")]
+		public static async Task GetRequestWithTextPayload(HttpContext context)
 		{
-			var payload = await context.Request.ReadRequestDataAsync();
+			var payload = await context.Request.ReadTextAsync();
 			await context.Response.WriteTextAsync(payload);
+		}
+		
+		[HttpGet("/get/request-with-json-payload")]
+		public static async Task GetRequestWithJsonPayload(HttpContext context)
+		{
+			var payload = await context.Request.ReadJsonAsync<object>();
+			await context.Response.WriteJsonAsync(payload);
 		}
 	}
 

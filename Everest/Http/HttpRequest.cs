@@ -3,6 +3,7 @@ using System.Collections.Specialized;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Everest.Collections;
 using Everest.Utils;
@@ -44,7 +45,7 @@ namespace Everest.Http
 
 		public HttpRequest(HttpListenerContext context, ILogger<HttpRequest> logger)
 		{
-			if (context == null) 
+			if (context == null)
 				throw new ArgumentNullException(nameof(context));
 
 			request = context.Request;
@@ -58,21 +59,35 @@ namespace Everest.Http
 		#region RequestData
 
 		/*https://learn.microsoft.com/en-us/dotnet/api/system.net.httplistenerrequest.inputstream?view=net-7.0*/
-		public async Task<string> ReadRequestDataAsync()
+		public async Task<byte[]> ReadDataAsync()
 		{
 			if (!request.HasEntityBody)
 				return null;
-			
-			if(outputStream.Length == 0)
+
+			if (outputStream.Length == 0)
 				await pipe.FlushAsync();
 
-			outputStream.Position = 0;
-			using (var reader = new StreamReader(outputStream, ContentEncoding, leaveOpen: true))
-			{
-				return await reader.ReadToEndAsync();
-			}
+			return outputStream.ToArray();
 		}
-		
+
 		#endregion
+	}
+
+	public static class HttpRequestExtensions
+	{
+		public static async Task<string> ReadTextAsync(this HttpRequest request)
+		{
+			var data = await request.ReadDataAsync();
+			return request.ContentEncoding.GetString(data);
+		}
+
+		public static async Task<T> ReadJsonAsync<T>(this HttpRequest request, JsonSerializerOptions options = null)
+		{
+			var data = await request.ReadDataAsync();
+
+			return options == null ? 
+				JsonSerializer.Deserialize<T>(data) : 
+				JsonSerializer.Deserialize<T>(data, options);
+		}
 	}
 }
