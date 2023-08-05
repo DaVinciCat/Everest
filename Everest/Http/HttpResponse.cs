@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Specialized;
 using System.IO;
 using System.Net;
 using System.Net.Mime;
@@ -69,7 +70,7 @@ namespace Everest.Http
 			set => response.ContentEncoding = value;
 		}
 
-		public WebHeaderCollection Headers => response.Headers;
+		public NameValueCollection Headers => response.Headers;
 
 		public HttpStatusCode StatusCode
 		{
@@ -100,12 +101,14 @@ namespace Everest.Http
 			AppendHeader(HttpHeaders.Server, "Everest");
 		}
 
+		public bool HasHeader(string name) => !string.IsNullOrWhiteSpace(response.Headers[name]);
+
 		public void AddHeader(string name, string value) => response.AddHeader(name, value);
 
 		public void AppendHeader(string name, string value) => response.AppendHeader(name, value);
 
 		public void RemoveHeader(string name) => response.Headers.Remove(name);
-
+		
 		public void WriteTo(Stream to) => pipe.PipeTo(to);
 		
 		public void WriteTo(Func<Stream, Stream> to) => pipe.PipeTo(to);

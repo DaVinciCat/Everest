@@ -56,7 +56,7 @@ namespace Everest.Http
 			PathParameters = new ParameterCollection();
 		}
 
-		#region RequestData
+		public bool HasHeader(string name) => !string.IsNullOrWhiteSpace(request.Headers[name]);
 
 		/*https://learn.microsoft.com/en-us/dotnet/api/system.net.httplistenerrequest.inputstream?view=net-7.0*/
 		public async Task<byte[]> ReadDataAsync()
@@ -69,8 +69,6 @@ namespace Everest.Http
 
 			return outputStream.ToArray();
 		}
-
-		#endregion
 	}
 
 	public static class HttpRequestExtensions
