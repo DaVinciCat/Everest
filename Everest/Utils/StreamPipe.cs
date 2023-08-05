@@ -119,7 +119,25 @@ namespace Everest.Utils
 			return this;
 		}
 
-		public async Task FlushAsync()
+        public StreamPipe Flush()
+        {
+	        if (input.CanSeek)
+	        {
+		        input.Position = 0;
+	        }
+
+	        var buffer = new byte[4096];
+	        int read;
+
+	        while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
+	        {
+		        output.WriteAsync(buffer, 0, read);
+	        }
+
+	        return this;
+        }
+
+		public async Task<StreamPipe> FlushAsync()
         {
 	        if (input.CanSeek)
 	        {
@@ -133,6 +151,8 @@ namespace Everest.Utils
             {
                 await output.WriteAsync(buffer, 0, read);
             }
+
+            return this;
         }
 
         #region Check
