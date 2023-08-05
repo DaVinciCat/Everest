@@ -91,7 +91,7 @@ namespace Everest.Http
 		{
 			this.context = context ?? throw new ArgumentNullException(nameof(context));
 			response = context.Response;
-			pipe = new(response.OutputStream);
+			pipe = new StreamPipe(response.OutputStream);
 
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			StatusCode = HttpStatusCode.OK;
