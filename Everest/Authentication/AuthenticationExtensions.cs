@@ -26,13 +26,5 @@ namespace Everest.Authentication
 
 			return !string.IsNullOrWhiteSpace(request.Headers[HttpHeaders.Authorization]);
 		}
-
-		public static bool SupportsAuthenticationScheme(this HttpRequest request, string scheme)
-		{
-			if (request == null) 
-				throw new ArgumentNullException(nameof(request));
-
-			return !string.IsNullOrWhiteSpace(request.Headers[HttpHeaders.Authorization]) && request.Headers[HttpHeaders.Authorization].StartsWith(scheme + ' ', StringComparison.OrdinalIgnoreCase);
-		}
 	}
 }
