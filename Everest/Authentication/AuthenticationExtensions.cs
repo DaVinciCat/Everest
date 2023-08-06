@@ -19,7 +19,7 @@ namespace Everest.Authentication
 			return true;
 		}
 
-		public static bool ContainsAuthentication(this HttpRequest request)
+		public static bool SupportsAuthentication(this HttpRequest request)
 		{
 			if (request == null)
 				throw new ArgumentNullException(nameof(request));
