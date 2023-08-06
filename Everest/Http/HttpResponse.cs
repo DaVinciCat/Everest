@@ -101,7 +101,7 @@ namespace Everest.Http
 			AppendHeader(HttpHeaders.Server, "Everest");
 		}
 
-		public bool HasHeader(string name) => !string.IsNullOrWhiteSpace(response.Headers[name]);
+		public bool HasHeader(string name) => response.Headers[name] != null;
 
 		public void AddHeader(string name, string value) => response.AddHeader(name, value);
 
