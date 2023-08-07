@@ -31,6 +31,9 @@ namespace Everest.Exceptions
 		{
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
+			
+			if (ex == null) 
+				throw new ArgumentNullException(nameof(ex));
 
 			context.Response.KeepAlive = false;
 			context.Response.StatusCode = HttpStatusCode.InternalServerError;
