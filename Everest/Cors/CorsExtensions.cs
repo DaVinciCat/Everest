@@ -10,7 +10,7 @@ namespace Everest.Cors
 			if (request == null) 
 				throw new ArgumentNullException(nameof(request));
 			
-			return request.HttpMethod == "OPTIONS" &&
+			return request.HttpMethod == HttpMethods.Options &&
 			       request.Headers[HttpHeaders.AccessControlRequestMethod] != null &&
 			       request.Headers[HttpHeaders.AccessControlRequestHeaders] != null &&
 			       request.Headers[HttpHeaders.Origin] != null;
