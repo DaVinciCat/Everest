@@ -18,12 +18,32 @@ namespace Everest.Files
 
 		public string RequestPath { get; set; } = "/files";
 
+		public string DefaultPhysicalPath { get; set; } = "files";
+
 		public string PhysicalPath
 		{
 			get => fileWatcher.Path;
 			set
 			{
+				if(!Directory.Exists(value))
+				{
+					Logger.LogWarning($"Static files directory does not exist: {new {PhysicalPath = value}}");
+					return;
+				}
+
 				fileWatcher.Path = value;
+				fileWatcher.NotifyFilter = NotifyFilters.Attributes
+				                           | NotifyFilters.CreationTime
+				                           | NotifyFilters.DirectoryName
+				                           | NotifyFilters.FileName
+				                           | NotifyFilters.LastAccess
+				                           | NotifyFilters.LastWrite
+				                           | NotifyFilters.Security
+				                           | NotifyFilters.Size;
+
+				fileWatcher.IncludeSubdirectories = true;
+				fileWatcher.EnableRaisingEvents = true;
+
 				files.Clear();
 				foreach (var file in Directory.EnumerateFiles(PhysicalPath, "*.*", SearchOption.AllDirectories))
 				{
@@ -160,20 +180,11 @@ namespace Everest.Files
 		{
 			Logger = logger;
 
-			PhysicalPath = "files";
+			if (Directory.Exists(DefaultPhysicalPath))
+			{
+				PhysicalPath = DefaultPhysicalPath;
+			}
 
-			fileWatcher.NotifyFilter = NotifyFilters.Attributes
-			                           | NotifyFilters.CreationTime
-			                           | NotifyFilters.DirectoryName
-			                           | NotifyFilters.FileName
-			                           | NotifyFilters.LastAccess
-			                           | NotifyFilters.LastWrite
-			                           | NotifyFilters.Security
-			                           | NotifyFilters.Size;
-
-			fileWatcher.IncludeSubdirectories = true;
-			fileWatcher.EnableRaisingEvents = true;
-			
 			Subscribe(true);
 		}
 
