@@ -7,35 +7,21 @@ using Microsoft.Extensions.Logging;
 
 namespace Everest.Authentication
 {
-    public class BasicAuthenticationOptions
-	{
-		public string Scheme { get; set; } = "Basic";
-
-		public string CredentialsDelimiter { get; set; } = ":";
-
-		public Encoding Encoding { get; set; } = Encoding.UTF8;
-	}
-
 	public class BasicAuthentication : IAuthentication
 	{
 		public ILogger<BasicAuthentication> Logger { get; }
 
-		public string Scheme => options.Scheme;
+		public string Scheme { get; set; } = "Basic";
 
-		private readonly BasicAuthenticationOptions options;
+		public Encoding Encoding { get; set; } = Encoding.UTF8;
 
-		public BasicAuthentication(BasicAuthenticationOptions options, ILogger<BasicAuthentication> logger)
-		{
-			this.options = options ?? throw new ArgumentNullException(nameof(options));
-			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
-		}
+		public string CredentialsDelimiter { get; set; } = ":";
 
 		public BasicAuthentication(ILogger<BasicAuthentication> logger)
-			: this(new BasicAuthenticationOptions(), logger)
 		{
-
+			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
-
+		
 		public Task<bool> TryAuthenticateAsync(HttpContext context)
 		{
 			if (context == null)
@@ -75,18 +61,18 @@ namespace Everest.Authentication
 			string decodedCredentials;
 			try
 			{
-				decodedCredentials = options.Encoding.GetString(base64DecodedCredentials);
+				decodedCredentials = Encoding.GetString(base64DecodedCredentials);
 			}
 			catch (Exception ex)
 			{
-				Logger.LogError(ex, $"{context.TraceIdentifier} - Failed to authenticate. Failed to decode Base64 credentials: {new { Encoding = options.Encoding.EncodingName, Scheme = Scheme }}");
+				Logger.LogError(ex, $"{context.TraceIdentifier} - Failed to authenticate. Failed to decode Base64 credentials: {new { Encoding = Encoding.EncodingName, Scheme = Scheme }}");
 				return Task.FromResult(false);
 			}
 
-			var delimiterIndex = decodedCredentials.IndexOf(options.CredentialsDelimiter, StringComparison.OrdinalIgnoreCase);
+			var delimiterIndex = decodedCredentials.IndexOf(CredentialsDelimiter, StringComparison.OrdinalIgnoreCase);
 			if (delimiterIndex == -1)
 			{
-				Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. Missing credentials delimiter: {new { Delimiter = options.CredentialsDelimiter, Scheme = Scheme }}");
+				Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. Missing credentials delimiter: {new { Delimiter = CredentialsDelimiter, Scheme = Scheme }}");
 				return Task.FromResult(false);
 			}
 

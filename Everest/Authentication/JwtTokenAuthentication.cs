@@ -8,36 +8,17 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Everest.Authentication
 {
-    public class JwtAuthenticationOptions
-	{
-		public string Scheme { get; set; } = "Bearer";
-		
-		public TokenValidationParameters TokenValidationParameters { get; set; }
-
-		public JwtAuthenticationOptions()
-		{
-			TokenValidationParameters = new TokenValidationParameters();
-		}
-	}
-
 	public class JwtAuthentication : IAuthentication
 	{
 		public ILogger<JwtAuthentication> Logger { get; }
 
-		public string Scheme => options.Scheme;
+		public string Scheme { get; set; } = "Bearer";
 
-		private readonly JwtAuthenticationOptions options;
-
-		public JwtAuthentication(JwtAuthenticationOptions options, ILogger<JwtAuthentication> logger)
-		{
-			this.options = options ?? throw new ArgumentNullException(nameof(options));
-			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
-		}
+		public TokenValidationParameters TokenValidationParameters { get; set; } = new();
 
 		public JwtAuthentication(ILogger<JwtAuthentication> logger)
-			: this(new JwtAuthenticationOptions(), logger)
 		{
-
+			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
 		public async Task<bool> TryAuthenticateAsync(HttpContext context)
@@ -68,7 +49,7 @@ namespace Everest.Authentication
 			{
 				var token = header.Substring(Scheme.Length).Trim();
 				var tokenHandler = new JwtSecurityTokenHandler();
-				var validationResult = await tokenHandler.ValidateTokenAsync(token, options.TokenValidationParameters);
+				var validationResult = await tokenHandler.ValidateTokenAsync(token, TokenValidationParameters);
 				var jwtToken = validationResult.SecurityToken as JwtSecurityToken;
 				var identity = new JwtTokenIdentity(jwtToken, validationResult.ClaimsIdentity);
 				context.User.AddIdentity(identity);

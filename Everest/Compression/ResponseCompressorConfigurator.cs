@@ -24,7 +24,7 @@ namespace Everest.Compression
 	public class DefaultResponseCompressorConfigurator : ResponseCompressorConfigurator
 	{
 		public new ResponseCompressor Compressor { get; }
-
+		
 		public DefaultResponseCompressorConfigurator(ResponseCompressor compressor, IServiceProvider services) 
 			: base(compressor, services)
 		{

@@ -10,13 +10,10 @@ using Everest.Utils;
 
 namespace Everest.Compression
 {
-    public class ResponseCompressionOptions
-	{
-		public int CompressionMinLength { get; set; } = 2048;
-	}
-
 	public class ResponseCompressor : IResponseCompressor
 	{
+		public int CompressionMinLength { get; set; } = 2048;
+
 		public string[] Encodings => compressions.Keys.ToArray();
 		
 		private readonly Dictionary<string, Func<Stream, Stream>> compressions = new()
@@ -25,20 +22,11 @@ namespace Everest.Compression
 			{ "deflate", input => new DeflateStream(input, CompressionLevel.Fastest) },
 			{ "brotli", input => new BrotliStream(input, CompressionLevel.Fastest) }
 		};
-
-		private readonly ResponseCompressionOptions options;
-
+		
 		public ILogger<ResponseCompressor> Logger { get; }
 
 		public ResponseCompressor(ILogger<ResponseCompressor> logger)
-			: this(new ResponseCompressionOptions(), logger)
 		{
-
-		}
-
-		public ResponseCompressor(ResponseCompressionOptions options, ILogger<ResponseCompressor> logger)
-		{
-			this.options = options ?? throw new ArgumentNullException(nameof(options));
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
@@ -65,9 +53,9 @@ namespace Everest.Compression
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
 			
-			if (context.Response.ContentLength < options.CompressionMinLength)
+			if (context.Response.ContentLength < CompressionMinLength)
 			{
-				Logger.LogTrace($"{context.TraceIdentifier} - No response compression required: {new { Length = context.Response.ContentLength.ToReadableSize(), CompressionMinLength = options.CompressionMinLength.ToReadableSize() }}");
+				Logger.LogTrace($"{context.TraceIdentifier} - No response compression required: {new { Length = context.Response.ContentLength.ToReadableSize(), CompressionMinLength = CompressionMinLength.ToReadableSize() }}");
 				return Task.FromResult(false);
 			}
 

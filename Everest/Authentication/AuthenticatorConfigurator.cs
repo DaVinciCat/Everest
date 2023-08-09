@@ -34,24 +34,20 @@ namespace Everest.Authentication
 
 	public static class AuthenticatorConfiguratorExtensions
 	{
-		public static AuthenticatorConfigurator AddBasicAuthentication(this AuthenticatorConfigurator configurator, Action<BasicAuthenticationOptions> options = null)
+		public static AuthenticatorConfigurator AddBasicAuthentication(this AuthenticatorConfigurator configurator, Action<BasicAuthentication> configure = null)
 		{
-			var configureOptions = new BasicAuthenticationOptions();
-			options?.Invoke(configureOptions);
-
 			var loggerFactory = configurator.Services.GetRequiredService<ILoggerFactory>();
-			var authentication = new BasicAuthentication(configureOptions, loggerFactory.CreateLogger<BasicAuthentication>());
+			var authentication = new BasicAuthentication(loggerFactory.CreateLogger<BasicAuthentication>());
+			configure?.Invoke(authentication);
 			configurator.AddAuthentication(authentication);
 			return configurator;
 		}
 
-		public static AuthenticatorConfigurator AddJwtTokenAuthentication(this AuthenticatorConfigurator configurator, Action<JwtAuthenticationOptions> options = null)
+		public static AuthenticatorConfigurator AddJwtTokenAuthentication(this AuthenticatorConfigurator configurator, Action<JwtAuthentication> configure = null)
 		{
-			var configureOptions = new JwtAuthenticationOptions();
-			options?.Invoke(configureOptions);
-
 			var loggerFactory = configurator.Services.GetRequiredService<ILoggerFactory>();
-			var authentication = new JwtAuthentication(configureOptions, loggerFactory.CreateLogger<JwtAuthentication>());
+			var authentication = new JwtAuthentication(loggerFactory.CreateLogger<JwtAuthentication>());
+			configure?.Invoke(authentication);
 			configurator.AddAuthentication(authentication);
 			return configurator;
 		}
