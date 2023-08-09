@@ -179,7 +179,7 @@ namespace Everest.Files
 			context.Response.KeepAlive = false;
 			context.Response.StatusCode = HttpStatusCode.NotFound;
 			context.Response.Clear();
-			await context.Response.WriteTextAsync($"Requested route not found: {context.Request.Description}");
+			await context.Response.WriteTextAsync($"Requested file not found: {context.Request.Description}");
 		};
 
 		public Func<HttpContext, StaticFileDescriptor, Task<bool>> OnServeFileAsync { get; set; } = async (context, descriptor) =>
