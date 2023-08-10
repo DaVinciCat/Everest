@@ -15,10 +15,8 @@ namespace Everest.Files
 		#endregion
 
 		#region Files
-
-		public string RequestPath { get; set; } = "/files";
-
-		public string DefaultPhysicalPath { get; set; } = "files";
+		
+		public string DefaultPhysicalPath => "public";
 
 		public string PhysicalPath
 		{
@@ -58,27 +56,27 @@ namespace Everest.Files
 
 		private void AddFile(string filePath)
 		{
-			files.Add(PhysicalPathToRequestPath(filePath));
+			files.Add(filePath);
 		}
 
 		private void RemoveFile(string filePath)
 		{
-			files.Remove(PhysicalPathToRequestPath(filePath));
+			files.Remove(filePath);
 		}
 
-		private string PhysicalPathToRequestPath(string filePath)
-		{
-			return filePath.Replace(PhysicalPath, RequestPath).Replace("\\", "/");
-		}
+		//private string PhysicalPathToRequestPath(string filePath)
+		//{
+		//	return Path.GetRelativePath(PhysicalPath, filePath.Replace("\\", "/"));
+		//}
 
 		private string RequestPathToPhysicalPath(string filePath)
 		{
-			return filePath.Replace(RequestPath, PhysicalPath).Replace("/", "\\");
+			return Path.Combine(PhysicalPath, filePath.Trim('/').Replace("/", "\\"));
 		}
 
 		public bool HasFile(HttpRequest request)
 		{
-			return files.Contains(request.Path);
+			return files.Contains(RequestPathToPhysicalPath(request.Path));
 		}
 
 		public bool TryGetFile(HttpRequest request, out FileInfo file)

@@ -5,8 +5,6 @@ namespace Everest.Files;
 
 public interface IStaticFilesProvider
 {
-	string RequestPath { get; set; }
-
 	string PhysicalPath { get; set; }
 
 	string[] Files { get; }
