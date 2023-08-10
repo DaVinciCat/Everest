@@ -15,8 +15,6 @@ namespace Everest.Files
 		#endregion
 
 		#region Files
-		
-		public string DefaultPhysicalPath => "public";
 
 		public string PhysicalPath
 		{
@@ -170,15 +168,23 @@ namespace Everest.Files
 		#region Ctor
 
 		public StaticFilesProvider(ILogger<StaticFilesProvider> logger)
+			: this("public", logger)
+		{
+			
+		}
+
+		public StaticFilesProvider(string physicalPath, ILogger<StaticFilesProvider> logger)
 		{
 			Logger = logger;
 
-			if (Directory.Exists(DefaultPhysicalPath))
+			if (Directory.Exists(physicalPath))
 			{
-				PhysicalPath = DefaultPhysicalPath;
+				PhysicalPath = physicalPath;
 			}
 
 			Subscribe(true);
+
+			Logger = logger;
 		}
 
 		#endregion
