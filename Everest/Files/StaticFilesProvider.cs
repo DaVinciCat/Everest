@@ -63,12 +63,7 @@ namespace Everest.Files
 		{
 			files.Remove(filePath);
 		}
-
-		//private string PhysicalPathToRequestPath(string filePath)
-		//{
-		//	return Path.GetRelativePath(PhysicalPath, filePath.Replace("\\", "/"));
-		//}
-
+		
 		private string RequestPathToPhysicalPath(string filePath)
 		{
 			return Path.Combine(PhysicalPath, filePath.Trim('/').Replace("/", "\\"));
