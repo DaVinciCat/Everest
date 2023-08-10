@@ -183,8 +183,6 @@ namespace Everest.Files
 			}
 
 			Subscribe(true);
-
-			Logger = logger;
 		}
 
 		#endregion
