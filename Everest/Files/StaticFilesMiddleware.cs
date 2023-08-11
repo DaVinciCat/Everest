@@ -20,7 +20,7 @@ namespace Everest.Files
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
 			
-			if (!context.Response.ResponseSent && !context.TryGetRouteDescriptor(out _) && handler.StaticFilesProvider.HasFile(context.Request) && await handler.TryServeStaticFileAsync(context))
+			if (!context.Response.ResponseSent && !context.TryGetRouteDescriptor(out _) && handler.FilesProvider.HasFile(context.Request) && await handler.TryServeStaticFileAsync(context))
 			{
 				return;
 			}

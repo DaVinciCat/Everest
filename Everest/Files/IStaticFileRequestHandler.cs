@@ -5,7 +5,7 @@ namespace Everest.Files;
 
 public interface IStaticFileRequestHandler
 {
-	IStaticFilesProvider StaticFilesProvider { get; }
+	IStaticFilesProvider FilesProvider { get; }
 
 	Task<bool> TryServeStaticFileAsync(HttpContext context);
 }

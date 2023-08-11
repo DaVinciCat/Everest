@@ -53,8 +53,8 @@ namespace Everest.Rest
 			services.TryAddSingleton<IStaticFileRequestHandler>(provider =>
 			{
 				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
-				var staticFilesProvider = new StaticFilesProvider(loggerFactory.CreateLogger<StaticFilesProvider>());
-				return new StaticFileRequestHandler(staticFilesProvider,loggerFactory.CreateLogger<StaticFileRequestHandler>());
+				var filesProvider = new StaticFilesProvider(loggerFactory.CreateLogger<StaticFilesProvider>());
+				return new StaticFileRequestHandler(filesProvider,loggerFactory.CreateLogger<StaticFileRequestHandler>());
 			});
 
 			services.TryAddSingleton<IResponseCompressor>(provider =>
@@ -142,8 +142,8 @@ namespace Everest.Rest
 			services.AddSingleton<IStaticFileRequestHandler>(provider =>
 			{
 				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
-				var staticFilesProvider = new StaticFilesProvider(loggerFactory.CreateLogger<StaticFilesProvider>());
-				var handler = new StaticFileRequestHandler(staticFilesProvider,loggerFactory.CreateLogger<StaticFileRequestHandler>());
+				var filesProvider = new StaticFilesProvider(loggerFactory.CreateLogger<StaticFilesProvider>());
+				var handler = new StaticFileRequestHandler(filesProvider,loggerFactory.CreateLogger<StaticFileRequestHandler>());
 				configurator(new DefaultStaticFileRequestHandlerConfigurator(handler, provider));
 
 				return handler;
