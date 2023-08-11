@@ -114,7 +114,7 @@ namespace Everest.Files
 
 		#region Files
 
-		public IStaticFilesProvider FilesProvider { get; }
+		private readonly IStaticFilesProvider filesProvider;
 
 		#endregion
 
@@ -123,7 +123,7 @@ namespace Everest.Files
 		public StaticFileRequestHandler(IStaticFilesProvider filesProvider, ILogger<StaticFileRequestHandler> logger)
 		{
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
-			FilesProvider = filesProvider ?? throw new ArgumentNullException(nameof(filesProvider));
+			this.filesProvider = filesProvider ?? throw new ArgumentNullException(nameof(filesProvider));
 		}
 
 		#endregion
@@ -138,7 +138,7 @@ namespace Everest.Files
 				return false;
 			}
 
-			if (!FilesProvider.TryGetFile(context.Request, out var file))
+			if (!filesProvider.TryGetFile(context.Request, out var file))
 			{
 				Logger.LogWarning($"{context.TraceIdentifier} - Failed to serve file. Requested file not found: {new { RequestPath = context.Request.Path, Request = context.Request.Description }}");
 				await OnFileNotFoundAsync(context);

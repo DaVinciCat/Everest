@@ -49,11 +49,17 @@ namespace Everest.Rest
 				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
 				return new Router(loggerFactory.CreateLogger<Router>());
 			});
-			
+
+			services.TryAddSingleton<IStaticFilesProvider>(provider =>
+			{
+				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
+				return new StaticFilesProvider(loggerFactory.CreateLogger<StaticFilesProvider>());
+			});
+
 			services.TryAddSingleton<IStaticFileRequestHandler>(provider =>
 			{
 				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
-				var filesProvider = new StaticFilesProvider(loggerFactory.CreateLogger<StaticFilesProvider>());
+				var filesProvider = provider.GetRequiredService<IStaticFilesProvider>();
 				return new StaticFileRequestHandler(filesProvider,loggerFactory.CreateLogger<StaticFileRequestHandler>());
 			});
 
@@ -142,11 +148,31 @@ namespace Everest.Rest
 			services.AddSingleton<IStaticFileRequestHandler>(provider =>
 			{
 				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
-				var filesProvider = new StaticFilesProvider(loggerFactory.CreateLogger<StaticFilesProvider>());
-				var handler = new StaticFileRequestHandler(filesProvider,loggerFactory.CreateLogger<StaticFileRequestHandler>());
+				var filesProvider = provider.GetRequiredService<IStaticFilesProvider>();
+				var handler = new StaticFileRequestHandler(filesProvider, loggerFactory.CreateLogger<StaticFileRequestHandler>());
 				configurator(new DefaultStaticFileRequestHandlerConfigurator(handler, provider));
 
 				return handler;
+			});
+
+			return services;
+		}
+
+		public static IServiceCollection AddStaticFilesProvider(this IServiceCollection services, Func<IServiceProvider, IStaticFilesProvider> builder)
+		{
+			services.AddSingleton(builder);
+			return services;
+		}
+
+		public static IServiceCollection AddStaticFilesProvider(this IServiceCollection services, Action<DefaultStaticFilesProviderConfigurator> configurator)
+		{
+			services.AddSingleton<IStaticFilesProvider>(provider =>
+			{
+				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
+				var filesProvider = new StaticFilesProvider(loggerFactory.CreateLogger<StaticFilesProvider>());
+				configurator(new DefaultStaticFilesProviderConfigurator(filesProvider, provider));
+
+				return filesProvider;
 			});
 
 			return services;
@@ -272,7 +298,8 @@ namespace Everest.Rest
 		public static RestServerBuilder UseStaticFilesMiddleware(this RestServerBuilder builder)
 		{
 			var handler = builder.Services.GetRequiredService<IStaticFileRequestHandler>();
-			builder.Middleware.Add(new StaticFilesMiddleware(handler));
+			var filesProvider = builder.Services.GetRequiredService<IStaticFilesProvider>();
+			builder.Middleware.Add(new StaticFilesMiddleware(handler, filesProvider));
 			return builder;
 		}
 

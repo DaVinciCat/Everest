@@ -1,4 +1,5 @@
 ﻿using System;
+using Everest.Media;
 using Everest.Services;
 
 namespace Everest.Files
@@ -22,6 +23,12 @@ namespace Everest.Files
 			: base(handler, services)
 		{
 			Handler = handler;
+		}
+
+		public DefaultStaticFileRequestHandlerConfigurator AddMimeDescriptor(string fileExtension, MimeDescriptor descriptor)
+		{
+			Handler.AddMimeDescriptor(fileExtension, descriptor);
+			return this;
 		}
 	}
 }
