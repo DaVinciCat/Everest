@@ -62,7 +62,7 @@ namespace Everest.Http
 		public async Task<byte[]> ReadDataAsync()
 		{
 			if (!request.HasEntityBody)
-				return null;
+				return Array.Empty<byte>();
 
 			if (outputStream.Length == 0)
 				await pipe.FlushAsync();
