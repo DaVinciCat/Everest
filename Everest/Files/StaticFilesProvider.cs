@@ -14,6 +14,12 @@ namespace Everest.Files
 
 		#endregion
 
+		#region Sync
+
+		private readonly object sync = new();
+
+		#endregion
+
 		#region Files
 
 		public string PhysicalPath
@@ -40,7 +46,7 @@ namespace Everest.Files
 				fileWatcher.IncludeSubdirectories = true;
 				fileWatcher.EnableRaisingEvents = true;
 
-				files.Clear();
+				ClearFiles();
 				foreach (var file in Directory.EnumerateFiles(PhysicalPath, "*.*", SearchOption.AllDirectories))
 				{
 					AddFile(file);
@@ -48,28 +54,57 @@ namespace Everest.Files
 			}
 		}
 
-		public string[] Files => files.ToArray();
+		public string[] Files
+		{
+			get
+			{
+				lock (sync)
+				{
+					return files.ToArray();
+				}
+			}
+		}
 
 		private readonly HashSet<string> files = new();
 
 		private void AddFile(string filePath)
 		{
-			files.Add(filePath);
+			lock (sync)
+			{
+				files.Add(filePath);
+			}
 		}
 
 		private void RemoveFile(string filePath)
 		{
-			files.Remove(filePath);
+			lock (sync)
+			{
+				files.Remove(filePath);
+			}
 		}
-		
-		private string RequestPathToPhysicalPath(string filePath)
+
+		private void ClearFiles()
 		{
-			return Path.Combine(PhysicalPath, filePath.Trim('/').Replace("/", "\\"));
+			lock (sync)
+			{
+				files.Clear();
+			}
+		}
+
+		public bool HasFile(string filePath)
+		{
+			lock (sync)
+			{
+				return files.Contains(filePath);
+			}
 		}
 
 		public bool HasFile(HttpRequest request)
 		{
-			return files.Contains(RequestPathToPhysicalPath(request.Path));
+			lock (sync)
+			{
+				return files.Contains(RequestPathToPhysicalPath(request.Path));
+			}
 		}
 
 		public bool TryGetFile(HttpRequest request, out FileInfo file)
@@ -83,6 +118,11 @@ namespace Everest.Files
 
 			file = null;
 			return false;
+		}
+
+		private string RequestPathToPhysicalPath(string filePath)
+		{
+			return Path.Combine(PhysicalPath, filePath.Trim('/').Replace("/", "\\"));
 		}
 
 		#endregion
@@ -99,12 +139,12 @@ namespace Everest.Files
 
 		private void OnRenamed(object sender, RenamedEventArgs e)
 		{
-			if (files.Contains(e.OldFullPath))
+			if (HasFile(e.OldFullPath))
 			{
 				RemoveFile(e.OldFullPath);
 			}
 
-			if (!files.Contains(e.FullPath))
+			if (!HasFile(e.FullPath))
 			{
 				AddFile(e.FullPath);
 			}
@@ -112,7 +152,7 @@ namespace Everest.Files
 
 		private void OnDeleted(object sender, FileSystemEventArgs e)
 		{
-			if (files.Contains(e.FullPath))
+			if (HasFile(e.FullPath))
 			{
 				RemoveFile(e.FullPath);
 			}
@@ -120,7 +160,7 @@ namespace Everest.Files
 
 		private void OnCreated(object sender, FileSystemEventArgs e)
 		{
-			if (!files.Contains(e.FullPath))
+			if (!HasFile(e.FullPath))
 			{
 				AddFile(e.FullPath);
 			}
@@ -133,7 +173,7 @@ namespace Everest.Files
 				return;
 			}
 
-			if (!files.Contains(e.FullPath))
+			if (!HasFile(e.FullPath))
 			{
 				AddFile(e.FullPath);
 			}
@@ -198,6 +238,7 @@ namespace Everest.Files
 
 			Subscribe(false);
 			fileWatcher.Dispose();
+			ClearFiles();
 			disposed = true;
 		}
 
