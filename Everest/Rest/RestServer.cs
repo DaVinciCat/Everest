@@ -163,14 +163,18 @@ namespace Everest.Rest
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
 
+			var exceptionWasThrown = false;
+
 			try
 			{
 				try
 				{
+					Logger.LogTrace($"{context.TraceIdentifier} - Try to process incoming request");
 					await aggregateMiddleware.InvokeAsync(context);
 				}
 				catch(Exception ex) 
 				{
+					exceptionWasThrown = true;
 					Logger.LogError(ex, $"{context.TraceIdentifier} - Failed to process incoming request");
 					context.Response.StatusCode = HttpStatusCode.InternalServerError;
 				}
@@ -179,6 +183,11 @@ namespace Everest.Rest
 					if (!context.Response.ResponseSent)
 					{
 						await context.Response.SendAsync();
+					}
+
+					if (!exceptionWasThrown)
+					{
+						Logger.LogTrace($"{context.TraceIdentifier} - Successfully processed incoming request");
 					}
 				}
 			}

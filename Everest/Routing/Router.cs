@@ -122,6 +122,7 @@ namespace Everest.Routing
 
 			context.Response.KeepAlive = false;
 			context.Response.StatusCode = HttpStatusCode.NotFound;
+			context.Response.Clear();
 			await context.Response.WriteTextAsync($"Requested route not found: {context.Request.Description}");
 		};
 

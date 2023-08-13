@@ -7,6 +7,7 @@ using Everest.Compression;
 using Everest.Cors;
 using Everest.EndPoints;
 using Everest.Exceptions;
+using Everest.Files;
 using Everest.Middleware;
 using Everest.Routing;
 using Microsoft.Extensions.DependencyInjection;
@@ -47,6 +48,19 @@ namespace Everest.Rest
 			{
 				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
 				return new Router(loggerFactory.CreateLogger<Router>());
+			});
+
+			services.TryAddSingleton<IStaticFilesProvider>(provider =>
+			{
+				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
+				return new StaticFilesProvider(loggerFactory.CreateLogger<StaticFilesProvider>());
+			});
+
+			services.TryAddSingleton<IStaticFileRequestHandler>(provider =>
+			{
+				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
+				var filesProvider = provider.GetRequiredService<IStaticFilesProvider>();
+				return new StaticFileRequestHandler(filesProvider,loggerFactory.CreateLogger<StaticFileRequestHandler>());
 			});
 
 			services.TryAddSingleton<IResponseCompressor>(provider =>
@@ -123,6 +137,47 @@ namespace Everest.Rest
 			return services;
 		}
 
+		public static IServiceCollection AddStaticFileRequestHandler(this IServiceCollection services, Func<IServiceProvider, IStaticFileRequestHandler> builder)
+		{
+			services.AddSingleton(builder);
+			return services;
+		}
+
+		public static IServiceCollection AddStaticFileRequestHandler(this IServiceCollection services, Action<DefaultStaticFileRequestHandlerConfigurator> configurator)
+		{
+			services.AddSingleton<IStaticFileRequestHandler>(provider =>
+			{
+				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
+				var filesProvider = provider.GetRequiredService<IStaticFilesProvider>();
+				var handler = new StaticFileRequestHandler(filesProvider, loggerFactory.CreateLogger<StaticFileRequestHandler>());
+				configurator(new DefaultStaticFileRequestHandlerConfigurator(handler, provider));
+
+				return handler;
+			});
+
+			return services;
+		}
+
+		public static IServiceCollection AddStaticFilesProvider(this IServiceCollection services, Func<IServiceProvider, IStaticFilesProvider> builder)
+		{
+			services.AddSingleton(builder);
+			return services;
+		}
+
+		public static IServiceCollection AddStaticFilesProvider(this IServiceCollection services, Action<DefaultStaticFilesProviderConfigurator> configurator)
+		{
+			services.AddSingleton<IStaticFilesProvider>(provider =>
+			{
+				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
+				var filesProvider = new StaticFilesProvider(loggerFactory.CreateLogger<StaticFilesProvider>());
+				configurator(new DefaultStaticFilesProviderConfigurator(filesProvider, provider));
+
+				return filesProvider;
+			});
+
+			return services;
+		}
+
 		public static IServiceCollection AddEndPointInvoker(this IServiceCollection services, Func<IServiceProvider, IEndPointInvoker> builder)
 		{
 			services.AddSingleton(builder);
@@ -168,7 +223,7 @@ namespace Everest.Rest
 
 			return services;
 		}
-
+		
 		public static IServiceCollection AddExceptionHandler(this IServiceCollection services, Func<IServiceProvider, IExceptionHandler> builder) 
 		{
 			services.AddSingleton(builder);
@@ -240,6 +295,14 @@ namespace Everest.Rest
 			return builder;
 		}
 
+		public static RestServerBuilder UseStaticFilesMiddleware(this RestServerBuilder builder)
+		{
+			var handler = builder.Services.GetRequiredService<IStaticFileRequestHandler>();
+			var filesProvider = builder.Services.GetRequiredService<IStaticFilesProvider>();
+			builder.Middleware.Add(new StaticFilesMiddleware(handler, filesProvider));
+			return builder;
+		}
+
 		public static RestServerBuilder UseEndPointMiddleware(this RestServerBuilder builder)
 		{
 			var invoker = builder.Services.GetRequiredService<IEndPointInvoker>();
@@ -260,7 +323,7 @@ namespace Everest.Rest
 			builder.Middleware.Add(new CorsMiddleware(handler));
 			return builder;
 		}
-
+		
 		public static RestServerBuilder UseAuthenticationMiddleware(this RestServerBuilder builder)
 		{
 			var authenticator = builder.Services.GetRequiredService<IAuthenticator>();

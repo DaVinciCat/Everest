@@ -125,6 +125,8 @@ namespace Everest.Http
 		
 		public Task ReadFromAsync(Func<Stream, Task<Stream>> from) => pipe.PipeFromAsync(from);
 
+		public void Clear() => pipe.PipeFrom(new MemoryStream());
+
 		public Stream OutputStream => response.OutputStream;
 		
 		public async Task SendAsync()
