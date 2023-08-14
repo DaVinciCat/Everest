@@ -13,4 +13,10 @@
     <ProjectReference Include="..\Everest\Everest.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="public\favicon.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
