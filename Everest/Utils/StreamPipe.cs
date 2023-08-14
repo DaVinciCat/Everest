@@ -137,6 +137,14 @@ namespace Everest.Utils
 	        return this;
         }
 
+        public StreamPipe Close()
+        {
+            input.Close();
+            output.Close();
+
+            return this;
+        }
+
 		public async Task<StreamPipe> FlushAsync()
         {
 	        if (input.CanSeek)

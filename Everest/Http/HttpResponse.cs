@@ -137,6 +137,7 @@ namespace Everest.Http
 				{
 					Logger.LogTrace($"{TraceIdentifier} - Sending response: {new { RemoteEndPoint = context.Request.RemoteEndPoint, ContentLength = ContentLength.ToReadableSize(), StatusCode = response.StatusCode, ContentType = response.ContentType, ContentEncoding = response.ContentEncoding?.EncodingName }}");
 					await pipe.FlushAsync();
+					pipe.Close();
 				}
 				catch
 				{
