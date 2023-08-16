@@ -11,9 +11,17 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Everest.Shell
 {
-	[RestResource("/api/1.0/tests")]
+	[RestResource]
+	[RoutePrefix("/api/1.0/tests")]
 	public static class Rest
 	{
+		[HttpGet("/")]
+		[RoutePrefix("/")]
+		public static async Task GetDefaultRoute(HttpContext context)
+		{
+			await context.Response.WriteTextAsync("Everest");
+		}
+
 		[HttpGet("/get/static-route-no-parameters")]
 		public static async Task GetStaticRouteNoParameters(HttpContext context)
 		{
@@ -21,14 +29,10 @@ namespace Everest.Shell
 			var greetings = service.Greet();
 			await context.Response.WriteJsonAsync(new { Message = greetings, From = "Everest", Success = true });
 		}
-
-
+		
 		[HttpGet("/get/static-route-text")]
 		public static async Task GetStaticRouteText(HttpContext context)
 		{
-			var service = context.GetGreetingsService();
-			var greetings = service.Greet();
-			
 			await context.Response.WriteTextAsync("lorem\n");
 			await context.Response.WriteTextAsync("ipsum\n");
 			await context.Response.WriteTextAsync("dolor\n");
@@ -67,9 +71,6 @@ namespace Everest.Shell
 		[HttpOptions("/options/cors-request")]
 		public static async Task OptionsCorsRoute(HttpContext context)
 		{
-			var service = context.GetGreetingsService();
-			var greetings = service.Greet();
-
 			context.Response.AddHeader(HttpHeaders.Origin, "*");
 			context.Response.AddHeader(HttpHeaders.AccessControlAllowHeaders, string.Join(" ", HttpHeaders.ContentType, HttpHeaders.Accept, HttpHeaders.XRequestedWith));
 			context.Response.AddHeader(HttpHeaders.AccessControlAllowMethods, string.Join(" ", HttpMethods.Get, HttpMethods.Post, HttpMethods.Put, HttpMethods.Delete));
@@ -80,9 +81,6 @@ namespace Everest.Shell
 		[HttpGet("/get/compressed-response")]
 		public static async Task GetCompressRoute(HttpContext context)
 		{
-			var service = context.GetGreetingsService();
-			var greetings = service.Greet();
-			
 			await context.Response.WriteTextAsync(string.Concat(Enumerable.Repeat("Apes!", 10000)));
 		}
 

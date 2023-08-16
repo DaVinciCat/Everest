@@ -28,16 +28,19 @@ namespace Everest.Routing
 			Logger.LogTrace($"Scanning assembly for routes: {new { Assembly = assembly }}");
 			foreach (var type in GetRestResourceTypes(assembly))
 			{
-				var routePrefix = GetAttributes<RestResourceAttribute>(type).FirstOrDefault()?.RoutePrefix;
+				var routePrefixAttribute = GetAttributes<RoutePrefixAttribute>(type).FirstOrDefault();
 
 				Logger.LogTrace($"Scanning type for routes: {new { Type = type }}");
 				foreach (var method in GetRestRouteMethods(type))
 				{
-					var attribute = GetAttributes<RestRouteAttribute>(method).FirstOrDefault();
-					if (attribute != null)
+					var routeAttribute = GetAttributes<RestRouteAttribute>(method).FirstOrDefault();
+					routePrefixAttribute = GetAttributes<RoutePrefixAttribute>(method).FirstOrDefault() ?? routePrefixAttribute;
+					
+					if (routeAttribute != null)
 					{
 						var action = (Func<HttpContext, Task>)method.CreateDelegate(typeof(Func<HttpContext, Task>), null);
-						var route = new Route(attribute.HttpMethod, $"{routePrefix}{attribute.RoutePattern}");
+						var routePrefix = routePrefixAttribute?.RoutePrefix ?? string.Empty;
+						var route = new Route(routeAttribute.HttpMethod, $"{routePrefix}{routeAttribute.RoutePattern}");
 						var endPoint = new EndPoint(type, method, action);
 						var descriptor = new RouteDescriptor(route, endPoint);
 
