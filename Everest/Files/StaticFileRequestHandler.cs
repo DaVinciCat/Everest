@@ -20,7 +20,7 @@ namespace Everest.Files
 		
 		#region Mime
 
-		public string DefaultMimeType => "application/octet-stream";
+		public string DefaultMimeType { get; set; } = "application/octet-stream";
 
 		public IReadOnlyDictionary<string, MimeDescriptor> MimeTypes => new ReadOnlyDictionary<string, MimeDescriptor>(mimeTypes);
 
