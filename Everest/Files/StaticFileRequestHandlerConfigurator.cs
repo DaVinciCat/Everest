@@ -25,9 +25,21 @@ namespace Everest.Files
 			Handler = handler;
 		}
 
-		public DefaultStaticFileRequestHandlerConfigurator AddMimeDescriptor(string fileExtension, MimeDescriptor descriptor)
+		public DefaultStaticFileRequestHandlerConfigurator AddMimeType(string fileExtension, MimeDescriptor descriptor)
 		{
-			Handler.AddMimeDescriptor(fileExtension, descriptor);
+			Handler.AddMimeType(fileExtension, descriptor);
+			return this;
+		}
+
+		public DefaultStaticFileRequestHandlerConfigurator AddMimeType(string fileExtension, string contentType)
+		{
+			Handler.AddMimeType(fileExtension, contentType);
+			return this;
+		}
+
+		public DefaultStaticFileRequestHandlerConfigurator AddMimeType(string fileExtension, string contentType, string contentDisposition)
+		{
+			Handler.AddMimeType(fileExtension, contentType, contentDisposition);
 			return this;
 		}
 	}
