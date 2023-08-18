@@ -8,6 +8,7 @@ using Everest.Cors;
 using Everest.EndPoints;
 using Everest.Exceptions;
 using Everest.Files;
+using Everest.Media;
 using Everest.Middleware;
 using Everest.Routing;
 using Microsoft.Extensions.DependencyInjection;
@@ -56,11 +57,14 @@ namespace Everest.Rest
 				return new StaticFilesProvider(loggerFactory.CreateLogger<StaticFilesProvider>());
 			});
 
+			services.TryAddSingleton<IMimeProvider>(_ => new MimeProvider());
+
 			services.TryAddSingleton<IStaticFileRequestHandler>(provider =>
 			{
 				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
 				var filesProvider = provider.GetRequiredService<IStaticFilesProvider>();
-				return new StaticFileRequestHandler(filesProvider,loggerFactory.CreateLogger<StaticFileRequestHandler>());
+				var mimeProvider = provider.GetRequiredService<IMimeProvider>();
+				return new StaticFileRequestHandler(filesProvider, mimeProvider, loggerFactory.CreateLogger<StaticFileRequestHandler>());
 			});
 
 			services.TryAddSingleton<IResponseCompressor>(provider =>
@@ -149,7 +153,8 @@ namespace Everest.Rest
 			{
 				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
 				var filesProvider = provider.GetRequiredService<IStaticFilesProvider>();
-				var handler = new StaticFileRequestHandler(filesProvider, loggerFactory.CreateLogger<StaticFileRequestHandler>());
+				var mimeProvider = provider.GetRequiredService<IMimeProvider>();
+				var handler = new StaticFileRequestHandler(filesProvider, mimeProvider, loggerFactory.CreateLogger<StaticFileRequestHandler>());
 				configurator(new DefaultStaticFileRequestHandlerConfigurator(handler, provider));
 
 				return handler;
@@ -173,6 +178,25 @@ namespace Everest.Rest
 				configurator(new DefaultStaticFilesProviderConfigurator(filesProvider, provider));
 
 				return filesProvider;
+			});
+
+			return services;
+		}
+
+		public static IServiceCollection AddMimeProvider(this IServiceCollection services, Func<IServiceProvider, IMimeProvider> builder)
+		{
+			services.AddSingleton(builder);
+			return services;
+		}
+
+		public static IServiceCollection AddMimeProvider(this IServiceCollection services, Action<DefaultMimeProviderConfigurator> configurator)
+		{
+			services.AddSingleton<IMimeProvider>(provider =>
+			{
+				var mimeProvider = new MimeProvider();
+				configurator(new DefaultMimeProviderConfigurator(mimeProvider, provider));
+
+				return mimeProvider;
 			});
 
 			return services;

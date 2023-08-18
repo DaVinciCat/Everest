@@ -12,12 +12,6 @@ namespace Everest.Files
 		{
 
 		}
-
-		public StaticFilesProviderConfigurator UsePhysicalPath(string physicalPath)
-		{
-			FilesProvider.PhysicalPath = physicalPath;
-			return this;
-		}
 	}
 
 	public class DefaultStaticFilesProviderConfigurator : StaticFilesProviderConfigurator
@@ -28,6 +22,12 @@ namespace Everest.Files
 			: base(filesProvider, services)
 		{
 			FilesProvider = filesProvider;
+		}
+
+		public StaticFilesProviderConfigurator UsePhysicalPath(string physicalPath)
+		{
+			FilesProvider.PhysicalPath = physicalPath;
+			return this;
 		}
 	}
 }

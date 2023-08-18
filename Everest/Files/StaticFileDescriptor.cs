@@ -8,9 +8,9 @@ namespace Everest.Files
 	{
 		public FileInfo File { get; }
 
-		public MimeDescriptor Mime { get; }
+		public Mime Mime { get; }
 
-		public StaticFileDescriptor(FileInfo file, MimeDescriptor mime)
+		public StaticFileDescriptor(FileInfo file, Mime mime)
 		{
 			File = file ?? throw new ArgumentNullException(nameof(file));
 			Mime = mime ?? throw new ArgumentNullException(nameof(mime));
