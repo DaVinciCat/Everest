@@ -47,7 +47,7 @@ namespace Everest.Authentication
 			authentications.Clear();
 		}
 
-		public async Task AuthenticateAsync(HttpContext context)
+		public async Task<bool> TryAuthenticateAsync(HttpContext context)
 		{
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
@@ -56,12 +56,12 @@ namespace Everest.Authentication
 			{
 				if (authentications.TryGetValue(scheme, out var authentication))
 				{
-					await authentication.TryAuthenticateAsync(context);
-					return;
-				}
-
-				Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. No supported authentication schemes {new { Scheme = scheme, SupportedSchemes = authentications.Keys.ToReadableArray() }}");
+					return await authentication.TryAuthenticateAsync(context);
+                }
 			}
-		}
+
+            Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. No supported authentication schemes {new { Scheme = scheme, SupportedSchemes = authentications.Keys.ToReadableArray() }}");
+            return false;
+        }
 	}
 }

@@ -15,6 +15,6 @@ namespace Everest.Authentication
 
 		void ClearAuthentications();
 
-		Task AuthenticateAsync(HttpContext context);
+		Task<bool> TryAuthenticateAsync(HttpContext context);
 	}
 }

@@ -21,7 +21,7 @@ namespace Everest.Authentication
 
 			if (context.Request.SupportsAuthentication())
 			{
-				await authenticator.AuthenticateAsync(context);
+				await authenticator.TryAuthenticateAsync(context);
 			}
 
 			if (HasNext)
