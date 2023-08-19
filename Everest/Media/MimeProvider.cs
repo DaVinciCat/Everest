@@ -23,11 +23,6 @@ namespace Everest.Media
 			}
 		}
 
-		public bool HasMime(string fileExtension)
-		{
-			return mimes.ContainsKey(fileExtension);
-		}
-
 		public void AddMime(string fileExtension, string contentType, bool isBinary)
 		{
 			var mime = new Mime(fileExtension, contentType, isBinary);
