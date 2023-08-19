@@ -2,6 +2,7 @@
 using Everest.Middleware;
 using Everest.Routing;
 using System;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Everest.Files
@@ -22,7 +23,8 @@ namespace Everest.Files
 
 			if (!context.Response.ResponseSent && 
                 !context.Request.Path.EndsWith('/') && 
-                !context.TryGetRouteDescriptor(out _) &&
+				!context.TryGetRouteDescriptor(out _) &&
+                Path.HasExtension(context.Request.Path) &&
                 (context.Request.IsGetMethod() || context.Request.IsHeadMethod()) &&
                 await handler.TryServeStaticFileAsync(context))
 			{
