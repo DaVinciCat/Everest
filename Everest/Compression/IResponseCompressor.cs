@@ -15,6 +15,6 @@ namespace Everest.Compression
 
 		void ClearCompressions();
 
-		Task<bool> TryComressResponseAsync(HttpContext context);
+		Task<bool> TryCompressResponseAsync(HttpContext context);
 	}
 }

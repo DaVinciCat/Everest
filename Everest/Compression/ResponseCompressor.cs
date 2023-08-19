@@ -48,7 +48,7 @@ namespace Everest.Compression
 			compressions.Clear();
 		}
 
-		public Task<bool> TryComressResponseAsync(HttpContext context)
+		public Task<bool> TryCompressResponseAsync(HttpContext context)
 		{
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));

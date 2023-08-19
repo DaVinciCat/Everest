@@ -24,7 +24,7 @@ namespace Everest.Compression
 
 	        if (!context.Response.ResponseSent && context.Request.SupportsContentCompression())
 	        {
-		        await compressor.TryComressResponseAsync(context);
+		        await compressor.TryCompressResponseAsync(context);
 	        }
         }
     }
