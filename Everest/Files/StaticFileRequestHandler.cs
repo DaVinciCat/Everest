@@ -5,6 +5,7 @@ using Everest.Http;
 using System.Net;
 using Everest.Media;
 using Everest.Utils;
+using System.IO;
 
 namespace Everest.Files
 {
@@ -45,13 +46,8 @@ namespace Everest.Files
 		
 		public async Task<bool> TryServeStaticFileAsync(HttpContext context)
 		{
-			if (!context.Request.IsGetMethod() && !context.Request.IsHeadMethod())
-			{
-				Logger.LogWarning($"{context.TraceIdentifier} - Failed to serve file. Request method not supported: {new { Request = context.Request.Description }}");
-				return false;
-			}
-
-			if (!filesProvider.TryGetFile(context.Request, out var file))
+			var physicalPath = Path.Combine(filesProvider.PhysicalPath, context.Request.Path.Trim('/').Replace("/", "\\"));
+            if (!filesProvider.TryGetFile(physicalPath, out var file))
 			{
 				Logger.LogWarning($"{context.TraceIdentifier} - Failed to serve file. Requested file not found: {new { RequestPath = context.Request.Path, Request = context.Request.Description }}");
 				await OnFileNotFoundAsync(context);
@@ -84,7 +80,7 @@ namespace Everest.Files
 			return false;
 		}
 
-		public Func<HttpContext, Task> OnFileNotFoundAsync { get; set; } = async context =>
+        public Func<HttpContext, Task> OnFileNotFoundAsync { get; set; } = async context =>
 		{
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));

@@ -34,12 +34,12 @@ namespace Everest.Routing
 				foreach (var method in GetRestRouteMethods(type))
 				{
 					var routeAttribute = GetAttributes<RestRouteAttribute>(method).FirstOrDefault();
-					routePrefixAttribute = GetAttributes<RoutePrefixAttribute>(method).FirstOrDefault() ?? routePrefixAttribute;
+					var prefixAttribute = GetAttributes<RoutePrefixAttribute>(method).FirstOrDefault() ?? routePrefixAttribute;
 					
 					if (routeAttribute != null)
 					{
 						var action = (Func<HttpContext, Task>)method.CreateDelegate(typeof(Func<HttpContext, Task>), null);
-						var routePrefix = routePrefixAttribute?.RoutePrefix ?? string.Empty;
+						var routePrefix = prefixAttribute?.RoutePrefix ?? string.Empty;
 						var route = new Route(routeAttribute.HttpMethod, $"{routePrefix}{routeAttribute.RoutePattern}");
 						var endPoint = new EndPoint(type, method, action);
 						var descriptor = new RouteDescriptor(route, endPoint);

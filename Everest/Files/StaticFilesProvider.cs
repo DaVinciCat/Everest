@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Everest.Http;
 
 namespace Everest.Files
 {
@@ -91,40 +90,26 @@ namespace Everest.Files
 			}
 		}
 
-		public bool HasFile(string filePath)
+		private bool HasFile(string filePath)
 		{
 			lock (sync)
 			{
 				return files.Contains(filePath);
 			}
 		}
-
-		public bool HasFile(HttpRequest request)
+		
+		public bool TryGetFile(string filePath, out FileInfo file)
 		{
-			lock (sync)
+			if (HasFile(filePath))
 			{
-				return files.Contains(RequestPathToPhysicalPath(request.Path));
-			}
-		}
-
-		public bool TryGetFile(HttpRequest request, out FileInfo file)
-		{
-			if (HasFile(request))
-			{
-				var physicalPath = RequestPathToPhysicalPath(request.Path);
-				file = new FileInfo(physicalPath);
+				file = new FileInfo(filePath);
 				return true;
 			}
 
 			file = null;
 			return false;
 		}
-
-		private string RequestPathToPhysicalPath(string filePath)
-		{
-			return Path.Combine(PhysicalPath, filePath.Trim('/').Replace("/", "\\"));
-		}
-
+       
 		#endregion
 
 		#region FileWatcher
