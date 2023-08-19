@@ -5,7 +5,6 @@ using Everest.Http;
 using System.Net;
 using Everest.Media;
 using Everest.Utils;
-using System.IO;
 
 namespace Everest.Files
 {
@@ -44,9 +43,9 @@ namespace Everest.Files
 
 		#region Handle
 		
-		public async Task<bool> TryServeStaticFileAsync(HttpContext context)
-		{
-			var physicalPath = Path.Combine(filesProvider.PhysicalPath, context.Request.Path.Trim('/').Replace("/", "\\"));
+        public async Task<bool> TryServeStaticFileAsync(HttpContext context)
+        {
+            var physicalPath = filesProvider.GetFilePhysicalPath(context.Request);
             if (!filesProvider.TryGetFile(physicalPath, out var file))
 			{
 				Logger.LogWarning($"{context.TraceIdentifier} - Failed to serve file. Requested file not found: {new { RequestPath = context.Request.Path, Request = context.Request.Description }}");

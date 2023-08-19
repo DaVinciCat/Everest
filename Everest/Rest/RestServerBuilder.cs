@@ -322,7 +322,8 @@ namespace Everest.Rest
 		public static RestServerBuilder UseStaticFilesMiddleware(this RestServerBuilder builder)
 		{
 			var handler = builder.Services.GetRequiredService<IStaticFileRequestHandler>();
-			builder.Middleware.Add(new StaticFilesMiddleware(handler));
+            var filesProvider = builder.Services.GetRequiredService<IStaticFilesProvider>();
+            builder.Middleware.Add(new StaticFilesMiddleware(handler, filesProvider));
 			return builder;
 		}
 

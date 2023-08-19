@@ -2,7 +2,6 @@
 using Everest.Middleware;
 using Everest.Routing;
 using System;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace Everest.Files
@@ -11,28 +10,24 @@ namespace Everest.Files
 	{
 		private readonly IStaticFileRequestHandler handler;
 
-		public StaticFilesMiddleware(IStaticFileRequestHandler handler)
+        private readonly IStaticFilesProvider filesProvider;
+
+		public StaticFilesMiddleware(IStaticFileRequestHandler handler, IStaticFilesProvider filesProvider)
 		{
 			this.handler = handler ?? throw new ArgumentNullException(nameof(handler));
-		}
+            this.filesProvider = filesProvider ?? throw new ArgumentNullException(nameof(filesProvider));
+        }
 
 		public override async Task InvokeAsync(HttpContext context)
 		{
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
 
-			if (!context.Response.ResponseSent && 
-                !context.Request.Path.EndsWith('/') && 
-				!context.TryGetRouteDescriptor(out _) &&
-                Path.HasExtension(context.Request.Path) &&
-                (context.Request.IsGetMethod() || context.Request.IsHeadMethod()) &&
-                await handler.TryServeStaticFileAsync(context))
-			{
-				return;
-			}
-
-			if (HasNext)
-				await Next.InvokeAsync(context);
-		}
+            if (context.Response.ResponseSent || context.TryGetRouteDescriptor(out _) || !filesProvider.IsStaticFileRequest(context.Request) || !await handler.TryServeStaticFileAsync(context))
+            {
+                if (HasNext)
+                    await Next.InvokeAsync(context);
+            }
+        }
 	}
 }
