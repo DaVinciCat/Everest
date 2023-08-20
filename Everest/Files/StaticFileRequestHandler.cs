@@ -45,7 +45,8 @@ namespace Everest.Files
 		
         public async Task<bool> TryServeStaticFileAsync(HttpContext context)
         {
-            if (!filesProvider.TryGetFile(context.Request.Path, out var file))
+            var filePath = context.Request.RequestPathToFilePath();
+            if (!filesProvider.TryGetFile(filePath, out var file))
 			{
 				Logger.LogWarning($"{context.TraceIdentifier} - Failed to serve file. Requested file not found: {new { RequestPath = context.Request.Path, Request = context.Request.Description }}");
 				await OnFileNotFoundAsync(context);
