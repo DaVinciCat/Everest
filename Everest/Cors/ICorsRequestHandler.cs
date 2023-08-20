@@ -5,6 +5,6 @@ namespace Everest.Cors
 {
 	public interface ICorsRequestHandler
 	{
-		public Task<bool> TryHandleCorsRequestAsync(HttpContext context);
+		Task<bool> TryHandleCorsRequestAsync(HttpContext context);
 	}
 }
