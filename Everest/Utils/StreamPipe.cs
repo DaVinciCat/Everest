@@ -192,8 +192,19 @@ namespace Everest.Utils
             if (disposed)
                 return;
 
-            input?.Dispose();
-            output?.Dispose();
+            input.Dispose();
+            output.Dispose();
+
+            disposed = true;
+        }
+
+        public async Task DisposeAsync()
+        {
+            if (disposed)
+                return;
+
+            await input.DisposeAsync();
+            await output.DisposeAsync();
 
             disposed = true;
         }
