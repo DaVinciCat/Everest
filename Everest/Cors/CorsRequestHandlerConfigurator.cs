@@ -3,11 +3,11 @@ using System;
 
 namespace Everest.Cors
 {
-	public class CorsRequestHandlerConfigurator : ServiceConfigurator<ICorsRequestHandler>
+	public class CorsRequestHandlerConfigurator : ServiceConfigurator<CorsRequestHandler>
 	{
-		public ICorsRequestHandler Handler => Service;
+		public CorsRequestHandler Handler => Service;
 
-		public CorsRequestHandlerConfigurator(ICorsRequestHandler handler, IServiceProvider services)
+		public CorsRequestHandlerConfigurator(CorsRequestHandler handler, IServiceProvider services)
 			: base(handler, services)
 		{
 
@@ -23,17 +23,6 @@ namespace Everest.Cors
 		{
 			Handler.AddCorsPolicy(policy);
 			return this;
-		}
-	}
-
-	public class DefaultCorsRequestHandlerConfigurator : CorsRequestHandlerConfigurator
-	{
-		public new CorsRequestHandler Handler { get; }
-
-		public DefaultCorsRequestHandlerConfigurator(CorsRequestHandler handler, IServiceProvider services) 
-			: base(handler, services)
-		{
-			Handler = handler;
 		}
 	}
 }

@@ -104,7 +104,7 @@ namespace Everest.Rest
 			return services;
 		}
 
-		public static IServiceCollection AddAuthenticator(this IServiceCollection services, Action<DefaultAuthenticatorConfigurator> configurator)
+		public static IServiceCollection AddAuthenticator(this IServiceCollection services, Action<AuthenticatorConfigurator> configurator)
 		{
 			if (configurator == null) 
 				throw new ArgumentNullException(nameof(configurator));
@@ -113,7 +113,7 @@ namespace Everest.Rest
 			{
 				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
 				var authenticator = new Authenticator(loggerFactory.CreateLogger<Authenticator>());
-				configurator(new DefaultAuthenticatorConfigurator(authenticator, provider));
+				configurator(new AuthenticatorConfigurator(authenticator, provider));
 
 				return authenticator;
 			});
@@ -127,13 +127,13 @@ namespace Everest.Rest
 			return services;
 		}
 
-		public static IServiceCollection AddRouter(this IServiceCollection services, Action<DefaultRouterConfigurator> configurator)
+		public static IServiceCollection AddRouter(this IServiceCollection services, Action<RouterConfigurator> configurator)
 		{
 			services.AddSingleton<IRouter>(provider =>
 			{
 				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
 				var router = new Router(loggerFactory.CreateLogger<Router>());
-				configurator(new DefaultRouterConfigurator(router, provider));
+				configurator(new RouterConfigurator(router, provider));
 
 				return router;
 			});
@@ -147,7 +147,7 @@ namespace Everest.Rest
 			return services;
 		}
 
-		public static IServiceCollection AddStaticFileRequestHandler(this IServiceCollection services, Action<DefaultStaticFileRequestHandlerConfigurator> configurator)
+		public static IServiceCollection AddStaticFileRequestHandler(this IServiceCollection services, Action<StaticFileRequestHandlerConfigurator> configurator)
 		{
 			services.AddSingleton<IStaticFileRequestHandler>(provider =>
 			{
@@ -155,7 +155,7 @@ namespace Everest.Rest
 				var filesProvider = provider.GetRequiredService<IStaticFilesProvider>();
 				var mimeProvider = provider.GetRequiredService<IMimeProvider>();
 				var handler = new StaticFileRequestHandler(filesProvider, mimeProvider, loggerFactory.CreateLogger<StaticFileRequestHandler>());
-				configurator(new DefaultStaticFileRequestHandlerConfigurator(handler, provider));
+				configurator(new StaticFileRequestHandlerConfigurator(handler, provider));
 
 				return handler;
 			});
@@ -169,13 +169,13 @@ namespace Everest.Rest
 			return services;
 		}
 
-		public static IServiceCollection AddStaticFilesProvider(this IServiceCollection services, Action<DefaultStaticFilesProviderConfigurator> configurator)
+		public static IServiceCollection AddStaticFilesProvider(this IServiceCollection services, Action<StaticFilesProviderConfigurator> configurator)
 		{
 			services.AddSingleton<IStaticFilesProvider>(provider =>
 			{
 				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
 				var filesProvider = new StaticFilesProvider(loggerFactory.CreateLogger<StaticFilesProvider>());
-				configurator(new DefaultStaticFilesProviderConfigurator(filesProvider, provider));
+				configurator(new StaticFilesProviderConfigurator(filesProvider, provider));
 
 				return filesProvider;
 			});
@@ -189,12 +189,12 @@ namespace Everest.Rest
 			return services;
 		}
 
-		public static IServiceCollection AddMimeProvider(this IServiceCollection services, Action<DefaultMimeProviderConfigurator> configurator)
+		public static IServiceCollection AddMimeProvider(this IServiceCollection services, Action<MimeProviderConfigurator> configurator)
 		{
 			services.AddSingleton<IMimeProvider>(provider =>
 			{
 				var mimeProvider = new MimeProvider();
-				configurator(new DefaultMimeProviderConfigurator(mimeProvider, provider));
+				configurator(new MimeProviderConfigurator(mimeProvider, provider));
 
 				return mimeProvider;
 			});
@@ -214,13 +214,13 @@ namespace Everest.Rest
 			return services;
 		}
 
-		public static IServiceCollection AddResponseCompressor(this IServiceCollection services, Action<DefaultResponseCompressorConfigurator> configurator)
+		public static IServiceCollection AddResponseCompressor(this IServiceCollection services, Action<ResponseCompressorConfigurator> configurator)
 		{
 			services.AddSingleton<IResponseCompressor>(provider =>
 			{
 				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
 				var compressor = new ResponseCompressor(loggerFactory.CreateLogger<ResponseCompressor>());
-				configurator(new DefaultResponseCompressorConfigurator(compressor, provider));
+				configurator(new ResponseCompressorConfigurator(compressor, provider));
 
 				return compressor;
 			});
@@ -234,13 +234,13 @@ namespace Everest.Rest
 			return services;
 		}
 
-		public static IServiceCollection AddCorsRequestHandler(this IServiceCollection services, Action<DefaultCorsRequestHandlerConfigurator> configurator)
+		public static IServiceCollection AddCorsRequestHandler(this IServiceCollection services, Action<CorsRequestHandlerConfigurator> configurator)
 		{
 			services.AddSingleton<ICorsRequestHandler>(provider =>
 			{
 				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
 				var handler = new CorsRequestHandler(loggerFactory.CreateLogger<CorsRequestHandler>());
-				configurator(new DefaultCorsRequestHandlerConfigurator(handler, provider));
+				configurator(new CorsRequestHandlerConfigurator(handler, provider));
 
 				return handler;
 			});
@@ -254,13 +254,13 @@ namespace Everest.Rest
 			return services;
 		}
 
-		public static IServiceCollection AddExceptionHandler(this IServiceCollection services, Action<DefaultExceptionHandlerConfigurator> configurator)
+		public static IServiceCollection AddExceptionHandler(this IServiceCollection services, Action<ExceptionHandlerConfigurator> configurator)
 		{
 			services.AddSingleton<IExceptionHandler>(provider =>
 			{
 				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
 				var handler = new ExceptionHandler(loggerFactory.CreateLogger<ExceptionHandler>());
-				configurator(new DefaultExceptionHandlerConfigurator(handler, provider));
+				configurator(new ExceptionHandlerConfigurator(handler, provider));
 
 				return handler;
 			});

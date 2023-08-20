@@ -5,11 +5,11 @@ using System.IO.Compression;
 
 namespace Everest.Compression
 {
-	public class ResponseCompressorConfigurator : ServiceConfigurator<IResponseCompressor>
+	public class ResponseCompressorConfigurator : ServiceConfigurator<ResponseCompressor>
 	{
-		public IResponseCompressor Compressor => Service;
+		public ResponseCompressor Compressor => Service;
 
-		public ResponseCompressorConfigurator(IResponseCompressor compressor, IServiceProvider services)
+		public ResponseCompressorConfigurator(ResponseCompressor compressor, IServiceProvider services)
 			: base(compressor, services)
 		{
 		}
@@ -20,18 +20,7 @@ namespace Everest.Compression
 			return this;
 		}
 	}
-
-	public class DefaultResponseCompressorConfigurator : ResponseCompressorConfigurator
-	{
-		public new ResponseCompressor Compressor { get; }
-		
-		public DefaultResponseCompressorConfigurator(ResponseCompressor compressor, IServiceProvider services) 
-			: base(compressor, services)
-		{
-			Compressor = compressor;
-		}
-	}
-
+	
 	public static class ResponseCompressorConfiguratorExtensions
 	{
 		public static ResponseCompressorConfigurator AddGzipCompression(this ResponseCompressorConfigurator configurator)

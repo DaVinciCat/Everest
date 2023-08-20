@@ -5,16 +5,6 @@ namespace Everest.Authentication
 {
     public interface IAuthenticator
 	{
-		public IAuthentication[] Authentications { get; }
-
-		void AddAuthentication(IAuthentication authentication);
-
-		void RemoveAuthentication(IAuthentication authentication);
-
-		void RemoveAuthentication(string scheme);
-
-		void ClearAuthentications();
-
 		Task<bool> TryAuthenticateAsync(HttpContext context);
 	}
 }

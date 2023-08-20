@@ -3,25 +3,14 @@ using Everest.Services;
 
 namespace Everest.Files
 {
-	public class StaticFileRequestHandlerConfigurator : ServiceConfigurator<IStaticFileRequestHandler>
+	public class StaticFileRequestHandlerConfigurator : ServiceConfigurator<StaticFileRequestHandler>
 	{
-		public IStaticFileRequestHandler Handler => Service;
+		public StaticFileRequestHandler Handler => Service;
 
-		public StaticFileRequestHandlerConfigurator(IStaticFileRequestHandler handler, IServiceProvider services) 
+		public StaticFileRequestHandlerConfigurator(StaticFileRequestHandler handler, IServiceProvider services) 
 			: base(handler, services)
 		{
 
-		}
-	}
-
-	public class DefaultStaticFileRequestHandlerConfigurator : StaticFileRequestHandlerConfigurator
-	{
-		public new StaticFileRequestHandler Handler { get; }
-
-		public DefaultStaticFileRequestHandlerConfigurator(StaticFileRequestHandler handler, IServiceProvider services)
-			: base(handler, services)
-		{
-			Handler = handler;
 		}
 	}
 }

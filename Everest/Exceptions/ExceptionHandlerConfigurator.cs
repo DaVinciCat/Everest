@@ -3,25 +3,14 @@ using Everest.Services;
 
 namespace Everest.Exceptions
 {
-	public class ExceptionHandlerConfigurator : ServiceConfigurator<IExceptionHandler>
+	public class ExceptionHandlerConfigurator : ServiceConfigurator<ExceptionHandler>
 	{
-		public IExceptionHandler Handler => Service;
+		public ExceptionHandler Handler => Service;
 
-		public ExceptionHandlerConfigurator(IExceptionHandler handler, IServiceProvider services) 
+		public ExceptionHandlerConfigurator(ExceptionHandler handler, IServiceProvider services) 
 			: base(handler, services)
 		{
 
-		}
-	}
-
-	public class DefaultExceptionHandlerConfigurator : ExceptionHandlerConfigurator
-	{
-		public new ExceptionHandler Handler { get; }
-
-		public DefaultExceptionHandlerConfigurator(ExceptionHandler handler, IServiceProvider services) 
-			: base(handler, services)
-		{
-			Handler = handler;
 		}
 	}
 }

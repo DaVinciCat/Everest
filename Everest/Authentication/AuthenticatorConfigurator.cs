@@ -5,11 +5,11 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Everest.Authentication
 {
-	public class AuthenticatorConfigurator : ServiceConfigurator<IAuthenticator>
+	public class AuthenticatorConfigurator : ServiceConfigurator<Authenticator>
 	{
-		public IAuthenticator Authenticator => Service;
+		public Authenticator Authenticator => Service;
 
-		public AuthenticatorConfigurator(IAuthenticator authenticator, IServiceProvider services)
+		public AuthenticatorConfigurator(Authenticator authenticator, IServiceProvider services)
 			: base(authenticator, services)
 		{
 
@@ -20,18 +20,7 @@ namespace Everest.Authentication
 			Authenticator.AddAuthentication(authentication);
 		}
 	}
-
-	public class DefaultAuthenticatorConfigurator : AuthenticatorConfigurator
-	{
-		public new Authenticator Authenticator { get; }
-
-		public DefaultAuthenticatorConfigurator(Authenticator authenticator, IServiceProvider services) 
-			: base(authenticator, services)
-		{
-			Authenticator = authenticator;
-		}
-	}
-
+	
 	public static class AuthenticatorConfiguratorExtensions
 	{
 		public static AuthenticatorConfigurator AddBasicAuthentication(this AuthenticatorConfigurator configurator, Action<BasicAuthentication> configure = null)
