@@ -65,8 +65,8 @@ namespace Everest.Files
 		}
 
 		private readonly HashSet<string> files = new();
-
-		private void AddFile(string filePath)
+		
+        private void AddFile(string filePath)
 		{
 			lock (sync)
 			{
@@ -99,7 +99,8 @@ namespace Everest.Files
 		}
 		
 		public bool TryGetFile(string filePath, out FileInfo file)
-		{
+        {
+            filePath = Path.Combine(PhysicalPath, filePath);
 			if (HasFile(filePath))
 			{
 				file = new FileInfo(filePath);
