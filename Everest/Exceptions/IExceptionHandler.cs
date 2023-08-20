@@ -6,6 +6,6 @@ namespace Everest.Exceptions
 {
 	public interface IExceptionHandler
 	{
-		Task HandleAsync(HttpContext context, Exception ex);
+		Task HandleExceptionAsync(HttpContext context, Exception ex);
 	}
 }

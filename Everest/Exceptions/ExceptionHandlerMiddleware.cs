@@ -26,7 +26,7 @@ namespace Everest.Exceptions
             }
             catch (Exception ex)
             {
-                await handler.HandleAsync(context, ex);
+                await handler.HandleExceptionAsync(context, ex);
             }
         }
     }

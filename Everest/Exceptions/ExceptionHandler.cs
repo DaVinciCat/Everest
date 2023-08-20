@@ -15,7 +15,7 @@ namespace Everest.Exceptions
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
-		public async Task HandleAsync(HttpContext context, Exception ex)
+		public async Task HandleExceptionAsync(HttpContext context, Exception ex)
 		{
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
