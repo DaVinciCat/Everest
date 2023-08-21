@@ -7,8 +7,8 @@ namespace Everest.Files
 	{
 		public StaticFilesProvider FilesProvider => Service;
 
-		public StaticFilesProviderConfigurator(StaticFilesProvider filesProvider, IServiceProvider services)
-			: base(filesProvider, services)
+		public StaticFilesProviderConfigurator(StaticFilesProvider staticFilesProvider, IServiceProvider services)
+			: base(staticFilesProvider, services)
 		{
 
 		}

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using Everest.Media;
+using Everest.Mime;
 
 namespace Everest.Files
 {
@@ -8,12 +8,12 @@ namespace Everest.Files
 	{
 		public FileInfo File { get; }
 
-		public Mime Mime { get; }
+		public MimeType MimeType { get; }
 
-		public StaticFileDescriptor(FileInfo file, Mime mime)
+		public StaticFileDescriptor(FileInfo file, MimeType mimeType)
 		{
 			File = file ?? throw new ArgumentNullException(nameof(file));
-			Mime = mime ?? throw new ArgumentNullException(nameof(mime));
+			MimeType = mimeType ?? throw new ArgumentNullException(nameof(mimeType));
 		}
 	}
 }

@@ -8,8 +8,8 @@ using Everest.Cors;
 using Everest.EndPoints;
 using Everest.Exceptions;
 using Everest.Files;
-using Everest.Media;
 using Everest.Middleware;
+using Everest.Mime;
 using Everest.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -57,14 +57,14 @@ namespace Everest.Rest
 				return new StaticFilesProvider(loggerFactory.CreateLogger<StaticFilesProvider>());
 			});
 
-			services.TryAddSingleton<IMimeProvider>(_ => new MimeProvider());
+			services.TryAddSingleton<IMimeTypesProvider>(_ => new MimeTypesProvider());
 
 			services.TryAddSingleton<IStaticFileRequestHandler>(provider =>
 			{
 				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
-				var filesProvider = provider.GetRequiredService<IStaticFilesProvider>();
-				var mimeProvider = provider.GetRequiredService<IMimeProvider>();
-				return new StaticFileRequestHandler(filesProvider, mimeProvider, loggerFactory.CreateLogger<StaticFileRequestHandler>());
+				var staticFilesProvider = provider.GetRequiredService<IStaticFilesProvider>();
+				var mimeTypesProvider = provider.GetRequiredService<IMimeTypesProvider>();
+				return new StaticFileRequestHandler(staticFilesProvider, mimeTypesProvider, loggerFactory.CreateLogger<StaticFileRequestHandler>());
 			});
 
 			services.TryAddSingleton<IResponseCompressor>(provider =>
@@ -152,9 +152,9 @@ namespace Everest.Rest
 			services.AddSingleton<IStaticFileRequestHandler>(provider =>
 			{
 				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
-				var filesProvider = provider.GetRequiredService<IStaticFilesProvider>();
-				var mimeProvider = provider.GetRequiredService<IMimeProvider>();
-				var handler = new StaticFileRequestHandler(filesProvider, mimeProvider, loggerFactory.CreateLogger<StaticFileRequestHandler>());
+				var staticFilesProvider = provider.GetRequiredService<IStaticFilesProvider>();
+				var mimeTypesProvider = provider.GetRequiredService<IMimeTypesProvider>();
+				var handler = new StaticFileRequestHandler(staticFilesProvider, mimeTypesProvider, loggerFactory.CreateLogger<StaticFileRequestHandler>());
 				configurator(new StaticFileRequestHandlerConfigurator(handler, provider));
 
 				return handler;
@@ -174,29 +174,29 @@ namespace Everest.Rest
 			services.AddSingleton<IStaticFilesProvider>(provider =>
 			{
 				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
-				var filesProvider = new StaticFilesProvider(loggerFactory.CreateLogger<StaticFilesProvider>());
-				configurator(new StaticFilesProviderConfigurator(filesProvider, provider));
+				var staticFilesProvider = new StaticFilesProvider(loggerFactory.CreateLogger<StaticFilesProvider>());
+				configurator(new StaticFilesProviderConfigurator(staticFilesProvider, provider));
 
-				return filesProvider;
+				return staticFilesProvider;
 			});
 
 			return services;
 		}
 
-		public static IServiceCollection AddMimeProvider(this IServiceCollection services, Func<IServiceProvider, IMimeProvider> builder)
+		public static IServiceCollection AddMimeTypesProvider(this IServiceCollection services, Func<IServiceProvider, IMimeTypesProvider> builder)
 		{
 			services.AddSingleton(builder);
 			return services;
 		}
 
-		public static IServiceCollection AddMimeProvider(this IServiceCollection services, Action<MimeProviderConfigurator> configurator)
+		public static IServiceCollection AddMimeTypesProvider(this IServiceCollection services, Action<MimeTypesProviderConfigurator> configurator)
 		{
-			services.AddSingleton<IMimeProvider>(provider =>
+			services.AddSingleton<IMimeTypesProvider>(provider =>
 			{
-				var mimeProvider = new MimeProvider();
-				configurator(new MimeProviderConfigurator(mimeProvider, provider));
+				var mimeTypesProvider = new MimeTypesProvider();
+				configurator(new MimeTypesProviderConfigurator(mimeTypesProvider, provider));
 
-				return mimeProvider;
+				return mimeTypesProvider;
 			});
 
 			return services;
@@ -322,8 +322,8 @@ namespace Everest.Rest
 		public static RestServerBuilder UseStaticFilesMiddleware(this RestServerBuilder builder)
 		{
 			var handler = builder.Services.GetRequiredService<IStaticFileRequestHandler>();
-            var filesProvider = builder.Services.GetRequiredService<IStaticFilesProvider>();
-            builder.Middleware.Add(new StaticFilesMiddleware(handler, filesProvider));
+            var staticFilesProvider = builder.Services.GetRequiredService<IStaticFilesProvider>();
+            builder.Middleware.Add(new StaticFilesMiddleware(handler, staticFilesProvider));
 			return builder;
 		}
 
