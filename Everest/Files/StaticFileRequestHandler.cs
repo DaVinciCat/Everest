@@ -99,7 +99,7 @@ namespace Everest.Files
 				throw new ArgumentNullException(nameof(descriptor));
 
 			context.Response.StatusCode = HttpStatusCode.OK;
-			await context.Response.WriteFileAsync(descriptor.File.FullName, descriptor.MimeType.ContentType.MediaType, descriptor.MimeType.ContentDisposition.DispositionType);
+			await context.Response.WriteFileAsync(descriptor.FileInfo.FullName, descriptor.MimeType.ContentType.MediaType, descriptor.MimeType.ContentDisposition.DispositionType);
 			return true;
 		};
 

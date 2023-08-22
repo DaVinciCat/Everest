@@ -6,13 +6,13 @@ namespace Everest.Files
 {
 	public class StaticFileDescriptor
 	{
-		public FileInfo File { get; }
+		public FileInfo FileInfo { get; }
 
 		public MimeType MimeType { get; }
 
-		public StaticFileDescriptor(FileInfo file, MimeType mimeType)
+		public StaticFileDescriptor(FileInfo fileInfo, MimeType mimeType)
 		{
-			File = file ?? throw new ArgumentNullException(nameof(file));
+			FileInfo = fileInfo ?? throw new ArgumentNullException(nameof(fileInfo));
 			MimeType = mimeType ?? throw new ArgumentNullException(nameof(mimeType));
 		}
 	}
