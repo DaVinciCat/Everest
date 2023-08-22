@@ -15,13 +15,13 @@ namespace Everest.Cors
 
 		public CorsRequestHandlerConfigurator AddDefaultCorsPolicy()
 		{
-			Handler.AddCorsPolicy(CorsPolicy.Default);
+			Handler.Policies.Add(CorsPolicy.Default);
 			return this;
 		}
 
 		public CorsRequestHandlerConfigurator AddCorsPolicy(CorsPolicy policy)
 		{
-			Handler.AddCorsPolicy(policy);
+			Handler.Policies.Add(policy);
 			return this;
 		}
 	}

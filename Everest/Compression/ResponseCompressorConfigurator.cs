@@ -7,7 +7,7 @@ namespace Everest.Compression
 {
 	public class ResponseCompressorConfigurator : ServiceConfigurator<ResponseCompressor>
 	{
-		public ResponseCompressor Compressor => Service;
+		public ResponseCompressor ResponseCompressor => Service;
 
 		public ResponseCompressorConfigurator(ResponseCompressor compressor, IServiceProvider services)
 			: base(compressor, services)
@@ -16,7 +16,7 @@ namespace Everest.Compression
 
 		public ResponseCompressorConfigurator AddCompression(string encoding, Func<Stream, Stream> compression)
 		{
-			Compressor.AddCompression(encoding, compression);
+			ResponseCompressor.Compressors.Add(encoding, compression);
 			return this;
 		}
 	}

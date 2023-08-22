@@ -17,12 +17,8 @@ namespace Everest.Routing
 		public string[] Delimiters { get; set; } = { "/" };
 
 		public RouteDescriptor[] Routes => methods.SelectMany(kvp => kvp.Value.Routes).ToArray();
-
-		public delegate IRouteSegmentParser CreateRouteSegmentParser(string segmentPattern);
-
-		public IReadOnlyDictionary<string, Func<string, IRouteSegmentParser>> SegmentParsers => segmentParsers;
-
-		private readonly Dictionary<string, Func<string, IRouteSegmentParser>> segmentParsers = new()
+		
+		public RouteSegmentParserCollection SegmentParsers { get; } = new()
 		{
 			{ AlphaNumericRouteSegmentParser.SegmentPattern, segment => new AlphaNumericRouteSegmentParser(segment) },
 			{ StringParameterRouteSegmentParser.SegmentPattern, segment => new StringParameterRouteSegmentParser(segment)},
@@ -40,25 +36,7 @@ namespace Everest.Routing
 		{
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
-
-		public void AddSegmentParser(string segmentPattern, CreateRouteSegmentParser factory)
-		{
-			segmentParsers[segmentPattern] = factory.Invoke;
-		}
-
-		public void RemoveSegmentParser(string segmentPattern)
-		{
-			if (segmentParsers.ContainsKey(segmentPattern))
-			{
-				segmentParsers.Remove(segmentPattern);
-			}
-		}
-
-		public void ClearSegmentParsers()
-		{
-			segmentParsers.Clear();
-		}
-
+		
 		public void RegisterRoute(RouteDescriptor descriptor)
 		{
 			if (descriptor == null)
@@ -78,12 +56,12 @@ namespace Everest.Routing
 
 			IRouteSegmentParser GetParser(string segment)
 			{
-				foreach (var segmentPattern in segmentParsers.Keys)
+				foreach (var segmentPattern in SegmentParsers)
 				{
 					var match = Regex.Match(segment, segmentPattern);
 					if (match.Success)
 					{
-						return segmentParsers[segmentPattern](segment);
+						return SegmentParsers[segmentPattern](segment);
 					}
 				}
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -16,43 +15,15 @@ namespace Everest.Cors
 
     public class CorsRequestHandler : ICorsRequestHandler
 	{
-		public ILogger<CorsRequestHandler> Logger { get; }
+        public ILogger<CorsRequestHandler> Logger { get; }
 
-		public CorsPolicy[] Policies => policies.Values.ToArray();
-
-		private readonly Dictionary<string, CorsPolicy> policies = new();
+        public CorsPolicyCollection Policies { get; } = new();
 		
 		public CorsRequestHandler(ILogger<CorsRequestHandler> logger)
 		{
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
-
-		public void AddCorsPolicy(CorsPolicy policy)
-		{
-			policies[policy.Origin] = policy;
-		}
-
-		public void RemoveCorsPolicy(CorsPolicy policy)
-		{
-			if (policies.ContainsKey(policy.Origin))
-			{
-				policies.Remove(policy.Origin);
-			}
-		}
-
-		public void RemoveCorsPolicy(string origin)
-		{
-			if (policies.ContainsKey(origin))
-			{
-				policies.Remove(origin);
-			}
-		}
-
-		public void ClearCorsPolicies()
-		{
-			policies.Clear();
-		}
-
+		
 		public Task<bool> TryHandleCorsRequestAsync(HttpContext context)
 		{
 			if (context == null)
@@ -73,7 +44,7 @@ namespace Everest.Cors
 
 			Logger.LogTrace($"{context.TraceIdentifier} - Try to match CORS policy: {new { Request = context.Request.Description, Origin = origin, Policies = Policies.Select(p => p.Origin).ToReadableArray() }}");
 
-			if (policies.TryGetValue(origin, out var policy))
+			if (Policies.TryGet(origin, out var policy))
 			{
 				var headers = new Headers(policy.AllowMethods, policy.AllowHeaders, policy.Origin, policy.MaxAge);
 				context.Response.AddHeader(HttpHeaders.AccessControlAllowMethods, headers.AllowMethods);

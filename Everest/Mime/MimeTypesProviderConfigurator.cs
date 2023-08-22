@@ -15,7 +15,7 @@ namespace Everest.Mime
 
         public MimeTypesProviderConfigurator AddMimeType(string fileExtension, string contentType, bool isBinary)
         {
-            MimeTypesProvider.AddMimeType(fileExtension, contentType, isBinary);
+            MimeTypesProvider.MimeTypes.Add(fileExtension, contentType, isBinary);
             return this;
         }
     }
