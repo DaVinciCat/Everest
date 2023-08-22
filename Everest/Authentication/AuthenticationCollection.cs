@@ -18,9 +18,9 @@ namespace Everest.Authentication
             return authentications.ContainsKey(scheme);
         }
 
-        public bool TryGet(string scheme, out IAuthentication corsPolicy)
+        public bool TryGet(string scheme, out IAuthentication authentication)
         {
-            return authentications.TryGetValue(scheme, out corsPolicy);
+            return authentications.TryGetValue(scheme, out authentication);
         }
 
         public void Add(IAuthentication authentication)
