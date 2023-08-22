@@ -8,13 +8,13 @@ namespace Everest.Files
 {
 	public class StaticFilesMiddleware : MiddlewareBase
 	{
-		private readonly IStaticFileRequestHandler handler;
+		private readonly IStaticFileRequestHandler staticFileRequestHandler;
 
         private readonly IStaticFilesProvider staticFilesProvider;
 
-		public StaticFilesMiddleware(IStaticFileRequestHandler handler, IStaticFilesProvider staticFilesProvider)
+		public StaticFilesMiddleware(IStaticFileRequestHandler staticFileRequestHandler, IStaticFilesProvider staticFilesProvider)
 		{
-			this.handler = handler ?? throw new ArgumentNullException(nameof(handler));
+			this.staticFileRequestHandler = staticFileRequestHandler ?? throw new ArgumentNullException(nameof(staticFileRequestHandler));
             this.staticFilesProvider = staticFilesProvider ?? throw new ArgumentNullException(nameof(staticFilesProvider));
         }
 
@@ -23,7 +23,7 @@ namespace Everest.Files
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
 
-            if (context.Response.ResponseSent || context.TryGetRouteDescriptor(out _) || !staticFilesProvider.IsStaticFileRequest(context.Request) || !await handler.TryServeStaticFileAsync(context))
+            if (context.Response.ResponseSent || context.TryGetRouteDescriptor(out _) || !staticFilesProvider.IsStaticFileRequest(context.Request) || !await staticFileRequestHandler.TryServeStaticFileAsync(context))
             {
                 if (HasNext)
                     await Next.InvokeAsync(context);
