@@ -5,7 +5,7 @@ namespace Everest.Cors
 {
 	public class CorsRequestHandlerConfigurator : ServiceConfigurator<CorsRequestHandler>
 	{
-		public CorsRequestHandler Handler => Service;
+		public CorsRequestHandler CorsRequestHandler => Service;
 
 		public CorsRequestHandlerConfigurator(CorsRequestHandler handler, IServiceProvider services)
 			: base(handler, services)
@@ -15,13 +15,13 @@ namespace Everest.Cors
 
 		public CorsRequestHandlerConfigurator AddDefaultCorsPolicy()
 		{
-			Handler.Policies.Add(CorsPolicy.Default);
+			CorsRequestHandler.Policies.Add(CorsPolicy.Default);
 			return this;
 		}
 
 		public CorsRequestHandlerConfigurator AddCorsPolicy(CorsPolicy policy)
 		{
-			Handler.Policies.Add(policy);
+			CorsRequestHandler.Policies.Add(policy);
 			return this;
 		}
 	}

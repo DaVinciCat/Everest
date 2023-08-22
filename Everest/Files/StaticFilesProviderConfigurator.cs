@@ -5,7 +5,7 @@ namespace Everest.Files
 {
 	public class StaticFilesProviderConfigurator : ServiceConfigurator<StaticFilesProvider>
 	{
-		public StaticFilesProvider FilesProvider => Service;
+		public StaticFilesProvider StaticFilesProvider => Service;
 
 		public StaticFilesProviderConfigurator(StaticFilesProvider staticFilesProvider, IServiceProvider services)
 			: base(staticFilesProvider, services)
@@ -15,7 +15,7 @@ namespace Everest.Files
 
         public StaticFilesProviderConfigurator UsePhysicalPath(string physicalPath)
         {
-            FilesProvider.PhysicalPath = physicalPath;
+            StaticFilesProvider.PhysicalPath = physicalPath;
             return this;
         }
     }
