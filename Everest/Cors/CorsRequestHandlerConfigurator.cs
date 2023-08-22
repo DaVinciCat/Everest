@@ -7,8 +7,8 @@ namespace Everest.Cors
 	{
 		public CorsRequestHandler CorsRequestHandler => Service;
 
-		public CorsRequestHandlerConfigurator(CorsRequestHandler handler, IServiceProvider services)
-			: base(handler, services)
+		public CorsRequestHandlerConfigurator(CorsRequestHandler corsRequestHandler, IServiceProvider services)
+			: base(corsRequestHandler, services)
 		{
 
 		}

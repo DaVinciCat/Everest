@@ -9,8 +9,8 @@ namespace Everest.Compression
 	{
 		public ResponseCompressor ResponseCompressor => Service;
 
-		public ResponseCompressorConfigurator(ResponseCompressor compressor, IServiceProvider services)
-			: base(compressor, services)
+		public ResponseCompressorConfigurator(ResponseCompressor responseCompressor, IServiceProvider services)
+			: base(responseCompressor, services)
 		{
 		}
 

@@ -7,11 +7,11 @@ namespace Everest.EndPoints
 {
     public class EndPointMiddleware : MiddlewareBase
     {
-        private readonly IEndPointInvoker invoker;
+        private readonly IEndPointInvoker endPointInvoker;
 
-        public EndPointMiddleware(IEndPointInvoker invoker)
+        public EndPointMiddleware(IEndPointInvoker endPointInvoker)
         {
-            this.invoker = invoker ?? throw new ArgumentNullException(nameof(invoker));
+            this.endPointInvoker = endPointInvoker ?? throw new ArgumentNullException(nameof(endPointInvoker));
         }
 
         public override async Task InvokeAsync(HttpContext context)
@@ -19,7 +19,7 @@ namespace Everest.EndPoints
 	        if (context == null)
 		        throw new ArgumentNullException(nameof(context));
 
-            await invoker.TryInvokeEndPointAsync(context);
+            await endPointInvoker.TryInvokeEndPointAsync(context);
             
             if (HasNext)
                 await Next.InvokeAsync(context);

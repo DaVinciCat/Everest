@@ -7,8 +7,8 @@ namespace Everest.Files
 	{
 		public StaticFileRequestHandler StaticFileRequestHandler => Service;
 
-		public StaticFileRequestHandlerConfigurator(StaticFileRequestHandler handler, IServiceProvider services) 
-			: base(handler, services)
+		public StaticFileRequestHandlerConfigurator(StaticFileRequestHandler staticFileRequestHandler, IServiceProvider services) 
+			: base(staticFileRequestHandler, services)
 		{
 
 		}

@@ -8,11 +8,11 @@ namespace Everest.Cors
 {
 	public class CorsMiddleware : MiddlewareBase
     {
-	    private readonly ICorsRequestHandler handler;
+	    private readonly ICorsRequestHandler corsRequestHandler;
 
-        public CorsMiddleware(ICorsRequestHandler handler)
+        public CorsMiddleware(ICorsRequestHandler corsRequestHandler)
         {
-           this.handler = handler ?? throw new ArgumentNullException(nameof(handler));
+           this.corsRequestHandler = corsRequestHandler ?? throw new ArgumentNullException(nameof(corsRequestHandler));
         }
 
         public override async Task InvokeAsync(HttpContext context)
@@ -28,7 +28,7 @@ namespace Everest.Cors
 
 	        if (!context.Response.ResponseSent && context.Request.IsCorsPreflightRequest())
 	        {
-		        await handler.TryHandleCorsRequestAsync(context);
+		        await corsRequestHandler.TryHandleCorsRequestAsync(context);
 	        }
         }
     }

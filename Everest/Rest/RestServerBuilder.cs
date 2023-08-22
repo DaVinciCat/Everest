@@ -154,10 +154,10 @@ namespace Everest.Rest
 				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
 				var staticFilesProvider = provider.GetRequiredService<IStaticFilesProvider>();
 				var mimeTypesProvider = provider.GetRequiredService<IMimeTypesProvider>();
-				var handler = new StaticFileRequestHandler(staticFilesProvider, mimeTypesProvider, loggerFactory.CreateLogger<StaticFileRequestHandler>());
-				configurator(new StaticFileRequestHandlerConfigurator(handler, provider));
+				var staticFileRequestHandler = new StaticFileRequestHandler(staticFilesProvider, mimeTypesProvider, loggerFactory.CreateLogger<StaticFileRequestHandler>());
+				configurator(new StaticFileRequestHandlerConfigurator(staticFileRequestHandler, provider));
 
-				return handler;
+				return staticFileRequestHandler;
 			});
 
 			return services;
@@ -219,10 +219,10 @@ namespace Everest.Rest
 			services.AddSingleton<IResponseCompressor>(provider =>
 			{
 				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
-				var compressor = new ResponseCompressor(loggerFactory.CreateLogger<ResponseCompressor>());
-				configurator(new ResponseCompressorConfigurator(compressor, provider));
+				var responseCompressor = new ResponseCompressor(loggerFactory.CreateLogger<ResponseCompressor>());
+				configurator(new ResponseCompressorConfigurator(responseCompressor, provider));
 
-				return compressor;
+				return responseCompressor;
 			});
 
 			return services;
@@ -239,10 +239,10 @@ namespace Everest.Rest
 			services.AddSingleton<ICorsRequestHandler>(provider =>
 			{
 				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
-				var handler = new CorsRequestHandler(loggerFactory.CreateLogger<CorsRequestHandler>());
-				configurator(new CorsRequestHandlerConfigurator(handler, provider));
+				var corsRequestHandler = new CorsRequestHandler(loggerFactory.CreateLogger<CorsRequestHandler>());
+				configurator(new CorsRequestHandlerConfigurator(corsRequestHandler, provider));
 
-				return handler;
+				return corsRequestHandler;
 			});
 
 			return services;
@@ -259,10 +259,10 @@ namespace Everest.Rest
 			services.AddSingleton<IExceptionHandler>(provider =>
 			{
 				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
-				var handler = new ExceptionHandler(loggerFactory.CreateLogger<ExceptionHandler>());
-				configurator(new ExceptionHandlerConfigurator(handler, provider));
+				var exceptionHandler = new ExceptionHandler(loggerFactory.CreateLogger<ExceptionHandler>());
+				configurator(new ExceptionHandlerConfigurator(exceptionHandler, provider));
 
-				return handler;
+				return exceptionHandler;
 			});
 
 			return services;
@@ -321,9 +321,9 @@ namespace Everest.Rest
 
 		public static RestServerBuilder UseStaticFilesMiddleware(this RestServerBuilder builder)
 		{
-			var handler = builder.Services.GetRequiredService<IStaticFileRequestHandler>();
+			var staticFileRequestHandler = builder.Services.GetRequiredService<IStaticFileRequestHandler>();
             var staticFilesProvider = builder.Services.GetRequiredService<IStaticFilesProvider>();
-            builder.Middleware.Add(new StaticFilesMiddleware(handler, staticFilesProvider));
+            builder.Middleware.Add(new StaticFilesMiddleware(staticFileRequestHandler, staticFilesProvider));
 			return builder;
 		}
 
@@ -336,15 +336,15 @@ namespace Everest.Rest
 		
 		public static RestServerBuilder UseResponseCompressionMiddleware(this RestServerBuilder builder)
 		{
-			var compressor = builder.Services.GetRequiredService<IResponseCompressor>();
-			builder.Middleware.Add(new ResponseCompressionMiddleware(compressor));
+			var responseCompressor = builder.Services.GetRequiredService<IResponseCompressor>();
+			builder.Middleware.Add(new ResponseCompressionMiddleware(responseCompressor));
 			return builder;
 		}
 
 		public static RestServerBuilder UseCorsMiddleware(this RestServerBuilder builder)
 		{
-			var handler = builder.Services.GetRequiredService<ICorsRequestHandler>();
-			builder.Middleware.Add(new CorsMiddleware(handler));
+			var corsRequestHandler = builder.Services.GetRequiredService<ICorsRequestHandler>();
+			builder.Middleware.Add(new CorsMiddleware(corsRequestHandler));
 			return builder;
 		}
 		
@@ -357,8 +357,8 @@ namespace Everest.Rest
 
 		public static RestServerBuilder UseExceptionHandlerMiddleware(this RestServerBuilder builder)
 		{
-			var handler = builder.Services.GetRequiredService<IExceptionHandler>();
-			builder.Middleware.Add(new ExceptionHandlerMiddleware(handler));
+			var exceptionHandler = builder.Services.GetRequiredService<IExceptionHandler>();
+			builder.Middleware.Add(new ExceptionHandlerMiddleware(exceptionHandler));
 			return builder;
 		}
 

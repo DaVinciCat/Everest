@@ -7,8 +7,8 @@ namespace Everest.Exceptions
 	{
 		public ExceptionHandler ExceptionHandler => Service;
 
-		public ExceptionHandlerConfigurator(ExceptionHandler handler, IServiceProvider services) 
-			: base(handler, services)
+		public ExceptionHandlerConfigurator(ExceptionHandler exceptionHandler, IServiceProvider services) 
+			: base(exceptionHandler, services)
 		{
 
 		}

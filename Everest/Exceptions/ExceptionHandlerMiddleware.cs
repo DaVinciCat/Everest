@@ -7,11 +7,11 @@ namespace Everest.Exceptions
 {
     public class ExceptionHandlerMiddleware : MiddlewareBase
     {
-        private readonly IExceptionHandler handler;
+        private readonly IExceptionHandler exceptionHandler;
         
-        public ExceptionHandlerMiddleware(IExceptionHandler handler)
+        public ExceptionHandlerMiddleware(IExceptionHandler exceptionHandler)
         {
-            this.handler = handler ?? throw new ArgumentNullException(nameof(handler));
+            this.exceptionHandler = exceptionHandler ?? throw new ArgumentNullException(nameof(exceptionHandler));
         }
 
         public override async Task InvokeAsync(HttpContext context)
@@ -26,7 +26,7 @@ namespace Everest.Exceptions
             }
             catch (Exception ex)
             {
-                await handler.HandleExceptionAsync(context, ex);
+                await exceptionHandler.HandleExceptionAsync(context, ex);
             }
         }
     }
