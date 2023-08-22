@@ -5,15 +5,15 @@ namespace Everest.Files
 {
     public static class StaticFilesProviderExtensions
     {
-        public static bool IsStaticFileRequest(this IStaticFilesProvider provider, HttpRequest request)
+        public static bool IsStaticFileRequest(this IStaticFilesProvider staticFilesProvider, HttpRequest request)
         {
-            if (provider == null) 
-                throw new ArgumentNullException(nameof(provider));
+            if (staticFilesProvider == null) 
+                throw new ArgumentNullException(nameof(staticFilesProvider));
 
             if (request == null) 
                 throw new ArgumentNullException(nameof(request));
 
-            return (request.IsGetMethod() || request.IsHeadMethod()) && !request.Path.EndsWith('/') && provider.TryGetFile(RequestPathToFilePath(request), out _);
+            return (request.IsGetMethod() || request.IsHeadMethod()) && !request.Path.EndsWith('/') && staticFilesProvider.TryGetFile(RequestPathToFilePath(request), out _);
         }
         
         public static string RequestPathToFilePath(this HttpRequest request)
