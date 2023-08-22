@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Everest.Authentication;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -14,6 +15,11 @@ namespace Everest.Compression
         }
 
         private readonly Dictionary<string, Func<Stream, Stream>> compressors = new();
+
+        public bool Has(string encoding)
+        {
+            return compressors.ContainsKey(encoding);
+        }
 
         public bool TryGet(string encoding, out Func<Stream, Stream> compressor)
         {
