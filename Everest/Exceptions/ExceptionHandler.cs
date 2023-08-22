@@ -37,6 +37,7 @@ namespace Everest.Exceptions
 
 			context.Response.KeepAlive = false;
 			context.Response.StatusCode = HttpStatusCode.InternalServerError;
+			context.Response.Clear();
 			await context.Response.WriteTextAsync($"Failed to process request: {context.Request.Description}{Environment.NewLine}{ex}");
 		};
 	}
