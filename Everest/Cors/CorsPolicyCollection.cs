@@ -18,9 +18,9 @@ namespace Everest.Cors
             return policies.ContainsKey(origin);
         }
 
-        public bool TryGet(string origin, out CorsPolicy corsPolicy)
+        public bool TryGet(string origin, out CorsPolicy policy)
         {
-            return policies.TryGetValue(origin, out corsPolicy);
+            return policies.TryGetValue(origin, out policy);
         }
 
         public void Add(CorsPolicy policy)
