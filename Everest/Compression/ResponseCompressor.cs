@@ -48,8 +48,7 @@ namespace Everest.Compression
 			
 			if (context.Response.ContentLength < CompressionMinLength)
 			{
-				//Logger.LogTrace($"{context.TraceIdentifier} - No response compression required: {new { Length = context.Response.ContentLength.ToReadableSize(), CompressionMinLength = CompressionMinLength.ToReadableSize() }}");
-				return Task.FromResult(false);
+                return Task.FromResult(false);
 			}
 
             if (!MediaTypes.Has(context.Response.ContentType))
