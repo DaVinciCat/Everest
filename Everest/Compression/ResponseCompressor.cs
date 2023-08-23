@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.IO.Compression;
 using System.Threading.Tasks;
+using Everest.Mime;
 using Everest.Utils;
 
 namespace Everest.Compression
@@ -12,6 +13,21 @@ namespace Everest.Compression
         public ILogger<ResponseCompressor> Logger { get; }
 
         public int CompressionMinLength { get; set; } = 2048;
+
+        public ContentTypeCollection MediaTypes { get; } = new()
+        {
+            "text/plain",
+            "text/css",
+            "application/javascript",
+            "text/javascript",
+            "text/html",
+            "application/xml",
+            "text/xml",
+            "application/json",
+            "text/json",
+            "application/wasm",
+			"image/x-icon"
+        };
 
         public CompressorCollection Compressors { get; } = new()
         {
@@ -35,6 +51,11 @@ namespace Everest.Compression
 				//Logger.LogTrace($"{context.TraceIdentifier} - No response compression required: {new { Length = context.Response.ContentLength.ToReadableSize(), CompressionMinLength = CompressionMinLength.ToReadableSize() }}");
 				return Task.FromResult(false);
 			}
+
+            if (!MediaTypes.Has(context.Response.ContentType))
+            {
+                return Task.FromResult(false);
+            }
 
 			//TODO: super naive implementation, should replace it with q values support
 			var acceptEncoding = context.Request.Headers[HttpHeaders.AcceptEncoding];
