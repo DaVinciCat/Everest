@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Everest.Authentication
 {
-    public class AuthenticationCollection : IEnumerable<IAuthentication>
+    public class AuthenticationCollection : IEnumerable<string>
     {
         public IAuthentication this[string scheme]
         {
@@ -23,19 +23,11 @@ namespace Everest.Authentication
             return authentications.TryGetValue(scheme, out authentication);
         }
 
-        public void Add(IAuthentication authentication)
+        public void Add(string scheme, IAuthentication authentication)
         {
-            authentications[authentication.Scheme] = authentication;
+            authentications[scheme] = authentication;
         }
-
-        public void Remove(IAuthentication authentication)
-        {
-            if (authentications.ContainsKey(authentication.Scheme))
-            {
-                authentications.Remove(authentication.Scheme);
-            }
-        }
-
+        
         public void Remove(string scheme)
         {
             if (authentications.ContainsKey(scheme))
@@ -49,9 +41,9 @@ namespace Everest.Authentication
             authentications.Clear();
         }
 
-        public IEnumerator<IAuthentication> GetEnumerator()
+        public IEnumerator<string> GetEnumerator()
         {
-            return authentications.Values.GetEnumerator();
+            return authentications.Keys.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()

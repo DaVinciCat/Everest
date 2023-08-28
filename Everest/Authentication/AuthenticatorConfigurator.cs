@@ -15,9 +15,9 @@ namespace Everest.Authentication
 
 		}
 
-		public AuthenticatorConfigurator AddAuthentication(IAuthentication authentication)
+		public AuthenticatorConfigurator AddAuthentication(string scheme, IAuthentication authentication)
 		{
-			Authenticator.Authentications.Add(authentication);
+			Authenticator.Authentications.Add(scheme, authentication);
 			return this;
 		}
 	}
@@ -29,7 +29,7 @@ namespace Everest.Authentication
 			var loggerFactory = configurator.Services.GetRequiredService<ILoggerFactory>();
 			var authentication = new BasicAuthentication(loggerFactory.CreateLogger<BasicAuthentication>());
 			configure?.Invoke(authentication);
-			configurator.AddAuthentication(authentication);
+			configurator.AddAuthentication(authentication.Scheme, authentication);
 			return configurator;
 		}
 
@@ -38,7 +38,7 @@ namespace Everest.Authentication
 			var loggerFactory = configurator.Services.GetRequiredService<ILoggerFactory>();
 			var authentication = new JwtAuthentication(loggerFactory.CreateLogger<JwtAuthentication>());
 			configure?.Invoke(authentication);
-			configurator.AddAuthentication(authentication);
+			configurator.AddAuthentication(authentication.Scheme, authentication);
 			return configurator;
 		}
 	}

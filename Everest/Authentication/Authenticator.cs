@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Everest.Http;
 using Everest.Utils;
@@ -31,7 +30,7 @@ namespace Everest.Authentication
                 }
 			}
 
-            Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. No supported authentication schemes {new { Scheme = scheme, SupportedSchemes = Authentications.Select(authentication => authentication.Scheme).ToReadableArray() }}");
+            Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. No supported authentication schemes {new { Scheme = scheme, SupportedSchemes = Authentications.ToReadableArray() }}");
             return false;
         }
 	}
