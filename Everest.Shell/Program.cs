@@ -157,7 +157,7 @@ namespace Everest.Shell
 			services.AddAuthenticator(configurator => configurator.AddBasicAuthentication())
 					.AddCorsRequestHandler(configurator => configurator.AddDefaultCorsPolicy())
 					.AddSingleton(_ => new GreetingsService())
-					.AddConsoleLoggerFactory(configurator => configurator.SetMinimumLevel(LogLevel.Warning));
+					.AddConsoleLoggerFactory();
 
 			using var rest = new RestServerBuilder(services)
 				.UsePrefixes("http://localhost:8080/")
