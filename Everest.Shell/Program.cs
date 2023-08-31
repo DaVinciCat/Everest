@@ -8,7 +8,6 @@ using Everest.Http;
 using Everest.Rest;
 using Everest.Routing;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace Everest.Shell
 {
