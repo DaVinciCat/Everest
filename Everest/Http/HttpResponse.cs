@@ -193,7 +193,7 @@ namespace Everest.Http
 			if (content == null)
 				throw new ArgumentNullException(nameof(content));
 
-			response.ContentType = "text/plain; charset=utf-8";
+			response.ContentType = "text/plain";
 			await response.WriteAsync(content);
 		}
 
@@ -205,7 +205,7 @@ namespace Everest.Http
 			if (content == null)
 				throw new ArgumentNullException(nameof(content));
 
-			response.ContentType = "text/html; charset=utf-8";
+			response.ContentType = "text/html";
 			await response.WriteAsync(content);
 		}
 
