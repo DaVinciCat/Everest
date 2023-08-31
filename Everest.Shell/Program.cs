@@ -8,6 +8,7 @@ using Everest.Http;
 using Everest.Rest;
 using Everest.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Everest.Shell
 {
@@ -119,7 +120,7 @@ namespace Everest.Shell
 			throw new InvalidOperationException("something went wrong ;(");
 		}
 
-		[HttpGet("/post/request-with-text-payload")]
+		[HttpGet("/get/request-with-text-payload")]
 		public static async Task GetRequestWithTextPayload(HttpContext context)
 		{
 			var payload = await context.Request.ReadTextAsync();
@@ -127,7 +128,7 @@ namespace Everest.Shell
             await context.Response.WriteTextAsync($"payload:{payload}");
         }
 		
-		[HttpGet("/post/request-with-json-payload")]
+		[HttpGet("/get/request-with-json-payload")]
 		public static async Task GetRequestWithJsonPayload(HttpContext context)
 		{
 			var payload = await context.Request.ReadJsonAsync<object>();
@@ -156,7 +157,7 @@ namespace Everest.Shell
 			services.AddAuthenticator(configurator => configurator.AddBasicAuthentication())
 					.AddCorsRequestHandler(configurator => configurator.AddDefaultCorsPolicy())
 					.AddSingleton(_ => new GreetingsService())
-					.AddConsoleLoggerFactory();
+					.AddConsoleLoggerFactory(configurator => configurator.SetMinimumLevel(LogLevel.Warning));
 
 			using var rest = new RestServerBuilder(services)
 				.UsePrefixes("http://localhost:8080/")
