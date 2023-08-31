@@ -19,57 +19,72 @@ namespace Everest.Shell
 		[RoutePrefix("/")]
 		public static async Task GetDefaultRoute(HttpContext context)
 		{
-			await context.Response.WriteTextAsync("Everest");
+			await context.Response.WriteTextAsync("default-route");
 		}
 
-		[HttpGet("/get/static-route-no-parameters")]
-		public static async Task GetStaticRouteNoParameters(HttpContext context)
+		[HttpGet("/get/simple-route")]
+		public static async Task GetSimpleRoute(HttpContext context)
 		{
-			var service = context.GetGreetingsService();
-			var greetings = service.Greet();
-			await context.Response.WriteJsonAsync(new { Message = greetings, From = "Everest", Success = true });
-		}
+            await context.Response.WriteTextAsync("simple-route");
+        }
 		
-		[HttpGet("/get/static-route-text")]
-		public static async Task GetStaticRouteText(HttpContext context)
+		[HttpGet("/get/route-with-mandatory-query-parameter-p")]
+		public static async Task GetRouteWithMandatoryQueryParameterP(HttpContext context)
 		{
-			await context.Response.WriteTextAsync("lorem\n");
-			await context.Response.WriteTextAsync("ipsum\n");
-			await context.Response.WriteTextAsync("dolor\n");
-		}
+			var p = context.Request.QueryParameters.GetParameterValue<string>("p");
+            await context.Response.WriteTextAsync("route-with-mandatory-query-parameter-p\n");
+            await context.Response.WriteTextAsync($"p:{p}");
+        }
 
-		[HttpGet("/get/static-route-with-query-parameter-me")]
-		public static async Task GetStaticRouteWithQueryParameterMe(HttpContext context)
+        [HttpGet("/get/route-with-optional-query-parameter-p")]
+        public static async Task GetRouteWithOptionalQueryParameterP(HttpContext context)
+        {
+            if (!context.Request.QueryParameters.TryGetParameterValue<string>("p", out var p))
+            {
+                await context.Response.WriteTextAsync("route-with-optional-query-parameter-p\n");
+                await context.Response.WriteTextAsync("no p");
+            }
+            else
+            {
+                await context.Response.WriteTextAsync("route-with-optional-query-parameter-p\n");
+                await context.Response.WriteTextAsync($"p:{p}");
+            }
+        }
+
+        [HttpGet("/get/route-with-mandatory-query-parameter-of-type-int-p")]
+        public static async Task GetRouteWithMandatoryQueryParameterOfTypeIntP(HttpContext context)
+        {
+            var p = context.Request.QueryParameters.GetParameterValue<int>("p");
+            await context.Response.WriteTextAsync("route-with-mandatory-query-parameter-of-type-int-p\n");
+            await context.Response.WriteTextAsync($"p:{p}");
+        }
+
+        [HttpGet("/get/route-with-path-parameter-p/{p:string}")]
+		public static async Task GetRouteWithPathParameterP(HttpContext context)
 		{
-			var service = context.GetGreetingsService();
-			var greetings = service.Greet();
-
-			var me = context.Request.QueryParameters.GetParameterValue<string>("me");
-			await context.Response.WriteJsonAsync(new { Message = greetings, From = "Everest", To = me, Success = true });
-		}
-
-		[HttpGet("/get/route-with-path-parameter-me/{me:string}")]
-		public static async Task GetRouteWithPathParameterMe(HttpContext context)
-		{
-			var service = context.GetGreetingsService();
-			var greetings = service.Greet();
-			var me = context.Request.PathParameters.GetParameterValue<string>("me");
-
-			await context.Response.WriteJsonAsync(new { Message = greetings, From = "Everest", To = me, Success = true });
-		}
+ 		    var p = context.Request.PathParameters.GetParameterValue<string>("p");
+            await context.Response.WriteTextAsync("route-with-path-parameter-p/{p:string}\n");
+            await context.Response.WriteTextAsync($"p:{p}");
+        }
 		
-		[HttpGet("/get/route-with-path-parameter-me-int/{me-int:int}")]
-		public static async Task GetRouteWithPathParameterMeInt(HttpContext context)
+		[HttpGet("/get/route-with-path-parameter-of-type-int-p/{p:int}")]
+		public static async Task GetRouteWithPathParameterOfTypeIntP(HttpContext context)
 		{
-			var service = context.GetGreetingsService();
-			var greetings = service.Greet();
+			var p = context.Request.PathParameters.GetParameterValue<int>("p");
+            await context.Response.WriteTextAsync("route-with-path-parameter-of-type-int-p/{p:int}\n");
+            await context.Response.WriteTextAsync($"p:{p}");
+        }
 
-			var me = context.Request.PathParameters.GetParameterValue<int>("me-int");
-			await context.Response.WriteJsonAsync(new { Message = greetings, From = "Everest", To = me, Success = true });
-		}
+        [HttpGet("/get/route-with-path-parameter-of-type-guid-p/{p:guid}")]
+        public static async Task GetRouteWithPathParameterOfTypeGuidP(HttpContext context)
+        {
+            var p = context.Request.PathParameters.GetParameterValue<Guid>("p");
+            await context.Response.WriteTextAsync("route-with-path-parameter-of-type-guid-p/{p:guid}\n");
+            await context.Response.WriteTextAsync($"p:{p}");
+        }
 
-		[HttpOptions("/options/cors-request")]
-		public static async Task OptionsCorsRoute(HttpContext context)
+        [HttpOptions("/options/cors-request-response")]
+		public static async Task OptionsCorsRequestResponse(HttpContext context)
 		{
 			context.Response.AddHeader(HttpHeaders.Origin, "*");
 			context.Response.AddHeader(HttpHeaders.AccessControlAllowHeaders, string.Join(" ", HttpHeaders.ContentType, HttpHeaders.Accept, HttpHeaders.XRequestedWith));
@@ -79,18 +94,16 @@ namespace Everest.Shell
 		}
 
 		[HttpGet("/get/compressed-response")]
-		public static async Task GetCompressRoute(HttpContext context)
+		public static async Task GetCompressedResponse(HttpContext context)
 		{
-			await context.Response.WriteTextAsync(string.Concat(Enumerable.Repeat("Apes!", 10000)));
+            await context.Response.WriteTextAsync("compressed-response\n");
+            await context.Response.WriteTextAsync(string.Concat(Enumerable.Repeat("text", 10000)));
 		}
 
 		[HttpGet("/get/send-response")]
 		public static async Task GetSendResponse(HttpContext context)
 		{
-			var service = context.GetGreetingsService();
-			var greetings = service.Greet();
-
-			await context.Response.WriteJsonAsync(new { Message = greetings, From = "Everest", Success = true });
+            await context.Response.WriteTextAsync("send-response");
 			await context.Response.SendAsync();
 		}
 
@@ -103,23 +116,37 @@ namespace Everest.Shell
 		[HttpGet("/get/exception-response")]
 		public static Task GetExceptionResponse(HttpContext context)
 		{
-			throw new InvalidOperationException("Something went wrong ;(");
+			throw new InvalidOperationException("something went wrong ;(");
 		}
 
-		[HttpGet("/get/request-with-text-payload")]
+		[HttpGet("/post/request-with-text-payload")]
 		public static async Task GetRequestWithTextPayload(HttpContext context)
 		{
 			var payload = await context.Request.ReadTextAsync();
-			await context.Response.WriteTextAsync(payload);
-		}
+            await context.Response.WriteTextAsync("request-with-text-payload\n");
+            await context.Response.WriteTextAsync($"payload:{payload}");
+        }
 		
-		[HttpGet("/get/request-with-json-payload")]
+		[HttpGet("/post/request-with-json-payload")]
 		public static async Task GetRequestWithJsonPayload(HttpContext context)
 		{
 			var payload = await context.Request.ReadJsonAsync<object>();
-			await context.Response.WriteJsonAsync(payload);
+            await context.Response.WriteTextAsync("request-with-json-payload\n");
+            await context.Response.WriteTextAsync("payload:\n");
+            await context.Response.WriteJsonAsync(payload);
 		}
-	}
+
+        [HttpGet("/get/greetings-request/{to:string}")]
+        public static async Task GetGreetingsRequest(HttpContext context)
+        {
+            var service = context.GetGreetingsService();
+            var greetings = service.Greet();
+
+            context.Request.PathParameters.TryGetParameterValue<string>("to", out var to);
+            await context.Response.WriteJsonAsync(new { Message = greetings, From = "Everest", To = to, Success = true });
+            await context.Response.SendAsync();
+        }
+    }
 
 	class Program
 	{
@@ -145,7 +172,16 @@ namespace Everest.Shell
 
 			rest.Start();
 
-			Console.WriteLine("Press any key to exit");
+            Console.WriteLine(@"
+ ______                       _
+|  ____|                     | |  
+| |____   _____ _ __ ___  ___| |_ 
+|  __\ \ / / _ \ '__/ _ \/ __| __|
+| |___\ V /  __/ | |  __/\__ \ |_ 
+|______\_/ \___|_|  \___||___/\__|");
+
+            Console.WriteLine("\nhttp://localhost:8080/");
+            Console.WriteLine("\nPress any key to exit");
 			Console.ReadKey();
 		}
 	}
