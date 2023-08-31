@@ -145,7 +145,6 @@ namespace Everest.Shell
 
             context.Request.PathParameters.TryGetParameterValue<string>("to", out var to);
             await context.Response.WriteJsonAsync(new { Message = greetings, From = "Everest", To = to, Success = true });
-            await context.Response.SendAsync();
         }
     }
 
