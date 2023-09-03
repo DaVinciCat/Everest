@@ -134,17 +134,14 @@ namespace Everest.Utils
 		        output.WriteAsync(buffer, 0, read);
 	        }
 
-	        return this;
-        }
-
-        public StreamPipe Close()
-        {
-            input.Close();
-            output.Close();
+            if (input.CanSeek && input.CanWrite)
+            {
+                input.SetLength(0);
+            }
 
             return this;
         }
-
+        
 		public async Task<StreamPipe> FlushAsync()
         {
 	        if (input.CanSeek)
@@ -159,6 +156,18 @@ namespace Everest.Utils
             {
                 await output.WriteAsync(buffer, 0, read);
             }
+
+            if (input.CanSeek && input.CanWrite)
+            {
+                input.SetLength(0);
+            }
+
+            return this;
+        }
+        public StreamPipe Close()
+        {
+            input.Close();
+            output.Close();
 
             return this;
         }
