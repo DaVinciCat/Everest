@@ -5,6 +5,7 @@ using System.Net;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Web;
 using Everest.Collections;
 using Everest.Utils;
 using Microsoft.Extensions.Logging;
@@ -19,7 +20,7 @@ namespace Everest.Http
 
 		public string HttpMethod => request.HttpMethod;
 
-		public bool HasPayload => request.HasEntityBody;
+		public bool HasBody => request.HasEntityBody;
 
 		public string Path => request.Url?.AbsolutePath.TrimEnd('/');
 
@@ -59,7 +60,7 @@ namespace Everest.Http
 		public bool HasHeader(string name) => request.Headers[name] != null;
 
 		/*https://learn.microsoft.com/en-us/dotnet/api/system.net.httplistenerrequest.inputstream?view=net-7.0*/
-		public async Task<byte[]> ReadDataAsync()
+		public async Task<byte[]> ReadBodyAsync()
 		{
 			if (!request.HasEntityBody)
 				return Array.Empty<byte>();
@@ -75,17 +76,24 @@ namespace Everest.Http
 	{
 		public static async Task<string> ReadTextAsync(this HttpRequest request)
 		{
-			var data = await request.ReadDataAsync();
+			var data = await request.ReadBodyAsync();
 			return request.ContentEncoding.GetString(data);
 		}
 
 		public static async Task<T> ReadJsonAsync<T>(this HttpRequest request, JsonSerializerOptions options = null)
 		{
-			var data = await request.ReadDataAsync();
+			var data = await request.ReadBodyAsync();
 
 			return options == null ? 
 				JsonSerializer.Deserialize<T>(data) : 
 				JsonSerializer.Deserialize<T>(data, options);
 		}
+
+        public static async Task<NameValueCollection> ReadFormAsync(this HttpRequest request)
+        {
+            var data = await request.ReadBodyAsync();
+            var content = request.ContentEncoding.GetString(data);
+            return HttpUtility.ParseQueryString(content, request.ContentEncoding);
+        }
 	}
 }

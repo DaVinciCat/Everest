@@ -136,6 +136,19 @@ namespace Everest.Shell
             await context.Response.WriteJsonAsync(payload);
 		}
 
+        [HttpPost("/post/request-with-form-payload")]
+        public static async Task PostRequestWithFormPayload(HttpContext context)
+        {
+            var payload = await context.Request.ReadFormAsync();
+            await context.Response.WriteTextAsync("request-with-form-payload\n");
+            await context.Response.WriteTextAsync("payload:\n");
+
+            foreach (var key in payload.AllKeys)
+            {
+                await context.Response.WriteTextAsync($"{key}={payload[key]}\n");
+            }
+        }
+
         [HttpGet("/get/greetings-request/{to:string}")]
         public static async Task GetGreetingsRequest(HttpContext context)
         {
