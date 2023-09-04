@@ -134,10 +134,7 @@ namespace Everest.Utils
 		        output.WriteAsync(buffer, 0, read);
 	        }
 
-            if (input.CanSeek && input.CanWrite)
-            {
-                input.SetLength(0);
-            }
+            input.Close();
 
             return this;
         }
@@ -157,10 +154,7 @@ namespace Everest.Utils
                 await output.WriteAsync(buffer, 0, read);
             }
 
-            if (input.CanSeek && input.CanWrite)
-            {
-                input.SetLength(0);
-            }
+           input.Close();
 
             return this;
         }
