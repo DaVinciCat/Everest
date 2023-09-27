@@ -163,7 +163,7 @@ namespace Everest.Rest
 		}
 
 #if !NET5_0_OR_GREATER
-		private async void ProcessRequestAsync(object state)
+		private void ProcessRequestAsync(object state)
         {
 			ProcessRequestAsync(state as HttpContext);
         }
