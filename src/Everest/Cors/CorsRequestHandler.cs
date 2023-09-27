@@ -16,7 +16,7 @@ namespace Everest.Cors
 	{
         public ILogger<CorsRequestHandler> Logger { get; }
 
-        public CorsPolicyCollection Policies { get; } = new();
+        public CorsPolicyCollection Policies { get; } = new CorsPolicyCollection();
 		
 		public CorsRequestHandler(ILogger<CorsRequestHandler> logger)
 		{

@@ -14,7 +14,7 @@ namespace Everest.Authentication
 
 		public string Scheme { get; set; } = "Bearer";
 
-		public TokenValidationParameters TokenValidationParameters { get; set; } = new();
+		public TokenValidationParameters TokenValidationParameters { get; set; } = new TokenValidationParameters();
 
 		public JwtAuthentication(ILogger<JwtAuthentication> logger)
 		{

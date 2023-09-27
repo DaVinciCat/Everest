@@ -18,8 +18,8 @@ namespace Everest.Routing
 
 		public RouteDescriptor[] Routes => methods.SelectMany(kvp => kvp.Value.Routes).ToArray();
 		
-		public RouteSegmentParserCollection SegmentParsers { get; } = new()
-		{
+		public RouteSegmentParserCollection SegmentParsers { get; } = new RouteSegmentParserCollection
+        {
 			{ AlphaNumericRouteSegmentParser.SegmentPattern, segment => new AlphaNumericRouteSegmentParser(segment) },
 			{ StringParameterRouteSegmentParser.SegmentPattern, segment => new StringParameterRouteSegmentParser(segment)},
 			{ IntParameterRouteSegmentParser.SegmentPattern, segment => new IntParameterRouteSegmentParser(segment)},
@@ -30,7 +30,7 @@ namespace Everest.Routing
 			{ DateTimeParameterRouteSegmentParser.SegmentPattern, segment => new DateTimeParameterRouteSegmentParser(segment)}
 		};
 
-		private readonly Dictionary<string, RouteTrie> methods = new();
+		private readonly Dictionary<string, RouteTrie> methods = new Dictionary<string, RouteTrie>();
 
 		public Router(ILogger<Router> logger)
 		{
@@ -118,7 +118,7 @@ namespace Everest.Routing
 
 			public bool IsTerminal => RouteDescriptor != null;
 
-			public Dictionary<string, TrieNode> Children { get; } = new();
+			public Dictionary<string, TrieNode> Children { get; } = new Dictionary<string, TrieNode>();
 
 			public TrieNode()
 			{
@@ -139,9 +139,9 @@ namespace Everest.Routing
 
 			public string[] Delimiters { get; set; } = { "/" };
 
-			private readonly Dictionary<string, RouteDescriptor> routes = new();
+			private readonly Dictionary<string, RouteDescriptor> routes = new Dictionary<string, RouteDescriptor>();
 
-			private readonly TrieNode root = new();
+			private readonly TrieNode root = new TrieNode();
 
 			private readonly Func<string, IRouteSegmentParser> getParser;
 

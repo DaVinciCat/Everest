@@ -4,7 +4,7 @@ namespace Everest.Cors
 {
     public class CorsPolicy
 	{
-		public static CorsPolicy Default { get; } = new();
+		public static CorsPolicy Default { get; } = new CorsPolicy();
 
 		public string Origin { get; set; } = "*";
 

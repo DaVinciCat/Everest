@@ -5,7 +5,7 @@ namespace Everest.Mime
 {
 	public class MimeTypesProvider : IMimeTypesProvider
     {
-        public MimeTypeCollection MimeTypes { get; } = new();
+        public MimeTypeCollection MimeTypes { get; } = new MimeTypeCollection();
 
         public MimeTypesProvider()
 		{
@@ -13,10 +13,8 @@ namespace Everest.Mime
 
 			foreach (var field in fields)
 			{
-				if (field.GetValue(null) is not MimeType mimeType) 
-					continue;
-
-                MimeTypes[mimeType.FileExtension] = mimeType;
+				if (field.GetValue(null) is MimeType mimeType)
+					MimeTypes[mimeType.FileExtension] = mimeType;
 			}
 		}
 		

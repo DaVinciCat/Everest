@@ -13,7 +13,7 @@ namespace Everest.Compression
             set => compressors[encoding] = value;
         }
 
-        private readonly Dictionary<string, Func<Stream, Stream>> compressors = new();
+        private readonly Dictionary<string, Func<Stream, Stream>> compressors = new Dictionary<string, Func<Stream, Stream>>();
 
         public bool Has(string encoding)
         {

@@ -11,7 +11,7 @@ namespace Everest.Mime
             set => mimeTypes[fileExtension] = value;
         }
 
-        private readonly Dictionary<string, MimeType> mimeTypes = new();
+        private readonly Dictionary<string, MimeType> mimeTypes = new Dictionary<string, MimeType>();
 
         public bool Has(string fileExtension)
         {

@@ -145,8 +145,12 @@ namespace Everest.Rest
 					var services = serviceProvider.CreateScope().ServiceProvider;
 					var httpContext = new HttpContext(context, features, services, loggerFactory);
 
+#if NET5_0_OR_GREATER
 					ThreadPool.QueueUserWorkItem(ProcessRequestAsync, httpContext, false);
-				}
+#else
+                    ThreadPool.QueueUserWorkItem(ProcessRequestAsync, httpContext);
+#endif
+                }
 				catch (HttpListenerException ex) when (ex.ErrorCode == 995 && (IsStopping || !IsListening))
 				{
 					Logger.LogWarning(ex, $"{ex.ErrorCode}");
@@ -158,6 +162,12 @@ namespace Everest.Rest
 			}
 		}
 
+#if !NET5_0_OR_GREATER
+		private async void ProcessRequestAsync(object state)
+        {
+			ProcessRequestAsync(state as HttpContext);
+        }
+#endif
 		private async void ProcessRequestAsync(HttpContext context)
 		{
 			if (context == null)

@@ -7,7 +7,7 @@ namespace Everest.Middleware
 {
 	public class AggregateMiddleware : MiddlewareBase
 	{
-		private readonly List<IMiddleware> collection = new();
+		private readonly List<IMiddleware> collection = new List<IMiddleware>();
 
 		public AggregateMiddleware()
 		{

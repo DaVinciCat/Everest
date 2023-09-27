@@ -15,7 +15,7 @@ namespace Everest.Files
 
 		#region Sync
 
-		private readonly object sync = new();
+		private readonly object sync = new object();
 
 		#endregion
 
@@ -64,7 +64,7 @@ namespace Everest.Files
 			}
 		}
 
-		private readonly HashSet<string> files = new();
+		private readonly HashSet<string> files = new HashSet<string>();
 		
         private void AddFile(string filePath)
 		{
@@ -115,7 +115,7 @@ namespace Everest.Files
 
 		#region FileWatcher
 
-		private readonly FileSystemWatcher fileWatcher = new();
+		private readonly FileSystemWatcher fileWatcher = new FileSystemWatcher();
 
 		private void OnError(object sender, ErrorEventArgs e)
 		{

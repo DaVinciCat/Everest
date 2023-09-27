@@ -11,7 +11,7 @@ namespace Everest.Cors
             set => policies[origin] = value;
         }
 
-        private readonly Dictionary<string, CorsPolicy> policies = new();
+        private readonly Dictionary<string, CorsPolicy> policies = new Dictionary<string, CorsPolicy>();
 
         public bool Has(string origin)
         {

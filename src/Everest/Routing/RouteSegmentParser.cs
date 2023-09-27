@@ -6,9 +6,9 @@ namespace Everest.Routing
 {
 	public interface IRouteSegmentParser
 	{
-		public string SegmentPattern { get; }
+		string SegmentPattern { get; }
 
-		public bool TryParse(Iterator<string> segments, out ParameterCollection parameters);
+		bool TryParse(Iterator<string> segments, out ParameterCollection parameters);
 	}
 
 	public class AlphaNumericRouteSegmentParser : IRouteSegmentParser
@@ -47,7 +47,7 @@ namespace Everest.Routing
 
         public static string SegmentPattern = @"\{([^:]+):string\}";
 
-		public static Regex Regex { get; set; } = new("^(.*)$", RegexOptions.Compiled);
+		public static Regex Regex { get; set; } = new Regex("^(.*)$", RegexOptions.Compiled);
 
 		public string Segment { get; }
 
@@ -91,7 +91,7 @@ namespace Everest.Routing
 
         public static string SegmentPattern = @"\{([^:]+):int\}";
 
-		public static Regex Regex { get; set; } = new("^-?[0-9]*$", RegexOptions.Compiled);
+		public static Regex Regex { get; set; } = new Regex("^-?[0-9]*$", RegexOptions.Compiled);
 
 		public string Segment { get; }
 
@@ -135,7 +135,7 @@ namespace Everest.Routing
 
         public static string SegmentPattern = @"\{([^:]+):double\}";
 
-		public static Regex Regex { get; set; } = new("^[+-]?([0-9]*[.])?[0-9]+", RegexOptions.Compiled);
+		public static Regex Regex { get; set; } = new Regex("^[+-]?([0-9]*[.])?[0-9]+", RegexOptions.Compiled);
 
 		public string Segment { get; }
 
@@ -179,7 +179,7 @@ namespace Everest.Routing
 
         public static string SegmentPattern = @"\{([^:]+):float\}";
 
-		public static Regex Regex { get; set; } = new("^[+-]?([0-9]*[.])?[0-9]+", RegexOptions.Compiled);
+		public static Regex Regex { get; set; } = new Regex("^[+-]?([0-9]*[.])?[0-9]+", RegexOptions.Compiled);
 
 		public string Segment { get; }
 
@@ -223,7 +223,7 @@ namespace Everest.Routing
 
         public static string SegmentPattern = @"\{([^:]+):bool\}";
 
-		public static Regex Regex { get; set; } = new(@"^(?i:true|false)$", RegexOptions.Compiled);
+		public static Regex Regex { get; set; } = new Regex(@"^(?i:true|false)$", RegexOptions.Compiled);
 
 		public string Segment { get; }
 
@@ -267,7 +267,7 @@ namespace Everest.Routing
 
         public static string SegmentPattern = @"\{([^:]+):guid\}";
 
-		public static Regex Regex { get; set; } = new(@"^([0-9A-Fa-f]{8}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{12})$", RegexOptions.Compiled);
+		public static Regex Regex { get; set; } = new Regex(@"^([0-9A-Fa-f]{8}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{4}[-][0-9A-Fa-f]{12})$", RegexOptions.Compiled);
 
 		public string Segment { get; }
 
@@ -311,7 +311,7 @@ namespace Everest.Routing
 
         public static string SegmentPattern = @"\{([^:]+):datetime\}";
 
-		public static Regex Regex { get; set; } = new(@"\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d(?:\.\d+)?Z?", RegexOptions.Compiled);
+		public static Regex Regex { get; set; } = new Regex(@"\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d(?:\.\d+)?Z?", RegexOptions.Compiled);
 
 		public string Segment { get; }
 

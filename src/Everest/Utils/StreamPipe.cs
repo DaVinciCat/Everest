@@ -154,7 +154,7 @@ namespace Everest.Utils
                 await output.WriteAsync(buffer, 0, read);
             }
 
-           input.Close();
+            input.Close();
 
             return this;
         }
@@ -206,12 +206,19 @@ namespace Everest.Utils
             if (disposed)
                 return;
 
+#if NET5_0_OR_GREATER
             await input.DisposeAsync();
             await output.DisposeAsync();
+#else
+            input.Dispose();
+            output.Dispose();
+
+            await Task.CompletedTask;
+#endif
 
             disposed = true;
         }
 
-        #endregion
+#endregion
     }
 }

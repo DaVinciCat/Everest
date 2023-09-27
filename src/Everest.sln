@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.32228.343
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34024.191
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Everest", "Everest\Everest.csproj", "{78BE63AE-E8E1-432B-8447-A797DA20D8EF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Everest.Shell", "Everest.Shell\Everest.Shell.csproj", "{4978FA97-221A-4F6B-8903-0821AD68F345}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Everest.Tests", "Everest.Tests\Everest.Tests.csproj", "{22CDCCC9-B3FC-460F-8848-05F028B8E38E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Everest.Tests", "Everest.Tests\Everest.Tests.csproj", "{22CDCCC9-B3FC-460F-8848-05F028B8E38E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

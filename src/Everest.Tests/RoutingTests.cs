@@ -1,7 +1,15 @@
+using NUnit.Framework;
+
 namespace Everest.Tests
 {
-	//public class RoutingTests
-	//{
+	public class RoutingTests
+	{
+		[Test]
+        public void Test()
+        {
+            Assert.True(true);
+        }
+
 	//	[Fact]
 	//	public async Task False_FooBar_Slash()
 	//	{
@@ -269,5 +277,5 @@ namespace Everest.Tests
 	//		Assert.True(parameters["b"] != null);
 	//		Assert.True(parameters["b"] == "false");
 	//	}
-	//}
+	}
 }

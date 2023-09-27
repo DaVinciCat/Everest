@@ -35,10 +35,12 @@ namespace Everest.Compression
 			return configurator;
 		}
 
+#if NET5_0_OR_GREATER
 		public static ResponseCompressorConfigurator AddBrotliCompressor(this ResponseCompressorConfigurator configurator)
 		{
 			configurator.AddCompressor("brotli", input => new BrotliStream(input, CompressionLevel.Fastest));
 			return configurator;
 		}
+#endif
 	}
 }

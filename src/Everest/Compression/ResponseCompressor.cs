@@ -14,7 +14,7 @@ namespace Everest.Compression
 
         public int CompressionMinLength { get; set; } = 2048;
 
-        public ContentTypeCollection MediaTypes { get; } = new()
+        public ContentTypeCollection MediaTypes { get; } = new ContentTypeCollection
         {
             "text/plain",
             "text/css",
@@ -29,11 +29,13 @@ namespace Everest.Compression
 			"image/x-icon"
         };
 
-        public CompressorCollection Compressors { get; } = new()
+        public CompressorCollection Compressors { get; } = new CompressorCollection
         {
             { "gzip", input => new GZipStream(input, CompressionLevel.Fastest) },
             { "deflate", input => new DeflateStream(input, CompressionLevel.Fastest) },
-            { "brotli", input => new BrotliStream(input, CompressionLevel.Fastest) }
+#if NET5_0_OR_GREATER
+			{ "brotli", input => new BrotliStream(input, CompressionLevel.Fastest) },
+#endif
         };
 
 		public ResponseCompressor(ILogger<ResponseCompressor> logger)

@@ -3,6 +3,7 @@
 namespace Everest.Services
 {
 	public abstract class ServiceConfigurator<TService>
+	    where TService : class
 	{
 		protected TService Service { get; }
 
@@ -10,8 +11,8 @@ namespace Everest.Services
 
 		protected ServiceConfigurator(TService service, IServiceProvider services)
 		{
-			Service = service ?? throw new ArgumentNullException(nameof(service));
-			Services = services ?? throw new ArgumentNullException(nameof(services));
-		}
+            Service = service ?? throw new ArgumentNullException(nameof(service));
+            Services = services ?? throw new ArgumentNullException(nameof(services));
+        }
 	}
 }

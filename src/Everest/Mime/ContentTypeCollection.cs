@@ -12,7 +12,7 @@ namespace Everest.Mime
             set => contentTypes[mediaType] = value;
         }
 
-        private readonly Dictionary<string, ContentType> contentTypes = new();
+        private readonly Dictionary<string, ContentType> contentTypes = new Dictionary<string, ContentType>();
 
         public bool Has(string mediaType)
         {

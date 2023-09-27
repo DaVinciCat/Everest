@@ -42,7 +42,7 @@ namespace Everest.Http
 
 		private readonly StreamPipe pipe;
 
-		private readonly MemoryStream outputStream = new();
+		private readonly MemoryStream outputStream = new MemoryStream();
 
 		public HttpRequest(HttpListenerContext context, ILogger<HttpRequest> logger)
 		{

@@ -11,7 +11,7 @@ namespace Everest.Authentication
             set => authentications[scheme] = value;
         }
 
-        private readonly Dictionary<string, IAuthentication> authentications = new();
+        private readonly Dictionary<string, IAuthentication> authentications = new Dictionary<string, IAuthentication>();
 
         public bool Has(string scheme)
         {

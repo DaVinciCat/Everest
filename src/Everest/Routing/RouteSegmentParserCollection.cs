@@ -12,7 +12,7 @@ namespace Everest.Routing
             set => parsers[pattern] = value;
         }
 
-        private readonly Dictionary<string, Func<string, IRouteSegmentParser>> parsers = new();
+        private readonly Dictionary<string, Func<string, IRouteSegmentParser>> parsers = new Dictionary<string, Func<string, IRouteSegmentParser>>();
 
         public bool Has(string pattern)
         {

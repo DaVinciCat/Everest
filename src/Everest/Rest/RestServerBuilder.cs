@@ -29,7 +29,8 @@ namespace Everest.Rest
 
 		public RestServerBuilder(IServiceCollection services = null)
 		{
-			services ??= new ServiceCollection();
+			if (services == null)
+			    services = new ServiceCollection();
 
 			services.TryAddSingleton<ILoggerFactory>(new NullLoggerFactory());
 
