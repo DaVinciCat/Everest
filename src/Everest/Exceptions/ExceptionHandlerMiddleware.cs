@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Everest.Http;
-using Everest.Middleware;
+using Everest.Middlewares;
 
 namespace Everest.Exceptions
 {
-    public class ExceptionHandlerMiddleware : MiddlewareBase
+    public class ExceptionHandlerMiddleware : Middleware
     {
         private readonly IExceptionHandler exceptionHandler;
         

@@ -3,7 +3,7 @@ using System;
 using System.Net;
 using System.Threading;
 using Everest.Collections;
-using Everest.Middleware;
+using Everest.Middlewares;
 using Everest.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

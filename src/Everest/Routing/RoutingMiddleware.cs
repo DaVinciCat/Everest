@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Everest.Http;
-using Everest.Middleware;
+using Everest.Middlewares;
 
 namespace Everest.Routing
 {
-    public class RoutingMiddleware : MiddlewareBase
+    public class RoutingMiddleware : Middleware
     {
 	    private readonly IRouter router;
         

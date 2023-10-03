@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Everest.Http;
-using Everest.Middleware;
+using Everest.Middlewares;
 
 namespace Everest.EndPoints
 {
-    public class EndPointMiddleware : MiddlewareBase
+    public class EndPointMiddleware : Middleware
     {
         private readonly IEndPointInvoker endPointInvoker;
 

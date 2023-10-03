@@ -8,7 +8,7 @@ using Everest.Cors;
 using Everest.EndPoints;
 using Everest.Exceptions;
 using Everest.Files;
-using Everest.Middleware;
+using Everest.Middlewares;
 using Everest.Mime;
 using Everest.Routing;
 using Microsoft.Extensions.DependencyInjection;

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Everest.Http;
-using Everest.Middleware;
+using Everest.Middlewares;
 
 namespace Everest.Compression
 {
-    public class ResponseCompressionMiddleware : MiddlewareBase
+    public class ResponseCompressionMiddleware : Middleware
     {
         private readonly IResponseCompressor responseCompressor;
 

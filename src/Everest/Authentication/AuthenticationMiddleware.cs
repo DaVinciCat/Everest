@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Everest.Http;
-using Everest.Middleware;
+using Everest.Middlewares;
 
 namespace Everest.Authentication
 {
-	public class AuthenticationMiddleware : MiddlewareBase
+	public class AuthenticationMiddleware : Middleware
 	{
 		private readonly IAuthenticator authenticator;
 

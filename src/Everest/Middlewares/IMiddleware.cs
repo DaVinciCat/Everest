@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Everest.Http;
 
-namespace Everest.Middleware
+namespace Everest.Middlewares
 {
 	public interface IMiddleware
 	{

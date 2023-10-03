@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
 using Everest.Http;
 
-namespace Everest.Middleware
+namespace Everest.Middlewares
 {
-	public abstract class MiddlewareBase : IMiddleware
+	public abstract class Middleware : IMiddleware
 	{
 		public IMiddleware Next;
 

@@ -1,12 +1,12 @@
 ﻿using Everest.Http;
-using Everest.Middleware;
 using Everest.Routing;
 using System;
 using System.Threading.Tasks;
+using Everest.Middlewares;
 
 namespace Everest.Files
 {
-	public class StaticFilesMiddleware : MiddlewareBase
+	public class StaticFilesMiddleware : Middleware
 	{
 		private readonly IStaticFileRequestHandler staticFileRequestHandler;
 

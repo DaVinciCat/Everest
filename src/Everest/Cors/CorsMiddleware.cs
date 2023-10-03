@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Everest.Http;
-using Everest.Middleware;
+using Everest.Middlewares;
 using Everest.Routing;
 
 namespace Everest.Cors
 {
-	public class CorsMiddleware : MiddlewareBase
+	public class CorsMiddleware : Middleware
     {
 	    private readonly ICorsRequestHandler corsRequestHandler;
 

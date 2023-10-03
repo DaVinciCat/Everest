@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Everest.Http;
 
-namespace Everest.Middleware
+namespace Everest.Middlewares
 {
-	public class AggregateMiddleware : MiddlewareBase
+	public class AggregateMiddleware : Middleware
 	{
 		private readonly List<IMiddleware> collection = new List<IMiddleware>();
 
