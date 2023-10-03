@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-	<Reference Include="System.Web" />
+	<Reference Condition=" '$(TargetFramework)' != 'net6.0'" Include="System.Web" />
   </ItemGroup>
 
 </Project>
