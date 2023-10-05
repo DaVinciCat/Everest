@@ -77,7 +77,7 @@ namespace Everest.WebSockets
             await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None);
         }
 
-        public virtual async Task ReceiveAsync(WebSocket socket, CancellationToken token)
+        protected virtual async Task ReceiveAsync(WebSocket socket, CancellationToken token)
         {
             if (socket == null)
             {
@@ -146,7 +146,7 @@ namespace Everest.WebSockets
             }
         }
 
-        public async Task BroadcastAsync(string text)
+        protected async Task BroadcastAsync(string text)
         {
             try
             {
@@ -170,7 +170,7 @@ namespace Everest.WebSockets
             }
         }
 
-        public async Task BroadcastAsync(byte[] bytes)
+        protected async Task BroadcastAsync(byte[] bytes)
         {
             try
             {
@@ -194,7 +194,7 @@ namespace Everest.WebSockets
             }
         }
 
-        public async Task CloseAsync()
+        protected async Task CloseAsync()
         {
             try
             {
