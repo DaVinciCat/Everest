@@ -13,12 +13,7 @@ namespace Everest.WebSockets
 
         public WebSocketContext(HttpListenerContext context)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
-            this.context = context;   
+            this.context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
         public async Task<WebSocket> AcceptWebSocketAsync()

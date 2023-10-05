@@ -8,11 +8,11 @@ namespace Everest.WebSockets
 {
     public abstract class WebSocketRequestHandler : WebSocketHandler, IWebSocketRequestHandler
     {
-        public virtual string Path { get; set; }
+        public virtual string Path => "";
 
         public ILogger Logger { get; }
 
-        public WebSocketRequestHandler(ILogger logger)
+        protected WebSocketRequestHandler(ILogger logger)
         {
             Logger = logger;
         }
@@ -32,7 +32,7 @@ namespace Everest.WebSockets
                     {
                         Logger.LogTrace($"{context.TraceIdentifier} - Try to accept WebSocket: {new { Path = Path }}");
                         var socket = await context.WebSockets.AcceptWebSocketAsync();
-                        Logger.LogTrace($"{context.TraceIdentifier} - Receiving messages from WebSocket: {new { State = socket.State }}");
+                        Logger.LogTrace($"{context.TraceIdentifier} - Start receiving messages from WebSocket: {new { State = socket.State }}");
                         await ReceiveAsync(socket, token);
                         Logger.LogTrace($"{context.TraceIdentifier} - Done receiving messages from WebSocket: {new { State = socket.State, CloseStatus = socket.CloseStatus, CloseDescription = socket.CloseStatusDescription }}");
                         return true;

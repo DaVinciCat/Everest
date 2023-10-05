@@ -13,6 +13,7 @@ using Everest.Http;
 using Everest.Middlewares;
 using Everest.Mime;
 using Everest.Routing;
+using Everest.WebSockets;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
@@ -271,6 +272,13 @@ namespace Everest.Rest
 			return services;
 		}
 
+        public static IServiceCollection AddWebSocketRequestHandler<THandler>(this IServiceCollection services)
+			where THandler : class, IWebSocketRequestHandler
+        {
+            services.AddSingleton<THandler>();
+			return services;
+        }
+
 		public static IServiceCollection AddRouteScanner(this IServiceCollection services, Func<IServiceProvider, IRouteScanner> builder)
 		{
 			services.AddSingleton(builder);
@@ -370,6 +378,14 @@ namespace Everest.Rest
 			builder.Middleware.Add(new ExceptionHandlerMiddleware(exceptionHandler));
 			return builder;
 		}
+
+        public static RestServerBuilder UseWebSocketMiddleware<THandler>(this RestServerBuilder builder) 
+		    where THandler : IWebSocketRequestHandler
+        {
+            var handler = builder.Services.GetRequiredService<THandler>(); 
+			builder.Middleware.Add(new WebSocketMiddleware<THandler>(handler));
+            return builder;
+        }
 
 		public static RestServerBuilder ScanRoutes(this RestServerBuilder builder, Assembly assembly)
 		{

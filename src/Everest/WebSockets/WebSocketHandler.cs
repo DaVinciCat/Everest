@@ -5,16 +5,19 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+#if !NET5_0_OR_GREATER
+using Everest.Utils;
+#endif
 
 namespace Everest.WebSockets
 {
     public abstract class WebSocketHandler
     {
-        private static readonly TimeSpan closeTimeout = TimeSpan.FromMilliseconds(250);
+        private static readonly TimeSpan CloseTimeout = TimeSpan.FromMilliseconds(250);
 
-        private const int receiveBufferSize = 4 * 1024;
+        private const int ReceiveBufferSize = 4 * 1024;
 
-        private HashSet<WebSocket> sockets = new HashSet<WebSocket>();
+        private readonly HashSet<WebSocket> sockets = new HashSet<WebSocket>();
 
         private readonly SemaphoreSlim locker = new SemaphoreSlim(1, 1);
 
@@ -42,7 +45,7 @@ namespace Everest.WebSockets
         {
             await Task.CompletedTask;
         }
-              
+
         protected virtual async Task SendAsync(WebSocket socket, byte[] message)
         {
             if (message == null)
@@ -86,7 +89,7 @@ namespace Everest.WebSockets
                 AddSocket(socket);
                 await OnOpenAsync(socket);
 
-                var bytes = new byte[receiveBufferSize];
+                var bytes = new byte[ReceiveBufferSize];
                 var buffer = new ArraySegment<byte>(bytes);
                 while (!token.IsCancellationRequested && socket.State == WebSocketState.Open)
                 {
@@ -108,7 +111,7 @@ namespace Everest.WebSockets
                             // We'll give the queued frame some amount of time to go out on the wire, and if a
                             // timeout occurs we'll give up and abort the connection.
                             await Task
-                                .WhenAny(CloseAsync(socket), Task.Delay(closeTimeout))
+                                .WhenAny(CloseAsync(socket), Task.Delay(CloseTimeout, token))
                                 .ContinueWith(_ => { }, TaskContinuationOptions.ExecuteSynchronously); // swallow exceptions occurring from sending the CLOSE
                             RemoveSocket(socket);
                             return;
@@ -140,6 +143,54 @@ namespace Everest.WebSockets
                 {
                     await OnCloseAsync(socket);
                 }
+            }
+        }
+
+        public async Task BroadcastAsync(string text)
+        {
+            try
+            {
+                await locker.WaitAsync();
+
+#if NET5_0_OR_GREATER
+                await Parallel.ForEachAsync(sockets, async (socket, _) =>
+                {
+                    await SendAsync(socket, text);
+                });
+#else
+                await sockets.ParallelForEachAsync(async socket =>
+                {
+                    await SendAsync(socket, text);
+                });
+#endif
+            }
+            finally
+            {
+                locker.Release();
+            }
+        }
+
+        public async Task BroadcastAsync(byte[] bytes)
+        {
+            try
+            {
+                await locker.WaitAsync();
+
+#if NET5_0_OR_GREATER
+                await Parallel.ForEachAsync(sockets, async (socket, _) =>
+                {
+                    await SendAsync(socket, bytes);
+                });
+#else
+                await sockets.ParallelForEachAsync(async socket =>
+                {
+                    await SendAsync(socket, bytes);
+                });
+#endif
+            }
+            finally
+            {
+                locker.Release();
             }
         }
 
@@ -190,8 +241,7 @@ namespace Everest.WebSockets
         {
             // If this exception is due to the underlying TCP connection going away, treat as a normal close
             // rather than a fatal exception.
-            var ce = ex as COMException;
-            if (ce != null)
+            if (ex is COMException ce)
             {
                 switch ((uint)ce.ErrorCode)
                 {
@@ -199,7 +249,7 @@ namespace Everest.WebSockets
                     case 0x800703e3:
                     case 0x800704cd:
                     case 0x80070026:
-                    return false;
+                        return false;
                 }
             }
 

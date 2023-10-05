@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Linq;
 using System.Net;
+using System.Net.WebSockets;
 using System.Reflection;
 using System.Threading.Tasks;
 using Everest.Authentication;
 using Everest.Http;
 using Everest.Rest;
 using Everest.Routing;
+using Everest.WebSockets;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Everest.Shell
 {
@@ -167,6 +171,7 @@ namespace Everest.Shell
 			var services = new ServiceCollection();
 			services.AddAuthenticator(configurator => configurator.AddBasicAuthentication())
 					.AddCorsRequestHandler(configurator => configurator.AddDefaultCorsPolicy())
+                    .AddWebSocketRequestHandler<EchoWebsocketRequestHandler>()
 					.AddSingleton(_ => new GreetingsService())
 					.AddConsoleLoggerFactory();
 
@@ -174,6 +179,7 @@ namespace Everest.Shell
 				.UsePrefixes("http://localhost:8080/")
 				.UseExceptionHandlerMiddleware()
 				.UseResponseCompressionMiddleware()
+                .UseWebSocketMiddleware<EchoWebsocketRequestHandler>()
                 .UseStaticFilesMiddleware()
                 .UseRoutingMiddleware()
                 .UseCorsMiddleware()
@@ -197,6 +203,35 @@ namespace Everest.Shell
 			Console.ReadKey();
 		}
 	}
+
+    #region Sockets
+
+    public class EchoWebsocketRequestHandler : WebSocketRequestHandler
+    {
+        public EchoWebsocketRequestHandler(ILoggerFactory loggerFactory)
+            : base(loggerFactory.CreateLogger<EchoWebsocketRequestHandler>())
+        {
+
+        }
+
+        protected override async Task OnMessageAsync(WebSocket socket, string message)
+        {
+			Logger.LogInformation($"Received WebSocket message: {message}");
+			await Echo();
+
+			async Task Echo()
+            {
+                await BroadcastAsync(message);
+            }
+        }
+
+        public EchoWebsocketRequestHandler(ILogger logger) 
+            : base(logger)
+        {
+        }
+    }
+
+    #endregion
 
 	#region Greetings
 
