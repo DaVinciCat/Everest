@@ -2,6 +2,7 @@
 using System.Net;
 using System.Security.Claims;
 using Everest.Collections;
+using Everest.WebSockets;
 using Microsoft.Extensions.Logging;
 
 namespace Everest.Http
@@ -16,7 +17,9 @@ namespace Everest.Http
 
 		public HttpResponse Response { get; }
 
-		public IFeatureCollection Features { get; }
+		public WebSocketContext WebSockets { get; }
+
+        public IFeatureCollection Features { get; }
 
 		public IServiceProvider Services { get; }
 
@@ -31,7 +34,8 @@ namespace Everest.Http
 			LoggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
 			Request = new HttpRequest(context, loggerFactory.CreateLogger<HttpRequest>());
 			Response = new HttpResponse(context, loggerFactory.CreateLogger<HttpResponse>());
-			Features = features ?? throw new ArgumentNullException(nameof(features));
+			WebSockets = new WebSocketContext(context);
+            Features = features ?? throw new ArgumentNullException(nameof(features));
 			Services = services ?? throw new ArgumentNullException(nameof(services));
 			User = new ClaimsPrincipal();
 		}
