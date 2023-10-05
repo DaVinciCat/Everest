@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using Everest.Authentication;
 using Everest.Compression;
 using Everest.Cors;
 using Everest.EndPoints;
 using Everest.Exceptions;
 using Everest.Files;
+using Everest.Http;
 using Everest.Middlewares;
 using Everest.Mime;
 using Everest.Routing;
@@ -313,7 +315,13 @@ namespace Everest.Rest
 			return builder;
 		}
 
-		public static RestServerBuilder UseRoutingMiddleware(this RestServerBuilder builder)
+        public static RestServerBuilder UseMiddleware(this RestServerBuilder builder, Func<HttpContext, Func<Task>, Task> middleware)
+        {
+			builder.Middleware.Add(new UseMiddleware(middleware));
+            return builder;
+        }
+		
+        public static RestServerBuilder UseRoutingMiddleware(this RestServerBuilder builder)
 		{
 			var router = builder.Services.GetRequiredService<IRouter>();
 			builder.Middleware.Add(new RoutingMiddleware(router));

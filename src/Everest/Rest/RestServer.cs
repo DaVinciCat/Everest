@@ -143,7 +143,7 @@ namespace Everest.Rest
 					var context = await listener.GetContextAsync();
 					var features = new FeatureCollection();
 					var services = serviceProvider.CreateScope().ServiceProvider;
-					var httpContext = new HttpContext(context, features, services, loggerFactory);
+                    var httpContext = new HttpContext(context, features, services, loggerFactory);
 
 #if NET5_0_OR_GREATER
 					ThreadPool.QueueUserWorkItem(ProcessRequestAsync, httpContext, false);
