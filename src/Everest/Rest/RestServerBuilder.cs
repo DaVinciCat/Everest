@@ -317,10 +317,10 @@ namespace Everest.Rest
 
         public static RestServerBuilder UseMiddleware(this RestServerBuilder builder, Func<HttpContext, Func<Task>, Task> middleware)
         {
-            builder.Middleware.Add(new UseMiddleware(middleware));
+			builder.Middleware.Add(new UseMiddleware(middleware));
             return builder;
         }
-
+		
         public static RestServerBuilder UseRoutingMiddleware(this RestServerBuilder builder)
 		{
 			var router = builder.Services.GetRequiredService<IRouter>();
