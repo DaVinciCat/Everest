@@ -17,46 +17,46 @@ namespace Everest.WebSockets
 
         private const int ReceiveBufferSize = 4 * 1024;
 
-        private readonly HashSet<WebSocket> sockets = new HashSet<WebSocket>();
+        private readonly HashSet<WebSocketSession> sessions = new HashSet<WebSocketSession>();
 
         private readonly SemaphoreSlim locker = new SemaphoreSlim(1, 1);
 
-        protected virtual async Task OnCloseAsync(WebSocket socket)
+        protected virtual async Task OnCloseAsync(WebSocketSession session)
         {
             await Task.CompletedTask;
         }
 
-        protected virtual async Task OnErrorAsync(WebSocket socket, Exception ex)
+        protected virtual async Task OnErrorAsync(WebSocketSession session, Exception ex)
         {
             await Task.CompletedTask;
         }
 
-        protected virtual Task OnMessageAsync(WebSocket socket, byte[] message)
+        protected virtual Task OnMessageAsync(WebSocketSession session, byte[] message)
         {
             throw new NotImplementedException();
         }
 
-        protected virtual Task OnMessageAsync(WebSocket socket, string message)
+        protected virtual Task OnMessageAsync(WebSocketSession session, string message)
         {
             throw new NotImplementedException();
         }
 
-        protected virtual async Task OnOpenAsync(WebSocket socket)
+        protected virtual async Task OnOpenAsync(WebSocketSession session)
         {
             await Task.CompletedTask;
         }
 
-        protected virtual async Task SendAsync(WebSocket socket, byte[] message)
+        protected virtual async Task SendAsync(WebSocketSession session, byte[] message)
         {
             if (message == null)
             {
                 throw new ArgumentNullException(nameof(message));
             }
 
-            await socket.SendAsync(new ArraySegment<byte>(message), WebSocketMessageType.Binary, true, CancellationToken.None);
+            await session.SendAsync(new ArraySegment<byte>(message), WebSocketMessageType.Binary, true, CancellationToken.None);
         }
 
-        protected virtual async Task SendAsync(WebSocket socket, string message)
+        protected virtual async Task SendAsync(WebSocketSession session, string message)
         {
             if (message == null)
             {
@@ -64,46 +64,46 @@ namespace Everest.WebSockets
             }
 
             var buffer = Encoding.UTF8.GetBytes(message);
-            await socket.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, CancellationToken.None);
+            await session.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, CancellationToken.None);
         }
 
-        protected virtual async Task CloseAsync(WebSocket socket)
+        protected virtual async Task CloseAsync(WebSocketSession session)
         {
-            if (socket == null)
+            if (session == null)
             {
-                throw new ArgumentNullException(nameof(socket));
+                throw new ArgumentNullException(nameof(session));
             }
 
-            await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None);
+            await session.CloseAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None);
         }
 
-        protected virtual async Task ReceiveAsync(WebSocket socket, CancellationToken token)
+        protected virtual async Task ReceiveAsync(WebSocketSession session, CancellationToken token)
         {
-            if (socket == null)
+            if (session == null)
             {
-                throw new ArgumentNullException(nameof(socket));
+                throw new ArgumentNullException(nameof(session));
             }
 
             try
             {
-                AddSocket(socket);
-                await OnOpenAsync(socket);
+                AddSession(session);
+                await OnOpenAsync(session);
 
                 var bytes = new byte[ReceiveBufferSize];
                 var buffer = new ArraySegment<byte>(bytes);
-                while (!token.IsCancellationRequested && socket.State == WebSocketState.Open)
+                while (!token.IsCancellationRequested && session.State == WebSocketState.Open)
                 {
-                    var result = await socket.ReceiveAsync(buffer, token);
+                    var result = await session.ReceiveAsync(buffer, token);
 
                     switch (result.MessageType)
                     {
                         case WebSocketMessageType.Binary:
-                            await OnMessageAsync(socket, bytes);
+                            await OnMessageAsync(session, bytes);
                             break;
 
                         case WebSocketMessageType.Text:
                             var text = Encoding.UTF8.GetString(bytes);
-                            await OnMessageAsync(socket, text);
+                            await OnMessageAsync(session, text);
                             break;
 
                         default:
@@ -111,9 +111,9 @@ namespace Everest.WebSockets
                             // We'll give the queued frame some amount of time to go out on the wire, and if a
                             // timeout occurs we'll give up and abort the connection.
                             await Task
-                                .WhenAny(CloseAsync(socket), Task.Delay(CloseTimeout, token))
+                                .WhenAny(CloseAsync(session), Task.Delay(CloseTimeout, token))
                                 .ContinueWith(_ => { }, TaskContinuationOptions.ExecuteSynchronously); // swallow exceptions occurring from sending the CLOSE
-                            RemoveSocket(socket);
+                            RemoveSession(session);
                             return;
                     }
                 }
@@ -123,25 +123,25 @@ namespace Everest.WebSockets
                 // ex.CancellationToken never has the token that was actually cancelled
                 if (!token.IsCancellationRequested)
                 {
-                    await OnErrorAsync(socket, ex);
+                    await OnErrorAsync(session, ex);
                 }
             }
             catch (Exception ex)
             {
                 if (IsFatalException(ex))
                 {
-                    await OnErrorAsync(socket, ex);
+                    await OnErrorAsync(session, ex);
                 }
             }
             finally
             {
                 try
                 {
-                    await CloseAsync(socket);
+                    await CloseAsync(session);
                 }
                 finally
                 {
-                    await OnCloseAsync(socket);
+                    await OnCloseAsync(session);
                 }
             }
         }
@@ -153,14 +153,14 @@ namespace Everest.WebSockets
                 await locker.WaitAsync();
 
 #if NET5_0_OR_GREATER
-                await Parallel.ForEachAsync(sockets, async (socket, _) =>
+                await Parallel.ForEachAsync(sessions, async (session, _) =>
                 {
-                    await SendAsync(socket, text);
+                    await SendAsync(session, text);
                 });
 #else
-                await sockets.ParallelForEachAsync(async socket =>
+                await sessions.ParallelForEachAsync(async session =>
                 {
-                    await SendAsync(socket, text);
+                    await SendAsync(session, text);
                 });
 #endif
             }
@@ -177,14 +177,14 @@ namespace Everest.WebSockets
                 await locker.WaitAsync();
 
 #if NET5_0_OR_GREATER
-                await Parallel.ForEachAsync(sockets, async (socket, _) =>
+                await Parallel.ForEachAsync(sessions, async (session, _) =>
                 {
-                    await SendAsync(socket, bytes);
+                    await SendAsync(session, bytes);
                 });
 #else
-                await sockets.ParallelForEachAsync(async socket =>
+                await sessions.ParallelForEachAsync(async session =>
                 {
-                    await SendAsync(socket, bytes);
+                    await SendAsync(session, bytes);
                 });
 #endif
             }
@@ -199,9 +199,9 @@ namespace Everest.WebSockets
             try
             {
                 await locker.WaitAsync();
-                foreach (var socket in sockets)
+                foreach (var session in sessions)
                 {
-                    await CloseAsync(socket);
+                    await CloseAsync(session);
                 }
             }
             finally
@@ -210,12 +210,12 @@ namespace Everest.WebSockets
             }
         }
 
-        private void AddSocket(WebSocket socket)
+        private void AddSession(WebSocketSession session)
         {
             try
             {
                 locker.Wait();
-                sockets.Add(socket);
+                sessions.Add(session);
             }
             finally
             {
@@ -223,12 +223,12 @@ namespace Everest.WebSockets
             }
         }
 
-        private void RemoveSocket(WebSocket socket)
+        private void RemoveSession(WebSocketSession session)
         {
             try
             {
                 locker.Wait();
-                sockets.Remove(socket);
+                sessions.Remove(session);
             }
             finally
             {

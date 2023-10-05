@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Net;
-using System.Net.WebSockets;
 using System.Threading.Tasks;
 
 namespace Everest.WebSockets
@@ -16,15 +15,15 @@ namespace Everest.WebSockets
             this.context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public async Task<WebSocket> AcceptWebSocketAsync()
+        public async Task<WebSocketSession> AcceptWebSocketAsync()
         {
             return await AcceptWebSocketAsync(null);
         }
 
-        public async Task<WebSocket> AcceptWebSocketAsync(string subProtocol)
+        public async Task<WebSocketSession> AcceptWebSocketAsync(string subProtocol)
         {
             var ctx = await context.AcceptWebSocketAsync(subProtocol);
-            return ctx.WebSocket;
+            return new WebSocketSession(ctx);
         }
     }
 }

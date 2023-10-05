@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Net;
-using System.Net.WebSockets;
 using System.Reflection;
 using System.Threading.Tasks;
 using Everest.Authentication;
@@ -11,7 +10,6 @@ using Everest.Routing;
 using Everest.WebSockets;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Everest.Shell
 {
@@ -179,11 +177,11 @@ namespace Everest.Shell
 				.UsePrefixes("http://localhost:8080/")
 				.UseExceptionHandlerMiddleware()
 				.UseResponseCompressionMiddleware()
+                .UseAuthenticationMiddleware()
                 .UseWebSocketMiddleware<EchoWebsocketRequestHandler>()
                 .UseStaticFilesMiddleware()
                 .UseRoutingMiddleware()
                 .UseCorsMiddleware()
-				.UseAuthenticationMiddleware()
 				.UseEndPointMiddleware()
 				.ScanRoutes(Assembly.GetExecutingAssembly())
 				.Build();
@@ -214,7 +212,7 @@ namespace Everest.Shell
 
         }
 
-        protected override async Task OnMessageAsync(WebSocket socket, string message)
+        protected override async Task OnMessageAsync(WebSocketSession session, string message)
         {
 			Logger.LogInformation($"Received WebSocket message: {message}");
 			await Echo();
