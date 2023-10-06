@@ -6,6 +6,7 @@ using System.Net.WebSockets;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using Everest.Collections;
 using Everest.Security;
 
 namespace Everest.WebSockets
@@ -42,6 +43,8 @@ namespace Everest.WebSockets
 
         public IPEndPoint RemoteEndPoint => request.RemoteEndPoint;
 
+        public ParameterCollection QueryParameters { get; }
+
         public ClaimsPrincipal User { get; }
 
         private readonly HttpListenerRequest request;
@@ -54,6 +57,7 @@ namespace Everest.WebSockets
             this.request = request;
 
             User = user;
+            QueryParameters = new ParameterCollection(request.QueryString);
         }
 
         public override void Abort()
