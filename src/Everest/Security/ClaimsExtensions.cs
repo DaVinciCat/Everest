@@ -17,5 +17,8 @@ namespace Everest.Security
 
         public static string Name(this IEnumerable<Claim> claims)
 	        => claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
-	}
+
+        public static bool IsAuthenticated(this ClaimsPrincipal principal) => principal.Identity != null && principal.Identity.IsAuthenticated;
+
+    }
 }

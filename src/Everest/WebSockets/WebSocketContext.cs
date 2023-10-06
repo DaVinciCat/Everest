@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Everest.WebSockets
@@ -10,9 +11,12 @@ namespace Everest.WebSockets
 
         private readonly HttpListenerContext context;
 
-        public WebSocketContext(HttpListenerContext context)
+        private readonly ClaimsPrincipal user;
+
+        public WebSocketContext(HttpListenerContext context, ClaimsPrincipal user)
         {
             this.context = context ?? throw new ArgumentNullException(nameof(context));
+            this.user = user ?? throw new ArgumentNullException(nameof(user));
         }
 
         public async Task<WebSocketSession> AcceptWebSocketAsync()
@@ -22,8 +26,8 @@ namespace Everest.WebSockets
 
         public async Task<WebSocketSession> AcceptWebSocketAsync(string subProtocol)
         {
-            var ctx = await context.AcceptWebSocketAsync(subProtocol);
-            return new WebSocketSession(ctx);
+            var webSocketContext = await context.AcceptWebSocketAsync(subProtocol);
+            return new WebSocketSession(webSocketContext, context.Request, user);
         }
     }
 }

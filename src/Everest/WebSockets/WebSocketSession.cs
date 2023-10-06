@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Net;
 using System.Net.WebSockets;
-using System.Security.Principal;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using Everest.Security;
 
 namespace Everest.WebSockets
 {
@@ -18,17 +19,13 @@ namespace Everest.WebSockets
         public override WebSocketState State => context.WebSocket.State;
 
         public override string SubProtocol => context.WebSocket.SubProtocol;
-
-        public IPrincipal User => context.User;
-
+        
         public CookieCollection Cookie => context.CookieCollection;
 
         public NameValueCollection Headers => context.Headers;
 
         public string Origin => context.Origin;
-
-        public bool IsAuthenticated => context.IsAuthenticated;
-
+        
         public Uri RequestUri => context.RequestUri;
 
         public bool IsSecureConnection => context.IsSecureConnection;
@@ -40,12 +37,23 @@ namespace Everest.WebSockets
         public string SecWebSocketVersion => context.SecWebSocketVersion;
 
         public IEnumerable<string> SecWebSocketProtocols  => context.SecWebSocketProtocols;
-        
+
+        public bool IsAuthenticated => User.IsAuthenticated();
+
+        public IPEndPoint RemoteEndPoint => request.RemoteEndPoint;
+
+        public ClaimsPrincipal User { get; }
+
+        private readonly HttpListenerRequest request;
+
         private readonly HttpListenerWebSocketContext context;
         
-        public WebSocketSession(HttpListenerWebSocketContext context)
+        public WebSocketSession(HttpListenerWebSocketContext context, HttpListenerRequest request, ClaimsPrincipal user)
         {
             this.context = context; 
+            this.request = request;
+
+            User = user;
         }
 
         public override void Abort()

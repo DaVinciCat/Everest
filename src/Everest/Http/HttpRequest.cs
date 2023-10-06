@@ -44,13 +44,10 @@ namespace Everest.Http
 
 		private readonly MemoryStream outputStream = new MemoryStream();
 
-		public HttpRequest(HttpListenerContext context, ILogger<HttpRequest> logger)
+		public HttpRequest(HttpListenerRequest request, ILogger<HttpRequest> logger)
 		{
-			if (context == null)
-				throw new ArgumentNullException(nameof(context));
-
-			request = context.Request;
-			pipe = new StreamPipe(outputStream).PipeFrom(request.InputStream);
+            this.request = request ?? throw new ArgumentNullException(nameof(request));
+            pipe = new StreamPipe(outputStream).PipeFrom(request.InputStream);
 
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			QueryParameters = new ParameterCollection(request.QueryString);

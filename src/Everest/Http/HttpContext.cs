@@ -32,12 +32,12 @@ namespace Everest.Http
 
 			TraceIdentifier = context.Request.RequestTraceIdentifier;
 			LoggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
-			Request = new HttpRequest(context, loggerFactory.CreateLogger<HttpRequest>());
-			Response = new HttpResponse(context, loggerFactory.CreateLogger<HttpResponse>());
-			WebSockets = new WebSocketContext(context);
-            Features = features ?? throw new ArgumentNullException(nameof(features));
+			Request = new HttpRequest(context.Request, loggerFactory.CreateLogger<HttpRequest>());
+			Response = new HttpResponse(context.Response, context.Request, loggerFactory.CreateLogger<HttpResponse>());
+			Features = features ?? throw new ArgumentNullException(nameof(features));
 			Services = services ?? throw new ArgumentNullException(nameof(services));
 			User = new ClaimsPrincipal();
-		}
+            WebSockets = new WebSocketContext(context, User);
+        }
 	}
 }

@@ -15,7 +15,7 @@ namespace Everest.Http
 	{
 		public ILogger<HttpResponse> Logger { get; }
 
-		public Guid TraceIdentifier => context.Request.RequestTraceIdentifier;
+		public Guid TraceIdentifier => request.RequestTraceIdentifier;
 
 		public bool ResponseSent { get; private set; }
 
@@ -81,18 +81,18 @@ namespace Everest.Http
 				response.StatusDescription = value.ToString();
 			}
 		}
-		
-		private readonly HttpListenerContext context;
 
 		private readonly HttpListenerResponse response;
 
+        private readonly HttpListenerRequest request;
+
 		private readonly StreamPipe pipe;
 
-		public HttpResponse(HttpListenerContext context, ILogger<HttpResponse> logger)
+		public HttpResponse(HttpListenerResponse response, HttpListenerRequest request, ILogger<HttpResponse> logger)
 		{
-			this.context = context ?? throw new ArgumentNullException(nameof(context));
-			response = context.Response;
-			pipe = new StreamPipe(response.OutputStream);
+			this.response = response ?? throw new ArgumentNullException(nameof(response));
+            this.request = request ?? throw new ArgumentNullException(nameof(request));
+            pipe = new StreamPipe(response.OutputStream);
 
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			StatusCode = HttpStatusCode.OK;
@@ -133,7 +133,7 @@ namespace Everest.Http
 			{
 				try
 				{
-					Logger.LogTrace($"{TraceIdentifier} - Sending response: {new { RemoteEndPoint = context.Request.RemoteEndPoint, ContentLength = ContentLength.ToReadableSize(), StatusCode = response.StatusCode, ContentType = response.ContentType, ContentEncoding = response.ContentEncoding?.EncodingName }}");
+					Logger.LogTrace($"{TraceIdentifier} - Sending response: {new { RemoteEndPoint = request.RemoteEndPoint, ContentLength = ContentLength.ToReadableSize(), StatusCode = response.StatusCode, ContentType = response.ContentType, ContentEncoding = response.ContentEncoding?.EncodingName }}");
 					await pipe.FlushAsync();
 					pipe.Close();
 				}
