@@ -13,6 +13,8 @@ namespace Everest.WebSockets
 {
     public class WebSocketSession : WebSocket
     {
+        public Guid Id { get; }
+
         public override WebSocketCloseStatus? CloseStatus => context.WebSocket.CloseStatus;
 
         public override string CloseStatusDescription => context.WebSocket.CloseStatusDescription;
@@ -56,6 +58,7 @@ namespace Everest.WebSockets
             this.context = context; 
             this.request = request;
 
+            Id = Guid.NewGuid();
             User = user;
             QueryParameters = new ParameterCollection(request.QueryString);
         }
