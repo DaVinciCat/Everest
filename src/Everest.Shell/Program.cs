@@ -5,6 +5,8 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Everest.Authentication;
 using Everest.Http;
+using Everest.OpenApi;
+using Everest.OpenApi.Annotations;
 using Everest.Rest;
 using Everest.Routing;
 using Everest.WebSockets;
@@ -160,6 +162,27 @@ namespace Everest.Shell
             context.Request.PathParameters.TryGetParameterValue<string>("to", out var to);
             await context.Response.WriteJsonAsync(new { Message = greetings, From = "Everest", To = to, Success = true });
         }
+		
+        [HttpGet("/get/open-api-example")]
+        [Tags("OpenApi", "Examples")]
+        public static async Task GetOpenApiExample(HttpContext context)
+        {
+
+        }
+		
+        [HttpGet("/post/open-api-example")]
+        [Tags("OpenApi", "Examples")]
+        [RequestBody("application/json", "application/xml")]
+        [RequestBodyExample(typeof(JsonRequestExample1))]
+        [RequestBodyExample(typeof(JsonRequestExample2), Name = "gsom")]
+        [RequestBodyExample(typeof(JsonRequestExample2))]
+        [RequestBodyExample(typeof(XmlRequestExample), Summary = "Xml")]
+        [Response(HttpStatusCode.OK, "application/json", "application/xml")]
+        [Response(HttpStatusCode.BadRequest, "application/json")]
+        public static async Task PostOpenApiExample(HttpContext context)
+        {
+           
+        }
     }
 
 	class Program
@@ -184,6 +207,7 @@ namespace Everest.Shell
                 .UseCorsMiddleware()
 				.UseEndPointMiddleware()
 				.ScanRoutes(Assembly.GetExecutingAssembly())
+                .GenerateOpenApiDocument()
 				.Build();
 
 			rest.Start();
@@ -201,6 +225,48 @@ namespace Everest.Shell
 			Console.ReadKey();
 		}
 	}
+
+    #region Examples
+
+    public class Request
+    {
+        public string Payload { get; }
+        public Request()
+        {
+
+        }
+
+        public Request(string payload)
+        {
+            Payload = payload;
+        }
+    }
+
+    public class JsonRequestExample1 : JsonExampleProvider<Request>
+    {
+        protected override Request GetExample()
+        {
+            return new Request("payload #1");
+        }
+    }
+
+    public class JsonRequestExample2 : JsonExampleProvider<Request>
+    {
+        protected override Request GetExample()
+        {
+            return new Request("payload #2");
+        }
+    }
+
+    public class XmlRequestExample : XmlExampleProvider<Request>
+    {
+        protected override Request GetExample()
+        {
+            return new Request("payload #3");
+        }
+    }
+
+    #endregion
 
     #region Sockets
 

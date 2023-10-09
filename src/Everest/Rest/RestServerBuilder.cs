@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 using Everest.Authentication;
 using Everest.Compression;
@@ -12,6 +14,7 @@ using Everest.Files;
 using Everest.Http;
 using Everest.Middlewares;
 using Everest.Mime;
+using Everest.OpenApi;
 using Everest.Routing;
 using Everest.WebSockets;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,6 +22,8 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Logging.Console;
+using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi.Writers;
 
 namespace Everest.Rest
 {
@@ -399,5 +404,22 @@ namespace Everest.Rest
 
 			return builder;
 		}
-	}
+
+        public static RestServerBuilder GenerateOpenApiDocument(this RestServerBuilder builder)
+        {
+            var router = builder.Services.GetRequiredService<IRouter>();
+            var loggerFactory = builder.Services.GetRequiredService<ILoggerFactory>();
+            var generator = new OpenApiDocumentGenerator(loggerFactory.CreateLogger<OpenApiDocumentGenerator>());
+
+
+
+            var doc = generator.Generate(router.Routes, new OpenApiInfo());
+
+            var sb = new StringBuilder();
+            doc.SerializeAsV3(new OpenApiJsonWriter((new StringWriter(sb))));
+            var json = sb.ToString();
+
+            return builder;
+        }
+    }
 }
