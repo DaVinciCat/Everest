@@ -113,8 +113,7 @@ namespace Everest.WebSockets
                             await Task
                                 .WhenAny(CloseAsync(session), Task.Delay(CloseTimeout, token))
                                 .ContinueWith(_ => { }, TaskContinuationOptions.ExecuteSynchronously); // swallow exceptions occurring from sending the CLOSE
-                            RemoveSession(session);
-                            return;
+                            break;
                     }
                 }
             }
@@ -141,6 +140,7 @@ namespace Everest.WebSockets
                 }
                 finally
                 {
+                    RemoveSession(session);
                     await OnCloseAsync(session);
                 }
             }
