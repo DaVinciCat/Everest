@@ -20,7 +20,7 @@ namespace Everest.OpenApi.Filters
             if (!item.Operations.TryGetValue(descriptor.GetOpenApiOperationType(), out var operation))
                 return;
 
-            var lookup = new Dictionary<IOpenApiExampleProvider, RequestBodyExampleAttribute>();
+            var lookup = new Dictionary<RequestBodyExampleAttribute, IOpenApiExampleProvider>();
             var attributes = descriptor.GetAttributes<RequestBodyExampleAttribute>().ToArray();
             foreach (var attribute in attributes)
             {
@@ -30,10 +30,10 @@ namespace Everest.OpenApi.Filters
                     throw new InvalidCastException($"Type {attribute.ExampleType} does not implement {typeof(IOpenApiExampleProvider)}.");
                 }
 
-                lookup[provider] = attribute;
+                lookup[attribute] = provider;
             }
 
-            var groups = lookup.Keys.GroupBy(p => p.MimeType);
+            var groups = lookup.Keys.GroupBy(p => p.MediaType).ToArray();
             foreach (var group in groups)
             {
                 if (!operation.RequestBody.Content.TryGetValue(group.Key, out var content))
@@ -43,15 +43,15 @@ namespace Everest.OpenApi.Filters
 
                 if (group.Count() == 1)
                 {
-                    var provider = group.First();
+                    var provider = lookup[group.First()];
                     content.Example = new OpenApiString(provider.GetExample());
                 }
                 else
                 {
                     var index = 0;
-                    foreach (var provider in group)
+                    foreach (var attribute in group)
                     {
-                        var attribute = lookup[provider];
+                        var provider = lookup[attribute];
                         var example = new OpenApiExample
                         {
                             Value = new OpenApiString(provider.GetExample()),

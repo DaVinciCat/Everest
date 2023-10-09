@@ -23,7 +23,8 @@ namespace Everest.OpenApi
                 new TagsDocumentFilter(),
                 new RequestBodyDocumentFilter(),
                 new RequestBodyExampleDocumentFilter(),
-                new ResponseDocumentFilter()
+                new ResponseDocumentFilter(),
+                new ResponseExampleDocumentFilter()
                 //new DescriptionOpenApiDocumentFilter(),
                 //new ProducesBodyOpenApiDocumentFilter(),
                 //new ConsumesParameterOpenApiDocumentFilter()

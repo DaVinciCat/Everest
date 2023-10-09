@@ -26,10 +26,10 @@ namespace Everest.OpenApi.Filters
                 Required = attribute.Required
             };
 
-            foreach (var mime in attribute.MimeTypes)
+            foreach (var media in attribute.MediaTypes)
             {
                 var content = new OpenApiMediaType();
-                body.Content.Add(mime, content);
+                body.Content.Add(media, content);
             }
 
             operation.RequestBody = body;

@@ -6,15 +6,11 @@ namespace Everest.OpenApi
 {
     public interface IOpenApiExampleProvider
     {
-        string MimeType { get; }
-        
         string GetExample();
     }
 
     public abstract class PlainExampleProvider<T> : IOpenApiExampleProvider
     {
-        public string MimeType => "text/plain";
-
         string IOpenApiExampleProvider.GetExample()
         {
             var example = GetExample();
@@ -26,9 +22,6 @@ namespace Everest.OpenApi
 
     public abstract class JsonExampleProvider<T> : IOpenApiExampleProvider
     {
-        public string MimeType => "application/json";
-
-
         private readonly JsonSerializerOptions options;
 
         protected JsonExampleProvider(JsonSerializerOptions options)
@@ -55,8 +48,6 @@ namespace Everest.OpenApi
 
     public abstract class XmlExampleProvider<T> : IOpenApiExampleProvider
     {
-        public string MimeType => "application/xml";
-        
         string IOpenApiExampleProvider.GetExample()
         {
             var example = GetExample();

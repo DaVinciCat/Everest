@@ -173,12 +173,15 @@ namespace Everest.Shell
         [HttpGet("/post/open-api-example")]
         [Tags("OpenApi", "Examples")]
         [RequestBody("application/json", "application/xml")]
-        [RequestBodyExample(typeof(JsonRequestExample1))]
-        [RequestBodyExample(typeof(JsonRequestExample2), Name = "gsom")]
-        [RequestBodyExample(typeof(JsonRequestExample2))]
-        [RequestBodyExample(typeof(XmlRequestExample), Summary = "Xml")]
+        [RequestBodyExample(typeof(JsonRequestExample1), "application/json")]
+        [RequestBodyExample(typeof(JsonRequestExample2), "application/json")]
+        [RequestBodyExample(typeof(XmlRequestExample), "application/xml", Summary = "Xml")]
         [Response(HttpStatusCode.OK, "application/json", "application/xml")]
         [Response(HttpStatusCode.BadRequest, "application/json")]
+        [ResponseExample(HttpStatusCode.OK, typeof(JsonResponseExample1), "application/json")]
+        [ResponseExample(HttpStatusCode.OK, typeof(JsonResponseExample2), "application/json")]
+        [ResponseExample(HttpStatusCode.OK, typeof(XmlResponseExample), "application/xml")]
+        [ResponseExample(HttpStatusCode.BadRequest, typeof(JsonResponseExample2), "application/json")]
         public static async Task PostOpenApiExample(HttpContext context)
         {
            
@@ -197,7 +200,7 @@ namespace Everest.Shell
 					.AddConsoleLoggerFactory();
 
 			using var rest = new RestServerBuilder(services)
-				.UsePrefixes("http://localhost:8080/")
+				.UsePrefixes("http://*:8080/")
 				.UseExceptionHandlerMiddleware()
 				.UseResponseCompressionMiddleware()
                 .UseAuthenticationMiddleware()
@@ -242,6 +245,20 @@ namespace Everest.Shell
         }
     }
 
+    public class Response
+    {
+        public string Payload { get; }
+        public Response()
+        {
+
+        }
+
+        public Response(string payload)
+        {
+            Payload = payload;
+        }
+    }
+
     public class JsonRequestExample1 : JsonExampleProvider<Request>
     {
         protected override Request GetExample()
@@ -263,6 +280,30 @@ namespace Everest.Shell
         protected override Request GetExample()
         {
             return new Request("payload #3");
+        }
+    }
+
+    public class JsonResponseExample1 : JsonExampleProvider<Response>
+    {
+        protected override Response GetExample()
+        {
+            return new Response("payload #1");
+        }
+    }
+
+    public class JsonResponseExample2 : JsonExampleProvider<Response>
+    {
+        protected override Response GetExample()
+        {
+            return new Response("payload #2");
+        }
+    }
+
+    public class XmlResponseExample : XmlExampleProvider<Response>
+    {
+        protected override Response GetExample()
+        {
+            return new Response("payload #3");
         }
     }
 
