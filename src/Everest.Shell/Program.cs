@@ -173,15 +173,15 @@ namespace Everest.Shell
         [HttpGet("/post/open-api-example")]
         [Tags("OpenApi", "Examples")]
         [RequestBody("application/json", "application/xml")]
-        [RequestBodyExample(typeof(JsonRequestExample1), "application/json")]
-        [RequestBodyExample(typeof(JsonRequestExample2), "application/json")]
-        [RequestBodyExample(typeof(XmlRequestExample), "application/xml", Summary = "Xml")]
+        [RequestBodyExample( "application/json", typeof(JsonRequestExample1))]
+        [RequestBodyExample( "application/json", typeof(JsonRequestExample2))]
+        [RequestBodyExample( "application/xml", typeof(XmlRequestExample), Summary = "Xml")]
         [Response(HttpStatusCode.OK, "application/json", "application/xml")]
         [Response(HttpStatusCode.BadRequest, "application/json")]
-        [ResponseExample(HttpStatusCode.OK, typeof(JsonResponseExample1), "application/json")]
-        [ResponseExample(HttpStatusCode.OK, typeof(JsonResponseExample2), "application/json")]
-        [ResponseExample(HttpStatusCode.OK, typeof(XmlResponseExample), "application/xml")]
-        [ResponseExample(HttpStatusCode.BadRequest, typeof(JsonResponseExample2), "application/json")]
+        [ResponseExample(HttpStatusCode.OK,  "application/json", typeof(JsonResponseExample1))]
+        [ResponseExample(HttpStatusCode.OK,  "application/json", typeof(JsonResponseExample2))]
+        [ResponseExample(HttpStatusCode.OK, "application/xml", typeof(XmlResponseExample))]
+        [ResponseExample(HttpStatusCode.BadRequest,  "application/json", typeof(JsonResponseExample2))]
         public static async Task PostOpenApiExample(HttpContext context)
         {
            
@@ -200,7 +200,7 @@ namespace Everest.Shell
 					.AddConsoleLoggerFactory();
 
 			using var rest = new RestServerBuilder(services)
-				.UsePrefixes("http://*:8080/")
+				.UsePrefixes("http://localhost:8080/")
 				.UseExceptionHandlerMiddleware()
 				.UseResponseCompressionMiddleware()
                 .UseAuthenticationMiddleware()

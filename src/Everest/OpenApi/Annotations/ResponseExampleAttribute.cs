@@ -19,16 +19,16 @@ namespace Everest.OpenApi.Annotations
 
         public string Description { get; set; }
 
-        public ResponseExampleAttribute(HttpStatusCode statusCode, Type exampleType, string mediaType)
+        public ResponseExampleAttribute(HttpStatusCode statusCode, string mediaType, Type exampleType)
         {
-            if (!exampleType.GetInterfaces().Contains(typeof(IOpenApiExampleProvider)))
+            if (exampleType.GetInterface(nameof(IOpenApiExampleProvider)) == null)
             {
-                throw new InvalidCastException($"Type {exampleType} does not implement {typeof(IOpenApiExampleProvider)}.");
+                throw new InvalidCastException($"Type {exampleType} does not implement {nameof(IOpenApiExampleProvider)}.");
             }
 
+            MediaType = mediaType;
             StatusCode = statusCode;
             ExampleType = exampleType;
-            MediaType = mediaType;
         }
     }
 }

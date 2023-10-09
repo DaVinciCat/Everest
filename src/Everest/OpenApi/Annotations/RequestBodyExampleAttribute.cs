@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 
 namespace Everest.OpenApi.Annotations
 {
@@ -16,15 +15,15 @@ namespace Everest.OpenApi.Annotations
 
         public string Description { get; set; }
         
-        public RequestBodyExampleAttribute(Type exampleType, string mediaType)
+        public RequestBodyExampleAttribute(string mediaType, Type exampleType)
         {
-            if (!exampleType.GetInterfaces().Contains(typeof(IOpenApiExampleProvider)))
+            if (exampleType.GetInterface(nameof(IOpenApiExampleProvider)) == null)
             {
-                throw new InvalidCastException($"Type {exampleType} does not implement {typeof(IOpenApiExampleProvider)}.");
+                throw new InvalidCastException($"Type {exampleType} does not implement {nameof(IOpenApiExampleProvider)}.");
             }
 
-            ExampleType = exampleType;
             MediaType = mediaType;
+            ExampleType = exampleType;
         }
     }
 }

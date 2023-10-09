@@ -27,7 +27,7 @@ namespace Everest.OpenApi.Filters
                 var provider = Activator.CreateInstance(attribute.ExampleType) as IOpenApiExampleProvider;
                 if (provider == null)
                 {
-                    throw new InvalidCastException($"Type {attribute.ExampleType} does not implement {typeof(IOpenApiExampleProvider)}.");
+                    throw new InvalidCastException($"Type {attribute.ExampleType} does not implement {nameof(IOpenApiExampleProvider)}.");
                 }
 
                 lookup[attribute] = provider;
