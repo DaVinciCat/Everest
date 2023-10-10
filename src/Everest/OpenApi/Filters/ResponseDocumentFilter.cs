@@ -27,9 +27,15 @@ namespace Everest.OpenApi.Filters
                 foreach (var media in attribute.MediaTypes)
                 {
                     var content = new OpenApiMediaType();
+                    if (attribute.ResponseType != null)
+                    {
+                        var schema = context.SchemaGenerator.GetSchema(attribute.ResponseType);
+                        content.Schema = schema;
+                    }
+
                     response.Content.Add(media, content);
                 }
-
+                
                 var key = attribute.StatusCode.ToString();
                 operation.Responses.Add(key, response);
             }

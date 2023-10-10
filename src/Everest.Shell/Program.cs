@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -174,19 +175,20 @@ namespace Everest.Shell
         [Operation(Summary = "Operation summary", Description = "Operation description")]
         [Tags("OpenApi", "Examples")]
         [RequestBody("application/json", "application/xml")]
-        [RequestBodyExample( "application/json", typeof(JsonRequestExample1))]
-        [RequestBodyExample( "application/json", typeof(JsonRequestExample2))]
-        [RequestBodyExample( "application/xml", typeof(XmlRequestExample), Summary = "Xml")]
-        [Response(HttpStatusCode.OK, "application/json", "application/xml")]
+        [RequestBodyExample(typeof(JsonRequestExample1), "application/json")]
+        [RequestBodyExample(typeof(JsonRequestExample2), "application/json")]
+        [RequestBodyExample(typeof(XmlRequestExample), "application/xml", Summary = "Xml")]
+        [Response(HttpStatusCode.OK, typeof(List<B>), "application/json", "application/xml")]
         [Response(HttpStatusCode.BadRequest, "application/json")]
-        [ResponseExample(HttpStatusCode.OK,  "application/json", typeof(JsonResponseExample1))]
-        [ResponseExample(HttpStatusCode.OK,  "application/json", typeof(JsonResponseExample2))]
-        [ResponseExample(HttpStatusCode.OK, "application/xml", typeof(XmlResponseExample))]
-        [ResponseExample(HttpStatusCode.BadRequest,  "application/json", typeof(JsonResponseExample2))]
+        [ResponseExample(HttpStatusCode.OK, typeof(JsonResponseExample1), "application/json")]
+        [ResponseExample(HttpStatusCode.OK, typeof(JsonResponseExample2), "application/json")]
+        [ResponseExample(HttpStatusCode.OK, typeof(XmlResponseExample), "application/xml")]
+        [ResponseExample(HttpStatusCode.BadRequest, typeof(JsonResponseExample2), "application/json")]
         [QueryRequestParameter("param", typeof(string), Description = "Some parameter description")]
         [QueryRequestParameter("int-param", typeof(int), Description = "Some int parameter description")]
         [QueryRequestParameter("int-array", typeof(int[]), Description = "Some int array parameter description")]
         [QueryRequestParameter("enum", typeof(EnumExample), Description = "Some enum parameter description")]
+        //[QueryRequestParameter("object-test", typeof(B), Description = "Some enum parameter description")]
         public static async Task PostOpenApiExample(HttpContext context)
         {
                
@@ -241,6 +243,24 @@ namespace Everest.Shell
         Test,
         Enum,
         Example
+    }
+
+    public class A
+    {
+        public string PropertyA { get; }
+
+
+    }
+
+    public class B
+    {
+        public string PropertyB { get; }
+
+        public A A { get; }
+
+        public IEnumerable<A> Enumerable { get; }
+
+        public Dictionary<string, int> Dict { get; }
     }
 
     public class Request

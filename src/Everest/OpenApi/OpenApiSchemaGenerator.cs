@@ -22,8 +22,11 @@ namespace Everest.OpenApi
                 new DateTimeSchemaProvider(),
                 new IntSchemaProvider(),
                 new GuidSchemaProvider(),
+                new EnumSchemaProvider(),
                 new ArraySchemaProvider(GetSchema),
-                new EnumSchemaProvider()
+                new DictionarySchemaProvider(GetSchema),
+                new EnumerableSchemaProvider(GetSchema),
+                new ObjectSchemaProvider(GetSchema)
             };
         }
         

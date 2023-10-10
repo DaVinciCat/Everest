@@ -23,7 +23,7 @@
 
         public static OpenApiDataType Double = new OpenApiDataType("double", "number", "double");
 
-        public static OpenApiDataType String = new OpenApiDataType("string", "string", "");
+        public static OpenApiDataType String = new OpenApiDataType("string", "string", null);
 
         public static OpenApiDataType Byte = new OpenApiDataType("byte", "string", "byte");
 
@@ -39,8 +39,10 @@
 
         public static OpenApiDataType Uuid = new OpenApiDataType("uuid", "string", "uuid");
 
-        public static OpenApiDataType Array = new OpenApiDataType("array", "array", "");
+        public static OpenApiDataType Array = new OpenApiDataType("array", "array", null);
 
-        public static OpenApiDataType Enum = new OpenApiDataType("enum", "enum", "");
+        public static OpenApiDataType Enum = new OpenApiDataType("enum", "enum", null);
+
+        public static OpenApiDataType Object = new OpenApiDataType("object", "object", null);
     }
 }

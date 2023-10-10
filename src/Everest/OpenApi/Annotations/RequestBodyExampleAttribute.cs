@@ -16,15 +16,15 @@ namespace Everest.OpenApi.Annotations
 
         public string Description { get; set; }
         
-        public RequestBodyExampleAttribute(string mediaType, Type exampleType)
+        public RequestBodyExampleAttribute(Type exampleType, string mediaType)
         {
             if (exampleType.GetInterface(nameof(IOpenApiExampleProvider)) == null)
             {
                 throw new InvalidCastException($"Type {exampleType} does not implement {nameof(IOpenApiExampleProvider)}.");
             }
-
-            MediaType = mediaType;
+            
             ExampleType = exampleType;
+            MediaType = mediaType;
         }
     }
 }
