@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Everest.Http;
 using Everest.Routing;
 using Everest.Utils;
@@ -23,7 +24,9 @@ namespace Everest.OpenApi
 
         public static string GetOpenApiPathItemKey(this RouteDescriptor descriptor)
         {
-            return descriptor.Route.RoutePattern;
+            var pattern = descriptor.Route.RoutePattern;
+            var result = Regex.Replace(pattern, "(?<=):[^{}]+", "");
+            return result;
         }
 
         public static OperationType GetOpenApiOperationType(this RouteDescriptor descriptor)
@@ -47,7 +50,8 @@ namespace Everest.OpenApi
         public static IEnumerable<T> GetAttributes<T>(this RouteDescriptor descriptor)
             where T : Attribute
         {
-            return descriptor.EndPoint.Type.GetAttributes<T>().Union(descriptor.EndPoint.MethodInfo.GetAttributes<T>()).ToArray();
+            return descriptor.EndPoint.Type.GetAttributes<T>().Union(descriptor.EndPoint.MethodInfo.GetAttributes<T>())
+                .ToArray();
         }
     }
 }

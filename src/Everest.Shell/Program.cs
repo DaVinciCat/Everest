@@ -170,7 +170,14 @@ namespace Everest.Shell
         {
 
         }
-		
+
+        [HttpGet("/get/open-api-example/{id:guid}/{name:string}/{value:int}")]
+        [Tags("OpenApi", "Examples")]
+        public static async Task GetOpenApiExample1(HttpContext context)
+        {
+
+        }
+
         [HttpGet("/post/open-api-example")]
         [Operation(Summary = "Operation summary", Description = "Operation description")]
         [Tags("OpenApi", "Examples")]
