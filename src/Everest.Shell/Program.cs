@@ -171,6 +171,7 @@ namespace Everest.Shell
         }
 		
         [HttpGet("/post/open-api-example")]
+        [Operation(Summary = "Operation summary", Description = "Operation description")]
         [Tags("OpenApi", "Examples")]
         [RequestBody("application/json", "application/xml")]
         [RequestBodyExample( "application/json", typeof(JsonRequestExample1))]

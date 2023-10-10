@@ -17,9 +17,6 @@ namespace Everest.OpenApi.Filters
                 return;
 
             var attributes = descriptor.GetAttributes<ResponseAttribute>().ToArray();
-            if (attributes.Length == 0)
-                return;
-
             foreach (var attribute in attributes)
             {
                 var response = new OpenApiResponse

@@ -8,8 +8,7 @@ namespace Everest.OpenApi.Filters
     {
         protected override void Apply(OpenApiDocumentContext context, RouteDescriptor descriptor)
         {
-            var hasAttribute = descriptor.GetAttributes<RestRouteAttribute>().Any();
-            if (!hasAttribute)
+            if (!descriptor.GetAttributes<RestRouteAttribute>().Any())
             {
                 return;
             }

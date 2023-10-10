@@ -5,7 +5,7 @@ using Everest.OpenApi.Annotations;
 
 namespace Everest.OpenApi.Filters
 {
-    public class QueryRequestParameterFilter : OpenApiDocumentFilter
+    public class QueryRequestParameterDocumentFilter : OpenApiDocumentFilter
     {
         protected override void Apply(OpenApiDocumentContext context, RouteDescriptor descriptor)
         {

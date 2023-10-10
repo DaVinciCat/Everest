@@ -11,7 +11,7 @@ namespace Everest.OpenApi
     {
         public ILogger<OpenApiDocumentGenerator> Logger { get; }
 
-        public IList<IOpenApiDocumentFilter> Filters { get; }
+        public IList<IOpenApiDocumentFilter> DocumentFilters { get; }
 
         public OpenApiSchemaGenerator SchemaGenerator { get; }
 
@@ -19,15 +19,16 @@ namespace Everest.OpenApi
         {
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            Filters = new List<IOpenApiDocumentFilter>
+            DocumentFilters = new List<IOpenApiDocumentFilter>
             {
                 new RestRouteDocumentFilter(),
+                new OperationDocumentFilter(),
                 new TagsDocumentFilter(),
                 new RequestBodyDocumentFilter(),
                 new RequestBodyExampleDocumentFilter(),
                 new ResponseDocumentFilter(),
                 new ResponseExampleDocumentFilter(),
-                new QueryRequestParameterFilter()
+                new QueryRequestParameterDocumentFilter()
             };
 
             SchemaGenerator = new OpenApiSchemaGenerator();
@@ -53,7 +54,7 @@ namespace Everest.OpenApi
             var context = new OpenApiDocumentContext(document, SchemaGenerator);
             foreach (var descriptor in descriptors)
             {
-                foreach (var filter in Filters)
+                foreach (var filter in DocumentFilters)
                 {
                     filter.Apply(context, descriptor);
                 }
