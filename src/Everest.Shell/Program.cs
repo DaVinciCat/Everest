@@ -5,8 +5,8 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Everest.Authentication;
 using Everest.Http;
-using Everest.OpenApi;
 using Everest.OpenApi.Annotations;
+using Everest.OpenApi.Examples;
 using Everest.Rest;
 using Everest.Routing;
 using Everest.WebSockets;
@@ -182,9 +182,13 @@ namespace Everest.Shell
         [ResponseExample(HttpStatusCode.OK,  "application/json", typeof(JsonResponseExample2))]
         [ResponseExample(HttpStatusCode.OK, "application/xml", typeof(XmlResponseExample))]
         [ResponseExample(HttpStatusCode.BadRequest,  "application/json", typeof(JsonResponseExample2))]
+        [QueryRequestParameter("param", typeof(string), Description = "Some parameter description")]
+        [QueryRequestParameter("int-param", typeof(int), Description = "Some int parameter description")]
+        [QueryRequestParameter("int-array", typeof(int[]), Description = "Some int array parameter description")]
+        [QueryRequestParameter("enum", typeof(EnumExample), Description = "Some enum parameter description")]
         public static async Task PostOpenApiExample(HttpContext context)
         {
-           
+               
         }
     }
 
@@ -230,6 +234,13 @@ namespace Everest.Shell
 	}
 
     #region Examples
+
+    public enum EnumExample
+    {
+        Test,
+        Enum,
+        Example
+    }
 
     public class Request
     {

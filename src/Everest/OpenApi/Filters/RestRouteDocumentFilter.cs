@@ -6,7 +6,7 @@ namespace Everest.OpenApi.Filters
 {
     public class RestRouteDocumentFilter : OpenApiDocumentFilter
     {
-        protected override void Apply(OpenApiDocument document, RouteDescriptor descriptor)
+        protected override void Apply(OpenApiDocumentContext context, RouteDescriptor descriptor)
         {
             var hasAttribute = descriptor.GetAttributes<RestRouteAttribute>().Any();
             if (!hasAttribute)
@@ -20,6 +20,7 @@ namespace Everest.OpenApi.Filters
                 OperationId = descriptor.EndPoint.MethodInfo.Name
             });
 
+            var document = context.Document;
             document.Paths.Add(descriptor.GetOpenApiPathItemKey(), item);
         }
     }

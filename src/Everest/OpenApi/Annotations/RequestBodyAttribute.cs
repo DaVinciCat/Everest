@@ -9,7 +9,7 @@ namespace Everest.OpenApi.Annotations
         
         public string Description { get; set; }
 
-        public bool Required { get; set; }
+        public bool IsOptional { get; set; }
 
         public RequestBodyAttribute(params string[] mediaTypes)
         {

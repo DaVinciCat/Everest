@@ -7,8 +7,9 @@ namespace Everest.OpenApi.Filters
 {
     public class RequestBodyDocumentFilter : OpenApiDocumentFilter
     {
-        protected override void Apply(OpenApiDocument document, RouteDescriptor descriptor)
+        protected override void Apply(OpenApiDocumentContext context, RouteDescriptor descriptor)
         {
+            var document = context.Document;
             if (!document.Paths.TryGetValue(descriptor.GetOpenApiPathItemKey(), out var item))
                 return;
 
@@ -23,7 +24,7 @@ namespace Everest.OpenApi.Filters
             var body = new OpenApiRequestBody
             {
                 Description = attribute.Description,
-                Required = attribute.Required
+                Required = !attribute.IsOptional
             };
 
             foreach (var media in attribute.MediaTypes)

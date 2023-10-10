@@ -4,6 +4,7 @@ using System.Linq;
 using Everest.OpenApi.Annotations;
 using System.Collections.Generic;
 using System;
+using Everest.OpenApi.Examples;
 using Microsoft.OpenApi.Any;
 
 namespace Everest.OpenApi.Filters
@@ -12,8 +13,9 @@ namespace Everest.OpenApi.Filters
     {
         public string DefaultExampleName { get; set; } = "Example";
 
-        protected override void Apply(OpenApiDocument document, RouteDescriptor descriptor)
+        protected override void Apply(OpenApiDocumentContext context, RouteDescriptor descriptor)
         {
+            var document = context.Document;
             if (!document.Paths.TryGetValue(descriptor.GetOpenApiPathItemKey(), out var item))
                 return;
 

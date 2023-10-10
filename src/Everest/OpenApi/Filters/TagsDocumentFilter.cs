@@ -6,8 +6,9 @@ namespace Everest.OpenApi.Filters
 {
     public class TagsDocumentFilter : OpenApiDocumentFilter
     {
-        protected override void Apply(OpenApiDocument document, RouteDescriptor descriptor)
+        protected override void Apply(OpenApiDocumentContext context, RouteDescriptor descriptor)
         {
+            var document = context.Document;
             if (!document.Paths.TryGetValue(descriptor.GetOpenApiPathItemKey(), out var item)) 
                 return;
 

@@ -1,18 +1,12 @@
 ﻿using System.Linq;
 using Everest.OpenApi.Annotations;
 using Everest.Routing;
-using Microsoft.OpenApi.Models;
 
 namespace Everest.OpenApi.Filters
 {
-    public interface IOpenApiDocumentFilter
-    {
-        void Apply(OpenApiDocument document, RouteDescriptor descriptor);
-    }
-
     public abstract class OpenApiDocumentFilter : IOpenApiDocumentFilter
     {
-        void IOpenApiDocumentFilter.Apply(OpenApiDocument document, RouteDescriptor descriptor)
+        void IOpenApiDocumentFilter.Apply(OpenApiDocumentContext context, RouteDescriptor descriptor)
         {
             var ignore = descriptor.GetAttributes<OpenApiIgnoreAttribute>().Any();
             if (ignore)
@@ -20,9 +14,9 @@ namespace Everest.OpenApi.Filters
                 return;
             }
 
-            Apply(document, descriptor);
+            Apply(context, descriptor);
         }
 
-        protected abstract void Apply(OpenApiDocument document, RouteDescriptor descriptor);
+        protected abstract void Apply(OpenApiDocumentContext context, RouteDescriptor descriptor);
     }
 }

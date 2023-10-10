@@ -1,4 +1,5 @@
 ﻿using System;
+using Everest.OpenApi.Examples;
 
 namespace Everest.OpenApi.Annotations
 {
