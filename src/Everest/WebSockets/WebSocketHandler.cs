@@ -119,11 +119,11 @@ namespace Everest.WebSockets
                         switch (result.MessageType)
                         {
                             case WebSocketMessageType.Binary:
-                                await OnMessageAsync(session, inputStream.ToArray());
+                                await OnMessageAsync(session, inputStream.GetBuffer());
                                 break;
 
                             case WebSocketMessageType.Text:
-                                var text = Encoding.UTF8.GetString(inputStream.ToArray());
+                                var text = Encoding.UTF8.GetString(inputStream.GetBuffer());
                                 await OnMessageAsync(session, text);
                                 break;
                         }
