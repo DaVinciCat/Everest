@@ -163,13 +163,6 @@ namespace Everest.Shell
             context.Request.PathParameters.TryGetParameterValue<string>("to", out var to);
             await context.Response.WriteJsonAsync(new { Message = greetings, From = "Everest", To = to, Success = true });
         }
-		
-        [HttpGet("/get/open-api-example")]
-        [Tags("OpenApi", "Examples")]
-        public static async Task GetOpenApiExample(HttpContext context)
-        {
-
-        }
 
         [HttpGet("/get/open-api-example/{id:guid}/{name:string}/{value:int}")]
         [Tags("OpenApi", "Examples")]
@@ -181,7 +174,7 @@ namespace Everest.Shell
         [HttpGet("/post/open-api-example")]
         [Operation(Summary = "Operation summary", Description = "Operation description")]
         [Tags("OpenApi", "Examples")]
-        [RequestBody("application/json", "application/xml")]
+        [RequestBody(typeof(Request), "application/json", "application/xml")]
         [RequestBodyExample(typeof(JsonRequestExample1), "application/json")]
         [RequestBodyExample(typeof(JsonRequestExample2), "application/json")]
         [RequestBodyExample(typeof(XmlRequestExample), "application/xml", Summary = "Xml")]
@@ -195,7 +188,7 @@ namespace Everest.Shell
         [QueryRequestParameter("int-param", typeof(int), Description = "Some int parameter description")]
         [QueryRequestParameter("int-array", typeof(int[]), Description = "Some int array parameter description")]
         [QueryRequestParameter("enum", typeof(EnumExample), Description = "Some enum parameter description")]
-        //[QueryRequestParameter("object-test", typeof(B), Description = "Some enum parameter description")]
+        [QueryRequestParameter("object-test", typeof(B), Description = "Some enum parameter description")]
         public static async Task PostOpenApiExample(HttpContext context)
         {
                

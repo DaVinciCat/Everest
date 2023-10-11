@@ -7,7 +7,7 @@ namespace Everest.OpenApi.Schemas
     {
         public bool TryGetSchema(Type type, out OpenApiSchema schema)
         {
-            if (typeof(string) == type)
+            if (typeof(string) == type || typeof(char) == type)
             {
                 schema = new OpenApiSchema { Format = OpenApiDataType.String.Format, Type = OpenApiDataType.String.Type };
                 return true;

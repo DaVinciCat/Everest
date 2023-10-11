@@ -9,7 +9,7 @@ namespace Everest.OpenApi.Schemas
 
         public bool TryGetSchema(Type type, out OpenApiSchema schema)
         {
-            if (typeof(long) == type)
+            if (typeof(long) == type || typeof(ulong) == type)
             {
                 schema = new OpenApiSchema { Format = OpenApiDataType.Long.Format, Type = OpenApiDataType.Long.Type };
                 return true;
