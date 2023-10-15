@@ -15,7 +15,6 @@ using Everest.Http;
 using Everest.Middlewares;
 using Everest.Mime;
 using Everest.OpenApi;
-using Everest.OpenApi.Parameters;
 using Everest.Routing;
 using Everest.WebSockets;
 using Microsoft.Extensions.DependencyInjection;

@@ -27,7 +27,6 @@ namespace Everest.OpenApi.Filters
                 if (operation.Parameters.TryGetParameter(attribute.Name, out var parameter))
                 {
                     parameter.Description = attribute.Description;
-                    parameter.Deprecated = attribute.Deprecated;
                 }
             }
         }
