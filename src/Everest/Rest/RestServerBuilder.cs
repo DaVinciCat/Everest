@@ -15,6 +15,7 @@ using Everest.Http;
 using Everest.Middlewares;
 using Everest.Mime;
 using Everest.OpenApi;
+using Everest.OpenApi.Parameters;
 using Everest.Routing;
 using Everest.WebSockets;
 using Microsoft.Extensions.DependencyInjection;
@@ -405,15 +406,16 @@ namespace Everest.Rest
 			return builder;
 		}
 
-        public static RestServerBuilder GenerateOpenApiDocument(this RestServerBuilder builder)
+        public static RestServerBuilder GenerateOpenApiDocument(this RestServerBuilder builder, OpenApiInfo info)
         {
+            if (info == null)
+                throw new ArgumentNullException(nameof(info));
+
             var router = builder.Services.GetRequiredService<IRouter>();
             var loggerFactory = builder.Services.GetRequiredService<ILoggerFactory>();
             var generator = new OpenApiDocumentGenerator(loggerFactory.CreateLogger<OpenApiDocumentGenerator>());
-
-
-
-            var doc = generator.Generate(router.Routes, new OpenApiInfo());
+			
+            var doc = generator.Generate(router.Routes, info);
 
             var sb = new StringBuilder();
             doc.SerializeAsV3(new OpenApiJsonWriter((new StringWriter(sb))));

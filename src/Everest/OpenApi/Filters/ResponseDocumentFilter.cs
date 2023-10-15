@@ -10,13 +10,13 @@ namespace Everest.OpenApi.Filters
         protected override void Apply(OpenApiDocumentContext context, RouteDescriptor descriptor)
         {
             var document = context.Document;
-            if (!document.Paths.TryGetValue(descriptor.GetOpenApiPathItemKey(), out var item))
+            if (!document.Paths.TryGetValue(context.GetOpenApiPathItemKey(descriptor), out var item))
                 return;
 
-            if (!item.Operations.TryGetValue(descriptor.GetOpenApiOperationType(), out var operation))
+            if (!item.Operations.TryGetValue(context.GetOpenApiOperationType(descriptor), out var operation))
                 return;
 
-            var attributes = descriptor.GetAttributes<ResponseAttribute>().ToArray();
+            var attributes = context.GetAttributes<ResponseAttribute>(descriptor).ToArray();
             foreach (var attribute in attributes)
             {
                 var response = new OpenApiResponse
@@ -36,7 +36,7 @@ namespace Everest.OpenApi.Filters
                     response.Content.Add(media, content);
                 }
                 
-                var key = attribute.StatusCode.ToString();
+                var key = ((int)attribute.StatusCode).ToString();
                 operation.Responses.Add(key, response);
             }
         }

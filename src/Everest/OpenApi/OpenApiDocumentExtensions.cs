@@ -40,18 +40,23 @@ namespace Everest.OpenApi
 
             return operation;
         }
-
-        public static bool TryGetValue(this IEnumerable<OpenApiTag> tags, string key, out OpenApiTag tag)
+        
+        public static bool TryGetTag(this IEnumerable<OpenApiTag> tags, string key, out OpenApiTag tag)
         {
             tag = tags.FirstOrDefault(t => t.Name == key);
             return tag != null;
         }
 
+        public static bool TryGetParameter(this IEnumerable<OpenApiParameter> parameters, string key, out OpenApiParameter parameter)
+        {
+            parameter = parameters.FirstOrDefault(p => p.Name == key);
+            return parameter != null;
+        }
+
         public static IEnumerable<T> GetAttributes<T>(this RouteDescriptor descriptor)
             where T : Attribute
         {
-            return descriptor.EndPoint.Type.GetAttributes<T>().Union(descriptor.EndPoint.MethodInfo.GetAttributes<T>())
-                .ToArray();
+            return descriptor.EndPoint.Type.GetAttributes<T>().Union(descriptor.EndPoint.MethodInfo.GetAttributes<T>()).ToArray();
         }
     }
 }

@@ -9,18 +9,18 @@ namespace Everest.OpenApi.Filters
         protected override void Apply(OpenApiDocumentContext context, RouteDescriptor descriptor)
         {
             var document = context.Document;
-            if (!document.Paths.TryGetValue(descriptor.GetOpenApiPathItemKey(), out var item)) 
+            if (!document.Paths.TryGetValue(context.GetOpenApiPathItemKey(descriptor), out var item)) 
                 return;
 
-            if (!item.Operations.TryGetValue(descriptor.GetOpenApiOperationType(), out var operation))
+            if (!item.Operations.TryGetValue(context.GetOpenApiOperationType(descriptor), out var operation))
                 return;
 
-            var attributes = descriptor.GetAttributes<TagsAttribute>();
+            var attributes = context.GetAttributes<TagsAttribute>(descriptor);
             foreach (var attribute in attributes)
             {
                 foreach (var name in attribute.Tags)
                 {
-                    if(!document.Tags.TryGetValue(name, out var tag))
+                    if(!document.Tags.TryGetTag(name, out var tag))
                     {
                         tag = new OpenApiTag
                         {

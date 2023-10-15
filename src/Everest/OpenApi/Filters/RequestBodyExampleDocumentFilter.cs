@@ -16,14 +16,14 @@ namespace Everest.OpenApi.Filters
         protected override void Apply(OpenApiDocumentContext context, RouteDescriptor descriptor)
         {
             var document = context.Document;
-            if (!document.Paths.TryGetValue(descriptor.GetOpenApiPathItemKey(), out var item))
+            if (!document.Paths.TryGetValue(context.GetOpenApiPathItemKey(descriptor), out var item))
                 return;
 
-            if (!item.Operations.TryGetValue(descriptor.GetOpenApiOperationType(), out var operation))
+            if (!item.Operations.TryGetValue(context.GetOpenApiOperationType(descriptor), out var operation))
                 return;
 
             var lookup = new Dictionary<RequestBodyExampleAttribute, IOpenApiExampleProvider>();
-            var attributes = descriptor.GetAttributes<RequestBodyExampleAttribute>().ToArray();
+            var attributes = context.GetAttributes<RequestBodyExampleAttribute>(descriptor).ToArray();
             foreach (var attribute in attributes)
             {
                 var provider = Activator.CreateInstance(attribute.ExampleType) as IOpenApiExampleProvider;

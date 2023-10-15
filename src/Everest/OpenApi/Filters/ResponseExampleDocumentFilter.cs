@@ -16,14 +16,14 @@ namespace Everest.OpenApi.Filters
         protected override void Apply(OpenApiDocumentContext context, RouteDescriptor descriptor)
         {
             var document = context.Document;
-            if (!document.Paths.TryGetValue(descriptor.GetOpenApiPathItemKey(), out var item))
+            if (!document.Paths.TryGetValue(context.GetOpenApiPathItemKey(descriptor), out var item))
                 return;
 
-            if (!item.Operations.TryGetValue(descriptor.GetOpenApiOperationType(), out var operation))
+            if (!item.Operations.TryGetValue(context.GetOpenApiOperationType(descriptor), out var operation))
                 return;
 
             var lookup = new Dictionary<ResponseExampleAttribute, IOpenApiExampleProvider>();
-            var attributes = descriptor.GetAttributes<ResponseExampleAttribute>().ToArray();
+            var attributes = context.GetAttributes<ResponseExampleAttribute>(descriptor).ToArray();
             foreach (var attribute in attributes)
             {
                 var provider = Activator.CreateInstance(attribute.ExampleType) as IOpenApiExampleProvider;
@@ -38,7 +38,8 @@ namespace Everest.OpenApi.Filters
             var groups = lookup.Keys.GroupBy(p => p.StatusCode).ToArray();
             foreach (var group in groups)
             {
-                if (!operation.Responses.TryGetValue(group.Key.ToString(), out var content))
+                var code = ((int)group.Key).ToString();
+                if (!operation.Responses.TryGetValue(code, out var content))
                 {
                     continue;
                 }

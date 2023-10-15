@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Everest.Routing;
 using Microsoft.OpenApi.Models;
 
@@ -9,19 +8,19 @@ namespace Everest.OpenApi.Filters
     {
         protected override void Apply(OpenApiDocumentContext context, RouteDescriptor descriptor)
         {
-            if (!descriptor.GetAttributes<RestRouteAttribute>().Any())
+            if (!context.GetAttributes<RestRouteAttribute>(descriptor).Any())
             {
                 return;
             }
 
             var item = new OpenApiPathItem();
-            item.Operations.Add(descriptor.GetOpenApiOperationType(), new OpenApiOperation
+            item.Operations.Add(context.GetOpenApiOperationType(descriptor), new OpenApiOperation
             {
                 OperationId = descriptor.EndPoint.MethodInfo.Name
             });
 
             var document = context.Document;
-            document.Paths.Add(descriptor.GetOpenApiPathItemKey(), item);
+            document.Paths.Add(context.GetOpenApiPathItemKey(descriptor), item);
         }
     }
 }

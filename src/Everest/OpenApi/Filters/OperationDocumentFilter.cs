@@ -9,13 +9,13 @@ namespace Everest.OpenApi.Filters
         public void Apply(OpenApiDocumentContext context, RouteDescriptor descriptor)
         {
             var document = context.Document;
-            if (!document.Paths.TryGetValue(descriptor.GetOpenApiPathItemKey(), out var item))
+            if (!document.Paths.TryGetValue(context.GetOpenApiPathItemKey(descriptor), out var item))
                 return;
 
-            if (!item.Operations.TryGetValue(descriptor.GetOpenApiOperationType(), out var operation))
+            if (!item.Operations.TryGetValue(context.GetOpenApiOperationType(descriptor), out var operation))
                 return;
 
-            var attributes = descriptor.GetAttributes<OperationAttribute>().ToArray();
+            var attributes = context.GetAttributes<OperationAttribute>(descriptor).ToArray();
             if (attributes.Length == 0)
                 return;
             var attribute = attributes.First();

@@ -6,30 +6,14 @@ namespace Everest.OpenApi.Annotations
     public abstract class RequestParameterAttribute : Attribute
     {
         public string Name { get; }
-
-        public Type Type { get; }
-
-        public bool IsOptional { get; set; }
-
+        
         public string Description { get; set; }
 
         public bool Deprecated { get; set; }
 
-        public bool AllowEmptyValue { get; set; }
-
-        protected RequestParameterAttribute(string name, Type type)
+        protected RequestParameterAttribute(string name)
         {
             Name = name;
-            Type = type;
-        }
-    }
-
-    public class QueryRequestParameterAttribute : RequestParameterAttribute
-    {
-        public QueryRequestParameterAttribute(string name, Type type) 
-            : base(name, type)
-        {
-
         }
     }
 }

@@ -41,7 +41,7 @@
 
         public static OpenApiDataType Array = new OpenApiDataType("array", "array", null);
 
-        public static OpenApiDataType Enum = new OpenApiDataType("enum", "enum", null);
+        public static OpenApiDataType Enum = new OpenApiDataType("enum", "string", null);
 
         public static OpenApiDataType Object = new OpenApiDataType("object", "object", null);
     }

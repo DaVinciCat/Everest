@@ -5,7 +5,7 @@ using Microsoft.OpenApi.Models;
 
 namespace Everest.OpenApi
 {
-    public class OpenApiSchemaGenerator
+    public class OpenApiSchemaGenerator : IOpenApiSchemaGenerator
     {
         public IList<IOpenApiSchemaProvider> SchemaProviders { get; }
 

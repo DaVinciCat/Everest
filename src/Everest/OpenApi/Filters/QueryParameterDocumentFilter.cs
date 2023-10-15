@@ -5,18 +5,18 @@ using Everest.OpenApi.Annotations;
 
 namespace Everest.OpenApi.Filters
 {
-    public class QueryRequestParameterDocumentFilter : OpenApiDocumentFilter
+    public class QueryParameterDocumentFilter : OpenApiDocumentFilter
     {
         protected override void Apply(OpenApiDocumentContext context, RouteDescriptor descriptor)
         {
             var document = context.Document;
-            if (!document.Paths.TryGetValue(descriptor.GetOpenApiPathItemKey(), out var item))
+            if (!document.Paths.TryGetValue(context.GetOpenApiPathItemKey(descriptor), out var item))
                 return;
 
-            if (!item.Operations.TryGetValue(descriptor.GetOpenApiOperationType(), out var operation))
+            if (!item.Operations.TryGetValue(context.GetOpenApiOperationType(descriptor), out var operation))
                 return;
 
-            var attributes = descriptor.GetAttributes<QueryRequestParameterAttribute>().ToArray();
+            var attributes = context.GetAttributes<QueryParameterAttribute>(descriptor).ToArray();
             foreach (var attribute in attributes)
             {
                 var parameter = new OpenApiParameter

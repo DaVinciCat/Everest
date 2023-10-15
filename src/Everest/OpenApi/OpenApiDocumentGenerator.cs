@@ -15,6 +15,8 @@ namespace Everest.OpenApi
 
         public OpenApiSchemaGenerator SchemaGenerator { get; }
 
+        public OpenApiPathParametersGenerator PathParametersGenerator { get; }
+
         public OpenApiDocumentGenerator(ILogger<OpenApiDocumentGenerator> logger)
         {
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -28,10 +30,12 @@ namespace Everest.OpenApi
                 new RequestBodyExampleDocumentFilter(),
                 new ResponseDocumentFilter(),
                 new ResponseExampleDocumentFilter(),
-                new QueryRequestParameterDocumentFilter()
+                new QueryParameterDocumentFilter(),
+                new PathParameterDocumentFilter()
             };
 
             SchemaGenerator = new OpenApiSchemaGenerator();
+            PathParametersGenerator = new OpenApiPathParametersGenerator(SchemaGenerator.GetSchema);
         }
 
         public OpenApiDocument Generate(IEnumerable<RouteDescriptor> descriptors, OpenApiInfo info)
@@ -51,7 +55,7 @@ namespace Everest.OpenApi
             
             Logger.LogTrace($"Generating OpenApi document: {new { Title = info.Title, Version = info.Version }}");
 
-            var context = new OpenApiDocumentContext(document, SchemaGenerator);
+            var context = new OpenApiDocumentContext(document, SchemaGenerator, PathParametersGenerator);
             foreach (var descriptor in descriptors)
             {
                 foreach (var filter in DocumentFilters)

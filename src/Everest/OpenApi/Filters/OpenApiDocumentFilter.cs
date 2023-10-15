@@ -8,7 +8,7 @@ namespace Everest.OpenApi.Filters
     {
         void IOpenApiDocumentFilter.Apply(OpenApiDocumentContext context, RouteDescriptor descriptor)
         {
-            var ignore = descriptor.GetAttributes<OpenApiIgnoreAttribute>().Any();
+            var ignore = context.GetAttributes<OpenApiIgnoreAttribute>(descriptor).Any();
             if (ignore)
             {
                 return;
