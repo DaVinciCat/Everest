@@ -8,9 +8,7 @@ namespace Everest.OpenApi.Annotations
         public string Name { get; }
         
         public string Description { get; set; }
-
-        public bool Deprecated { get; set; }
-
+        
         protected RequestParameterAttribute(string name)
         {
             Name = name;

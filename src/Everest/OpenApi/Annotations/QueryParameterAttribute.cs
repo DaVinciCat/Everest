@@ -10,6 +10,8 @@ namespace Everest.OpenApi.Annotations
 
         public bool AllowEmptyValue { get; set; }
 
+        public bool Deprecated { get; set; }
+
         public QueryParameterAttribute(string name, Type type)
             : base(name)
         {
