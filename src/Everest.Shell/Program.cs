@@ -205,6 +205,7 @@ namespace Everest.Shell
 			var services = new ServiceCollection();
 			services.AddAuthenticator(configurator => configurator.AddBasicAuthentication())
 					.AddCorsRequestHandler(configurator => configurator.AddDefaultCorsPolicy())
+                    .AddOpenApiDocumentGenerator(configurator => configurator.DocumentGenerator.OpenApiInfo = new OpenApiInfo { Title = "Everest", Version = "V3"})
                     .AddWebSocketRequestHandler<EchoWebsocketRequestHandler>()
 					.AddSingleton(_ => new GreetingsService())
 					.AddConsoleLoggerFactory();
@@ -220,7 +221,7 @@ namespace Everest.Shell
                 .UseCorsMiddleware()
 				.UseEndPointMiddleware()
 				.ScanRoutes(Assembly.GetExecutingAssembly())
-                .GenerateOpenApiDocument(new OpenApiInfo { Title = "Everest", Version = "V3"})
+                .UseSwagger()
 				.Build();
 
 			rest.Start();

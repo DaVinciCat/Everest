@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using Everest.Authentication;
 using Everest.Compression;
@@ -16,13 +15,13 @@ using Everest.Middlewares;
 using Everest.Mime;
 using Everest.OpenApi;
 using Everest.Routing;
+using Everest.Utils;
 using Everest.WebSockets;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Logging.Console;
-using Microsoft.OpenApi.Models;
 using Microsoft.OpenApi.Writers;
 
 namespace Everest.Rest
@@ -63,7 +62,7 @@ namespace Everest.Rest
 			services.TryAddSingleton<IStaticFilesProvider>(provider =>
 			{
 				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
-				return new StaticFilesProvider(loggerFactory.CreateLogger<StaticFilesProvider>());
+				return new StaticFilesProvider("public", loggerFactory.CreateLogger<StaticFilesProvider>());
 			});
 
 			services.TryAddSingleton<IMimeTypesProvider>(_ => new MimeTypesProvider());
@@ -183,7 +182,7 @@ namespace Everest.Rest
 			services.AddSingleton<IStaticFilesProvider>(provider =>
 			{
 				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
-				var staticFilesProvider = new StaticFilesProvider(loggerFactory.CreateLogger<StaticFilesProvider>());
+				var staticFilesProvider = new StaticFilesProvider("public", loggerFactory.CreateLogger<StaticFilesProvider>());
 				configurator(new StaticFilesProviderConfigurator(staticFilesProvider, provider));
 
 				return staticFilesProvider;
@@ -289,14 +288,34 @@ namespace Everest.Rest
 			services.AddSingleton(builder);
 			return services;
 		}
-
+		
 		public static IServiceCollection AddLoggerFactory(this IServiceCollection services, Func<IServiceProvider, ILoggerFactory> builder)
 		{
 			services.AddSingleton(builder);
 			return services;
 		}
 
-		public static IServiceCollection AddConsoleLoggerFactory(this IServiceCollection services, Action<ILoggingBuilder> configurator = null)
+        public static IServiceCollection AddOpenApiDocumentGenerator(this IServiceCollection services, Func<IServiceProvider, IOpenApiDocumentGenerator> builder)
+        {
+            services.AddSingleton(builder);
+            return services;
+        }
+
+        public static IServiceCollection AddOpenApiDocumentGenerator(this IServiceCollection services, Action<OpenApiDocumentGeneratorConfigurator> configurator)
+        {
+            services.AddSingleton<IOpenApiDocumentGenerator>(provider =>
+            {
+                var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
+				var generator = new OpenApiDocumentGenerator(loggerFactory.CreateLogger<OpenApiDocumentGenerator>());
+                configurator(new OpenApiDocumentGeneratorConfigurator(generator, provider));
+
+                return generator;
+            });
+
+            return services;
+        }
+
+        public static IServiceCollection AddConsoleLoggerFactory(this IServiceCollection services, Action<ILoggingBuilder> configurator = null)
 		{
 			var factory = LoggerFactory.Create(config =>
 			{
@@ -405,21 +424,21 @@ namespace Everest.Rest
 			return builder;
 		}
 
-        public static RestServerBuilder GenerateOpenApiDocument(this RestServerBuilder builder, OpenApiInfo info)
+        public static RestServerBuilder UseSwagger(this RestServerBuilder builder, string filePath = null)
         {
-            if (info == null)
-                throw new ArgumentNullException(nameof(info));
-
+            var generator = builder.Services.GetRequiredService<IOpenApiDocumentGenerator>();
             var router = builder.Services.GetRequiredService<IRouter>();
-            var loggerFactory = builder.Services.GetRequiredService<ILoggerFactory>();
-            var generator = new OpenApiDocumentGenerator(loggerFactory.CreateLogger<OpenApiDocumentGenerator>());
+
+			//TODO: перенести логику в отдельный класс swagger-gen
+
+            if (string.IsNullOrWhiteSpace(filePath))
+                filePath = Path.Combine("public", "swagger", "swagger.json");
+
+			FileExtensions.CreateFile(filePath);
+
+            var document = generator.Generate(router.Routes);
+            document.SerializeAsV3(new OpenApiJsonWriter(new StreamWriter(filePath)));
 			
-            var doc = generator.Generate(router.Routes, info);
-
-            var sb = new StringBuilder();
-            doc.SerializeAsV3(new OpenApiJsonWriter((new StringWriter(sb))));
-            var json = sb.ToString();
-
             return builder;
         }
     }

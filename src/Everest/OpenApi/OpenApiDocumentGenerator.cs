@@ -7,7 +7,7 @@ using Everest.Routing;
 
 namespace Everest.OpenApi
 {
-    public class OpenApiDocumentGenerator
+    public class OpenApiDocumentGenerator : IOpenApiDocumentGenerator
     {
         public ILogger<OpenApiDocumentGenerator> Logger { get; }
 
@@ -16,6 +16,8 @@ namespace Everest.OpenApi
         public OpenApiSchemaGenerator SchemaGenerator { get; }
 
         public OpenApiPathParametersGenerator PathParametersGenerator { get; }
+
+        public OpenApiInfo OpenApiInfo { get; set; }
 
         public OpenApiDocumentGenerator(ILogger<OpenApiDocumentGenerator> logger)
         {
@@ -34,26 +36,24 @@ namespace Everest.OpenApi
                 new PathParameterDocumentFilter()
             };
 
+            OpenApiInfo = new OpenApiInfo();
             SchemaGenerator = new OpenApiSchemaGenerator();
             PathParametersGenerator = new OpenApiPathParametersGenerator(SchemaGenerator.GetSchema);
         }
 
-        public OpenApiDocument Generate(IEnumerable<RouteDescriptor> descriptors, OpenApiInfo info)
+        public OpenApiDocument Generate(IEnumerable<RouteDescriptor> descriptors)
         {
             if (descriptors == null)
                 throw new ArgumentNullException(nameof(descriptors));
-
-            if (info == null)
-                throw new ArgumentNullException(nameof(info));
-
+            
             var document = new OpenApiDocument
             {
-                Info = info,
+                Info = OpenApiInfo,
                 Paths = new OpenApiPaths(),
                 Components = new OpenApiComponents(),
             };
             
-            Logger.LogTrace($"Generating OpenApi document: {new { Title = info.Title, Version = info.Version }}");
+            Logger.LogTrace($"Generating OpenApi document: {new { Title = OpenApiInfo.Title, Version = OpenApiInfo.Version }}");
 
             var context = new OpenApiDocumentContext(document, SchemaGenerator, PathParametersGenerator);
             foreach (var descriptor in descriptors)
@@ -64,7 +64,7 @@ namespace Everest.OpenApi
                 }
             }
 
-            Logger.LogTrace($"Successfully generated OpenApi document: {new { Title = info.Title, Version = info.Version }}");
+            Logger.LogTrace($"Successfully generated OpenApi document: {new { Title = OpenApiInfo.Title, Version = OpenApiInfo.Version }}");
             return document;
         }
     }
