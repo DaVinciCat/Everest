@@ -432,7 +432,7 @@ namespace Everest.Rest
 			//TODO: перенести логику в отдельный класс swagger-gen
 
             if (string.IsNullOrWhiteSpace(filePath))
-                filePath = Path.Combine("public", "swagger", "swagger.json");
+                filePath = Path.Combine("public", "api", "swagger.json");
 
 			FileExtensions.CreateFile(filePath);
 
