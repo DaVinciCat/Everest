@@ -17,8 +17,6 @@ namespace Everest.OpenApi
 
         public OpenApiPathParametersGenerator PathParametersGenerator { get; }
 
-        public OpenApiInfo OpenApiInfo { get; set; }
-
         public OpenApiDocumentGenerator(ILogger<OpenApiDocumentGenerator> logger)
         {
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -36,24 +34,26 @@ namespace Everest.OpenApi
                 new PathParameterDocumentFilter()
             };
 
-            OpenApiInfo = new OpenApiInfo();
             SchemaGenerator = new OpenApiSchemaGenerator();
             PathParametersGenerator = new OpenApiPathParametersGenerator(SchemaGenerator.GetSchema);
         }
 
-        public OpenApiDocument Generate(IEnumerable<RouteDescriptor> descriptors)
+        public OpenApiDocument Generate(OpenApiInfo info, RouteDescriptor[] descriptors)
         {
+            if (info == null)
+                throw new ArgumentNullException(nameof(info));
+
             if (descriptors == null)
                 throw new ArgumentNullException(nameof(descriptors));
             
             var document = new OpenApiDocument
             {
-                Info = OpenApiInfo,
+                Info = info,
                 Paths = new OpenApiPaths(),
                 Components = new OpenApiComponents(),
             };
             
-            Logger.LogTrace($"Generating OpenApi document: {new { Title = OpenApiInfo.Title, Version = OpenApiInfo.Version }}");
+            Logger.LogTrace($"Generating OpenApi document: {new { Title = info.Title, Version = info.Version }}");
 
             var context = new OpenApiDocumentContext(document, SchemaGenerator, PathParametersGenerator);
             foreach (var descriptor in descriptors)
@@ -64,7 +64,7 @@ namespace Everest.OpenApi
                 }
             }
 
-            Logger.LogTrace($"Successfully generated OpenApi document: {new { Title = OpenApiInfo.Title, Version = OpenApiInfo.Version }}");
+            Logger.LogTrace($"Successfully generated OpenApi document: {new { Title = info.Title, Version = info.Version }}");
             return document;
         }
     }

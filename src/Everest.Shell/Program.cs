@@ -7,12 +7,12 @@ using Everest.Authentication;
 using Everest.Http;
 using Everest.OpenApi.Annotations;
 using Everest.OpenApi.Examples;
+using Everest.OpenApi.Swagger;
 using Everest.Rest;
 using Everest.Routing;
 using Everest.WebSockets;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.OpenApi.Models;
 
 namespace Everest.Shell
 {
@@ -205,7 +205,6 @@ namespace Everest.Shell
 			var services = new ServiceCollection();
 			services.AddAuthenticator(configurator => configurator.AddBasicAuthentication())
 					.AddCorsRequestHandler(configurator => configurator.AddDefaultCorsPolicy())
-                    .AddOpenApiDocumentGenerator(configurator => configurator.DocumentGenerator.OpenApiInfo = new OpenApiInfo { Title = "Everest", Version = "V3"})
                     .AddWebSocketRequestHandler<EchoWebsocketRequestHandler>()
 					.AddSingleton(_ => new GreetingsService())
 					.AddConsoleLoggerFactory();
@@ -220,8 +219,17 @@ namespace Everest.Shell
                 .UseRoutingMiddleware()
                 .UseCorsMiddleware()
 				.UseEndPointMiddleware()
-				.ScanRoutes(Assembly.GetExecutingAssembly())
-                .UseSwagger()
+                .ScanRoutes(Assembly.GetExecutingAssembly(), configurator =>
+                {
+                    //configurator.UseSwaggerEndPoint("/api/my/swagger.json");
+                    //configurator.UseSwaggerUi("/my/swagger");
+                    configurator.UseOpenApiInfo(info =>
+                    {
+                        info.Title = "Everest API";
+                        info.Description = "Some API description";
+                        info.Version = "V3";
+                    });
+                })
 				.Build();
 
 			rest.Start();

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -14,19 +13,18 @@ using Everest.Http;
 using Everest.Middlewares;
 using Everest.Mime;
 using Everest.OpenApi;
+using Everest.OpenApi.Swagger;
 using Everest.Routing;
-using Everest.Utils;
 using Everest.WebSockets;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Logging.Console;
-using Microsoft.OpenApi.Writers;
 
 namespace Everest.Rest
 {
-	public class RestServerBuilder
+    public class RestServerBuilder
 	{
 		public IList<string> Prefixes { get; } = new List<string>();
 
@@ -86,8 +84,14 @@ namespace Everest.Rest
 				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
 				return new EndPointInvoker(loggerFactory.CreateLogger<EndPointInvoker>());
 			});
+
+			services.TryAddSingleton<IOpenApiDocumentGenerator>(provider =>
+            {
+                var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
+                return new OpenApiDocumentGenerator(loggerFactory.CreateLogger<OpenApiDocumentGenerator>());
+            });
 			
-			Services = services.BuildServiceProvider();
+            Services = services.BuildServiceProvider();
 		}
 
 		public RestServer Build()
@@ -314,7 +318,7 @@ namespace Everest.Rest
 
             return services;
         }
-
+		
         public static IServiceCollection AddConsoleLoggerFactory(this IServiceCollection services, Action<ILoggingBuilder> configurator = null)
 		{
 			var factory = LoggerFactory.Create(config =>
@@ -414,7 +418,7 @@ namespace Everest.Rest
 		public static RestServerBuilder ScanRoutes(this RestServerBuilder builder, Assembly assembly)
 		{
 			var scanner = builder.Services.GetRequiredService<IRouteScanner>();
-			var router = builder.Services.GetService<IRouter>();
+			var router = builder.Services.GetRequiredService<IRouter>();
 
 			foreach (var route in scanner.Scan(assembly).ToArray())
 			{
@@ -424,20 +428,24 @@ namespace Everest.Rest
 			return builder;
 		}
 
-        public static RestServerBuilder UseSwagger(this RestServerBuilder builder, string filePath = null)
+        public static RestServerBuilder ScanRoutes(this RestServerBuilder builder, Assembly assembly, Action<SwaggerGeneratorConfigurator> options)
         {
-            var generator = builder.Services.GetRequiredService<IOpenApiDocumentGenerator>();
+            var scanner = builder.Services.GetRequiredService<IRouteScanner>();
             var router = builder.Services.GetRequiredService<IRouter>();
+            var documentGenerator = builder.Services.GetRequiredService<IOpenApiDocumentGenerator>();
+            var loggerFactory = builder.Services.GetRequiredService<ILoggerFactory>();
 
-			//TODO: перенести логику в отдельный класс swagger-gen
+            var generator = new SwaggerGenerator(documentGenerator, loggerFactory.CreateLogger<SwaggerGenerator>());
+			var configurator = new SwaggerGeneratorConfigurator(generator, builder.Services);
+            options(configurator);
 
-            if (string.IsNullOrWhiteSpace(filePath))
-                filePath = Path.Combine("public", "api", "swagger.json");
+            var routes = scanner.Scan(assembly).ToArray();
+            foreach (var route in routes)
+            {
+                router.RegisterRoute(route);
+            }
 
-			FileExtensions.CreateFile(filePath);
-
-            var document = generator.Generate(router.Routes);
-            document.SerializeAsV3(new OpenApiJsonWriter(new StreamWriter(filePath)));
+            generator.Generate(configurator.OpenApiInfo, routes);
 			
             return builder;
         }

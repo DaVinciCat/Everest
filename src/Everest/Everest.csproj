@@ -9,6 +9,84 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="OpenApi\Swagger\Dist\favicon-16x16.png" />
+    <None Remove="OpenApi\Swagger\Dist\favicon-32x32.png" />
+    <None Remove="OpenApi\Swagger\Dist\index.css" />
+    <None Remove="OpenApi\Swagger\Dist\index.html" />
+    <None Remove="OpenApi\Swagger\Dist\oauth2-redirect.html" />
+    <None Remove="OpenApi\Swagger\Dist\swagger-initializer.js" />
+    <None Remove="OpenApi\Swagger\Dist\swagger-ui-bundle.js" />
+    <None Remove="OpenApi\Swagger\Dist\swagger-ui-bundle.js.map" />
+    <None Remove="OpenApi\Swagger\Dist\swagger-ui-es-bundle-core.js" />
+    <None Remove="OpenApi\Swagger\Dist\swagger-ui-es-bundle-core.js.map" />
+    <None Remove="OpenApi\Swagger\Dist\swagger-ui-es-bundle.js" />
+    <None Remove="OpenApi\Swagger\Dist\swagger-ui-es-bundle.js.map" />
+    <None Remove="OpenApi\Swagger\Dist\swagger-ui-standalone-preset.js" />
+    <None Remove="OpenApi\Swagger\Dist\swagger-ui-standalone-preset.js.map" />
+    <None Remove="OpenApi\Swagger\Dist\swagger-ui.css" />
+    <None Remove="OpenApi\Swagger\Dist\swagger-ui.css.map" />
+    <None Remove="OpenApi\Swagger\Dist\swagger-ui.js" />
+    <None Remove="OpenApi\Swagger\Dist\swagger-ui.js.map" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="OpenApi\Swagger\Dist\favicon-16x16.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OpenApi\Swagger\Dist\favicon-32x32.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OpenApi\Swagger\Dist\index.css">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OpenApi\Swagger\Dist\index.html">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OpenApi\Swagger\Dist\oauth2-redirect.html">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OpenApi\Swagger\Dist\swagger-initializer.js">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OpenApi\Swagger\Dist\swagger-ui-bundle.js">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OpenApi\Swagger\Dist\swagger-ui-bundle.js.map">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OpenApi\Swagger\Dist\swagger-ui-es-bundle-core.js">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OpenApi\Swagger\Dist\swagger-ui-es-bundle-core.js.map">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OpenApi\Swagger\Dist\swagger-ui-es-bundle.js">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OpenApi\Swagger\Dist\swagger-ui-es-bundle.js.map">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OpenApi\Swagger\Dist\swagger-ui-standalone-preset.js">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OpenApi\Swagger\Dist\swagger-ui-standalone-preset.js.map">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OpenApi\Swagger\Dist\swagger-ui.css">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OpenApi\Swagger\Dist\swagger-ui.css.map">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OpenApi\Swagger\Dist\swagger-ui.js">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OpenApi\Swagger\Dist\swagger-ui.js.map">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
     <PackageReference Include="Microsoft.OpenApi" Version="1.6.9" />
