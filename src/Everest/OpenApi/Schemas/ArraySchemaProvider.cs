@@ -3,7 +3,7 @@ using Microsoft.OpenApi.Models;
 
 namespace Everest.OpenApi.Schemas
 {
-    internal class ArraySchemaProvider : IOpenApiSchemaProvider
+    public class ArraySchemaProvider : IOpenApiSchemaProvider
     {
         private readonly Func<Type, OpenApiSchema> getItemSchema;
 
@@ -14,20 +14,29 @@ namespace Everest.OpenApi.Schemas
 
         public bool TryGetSchema(Type type, out OpenApiSchema schema)
         {
-            if (!type.IsArray)
+            if (!typeof(Array).IsAssignableFrom(type))
             {
                 schema = null;
                 return false;
             }
 
-            var elementType = type.GetElementType();
-            var itemSchema = getItemSchema(elementType);
+            OpenApiSchema itemSchema = null;
 
+            var elementType = type.GetElementType();
+            if (elementType != null)
+            {
+                itemSchema = getItemSchema(elementType);
+            }
+            
             schema = new OpenApiSchema
             {
-                Type = OpenApiDataType.Array.Type,
-                Items = itemSchema
+                Type = OpenApiDataType.Array.Type
             };
+
+            if (itemSchema != null)
+            {
+                schema.Items = itemSchema;
+            }
 
             return true;
         }

@@ -4,9 +4,9 @@ using Everest.OpenApi.Annotations;
 
 namespace Everest.OpenApi.Filters
 {
-    internal class OperationDocumentFilter : IOpenApiDocumentFilter
+    public class OperationDocumentFilter : OpenApiDocumentFilter
     {
-        public void Apply(OpenApiDocumentContext context, RouteDescriptor descriptor)
+        protected override void Apply(OpenApiDocumentContext context, RouteDescriptor descriptor)
         {
             var document = context.Document;
             if (!document.Paths.TryGetValue(context.GetOpenApiPathItemKey(descriptor), out var item))

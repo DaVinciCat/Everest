@@ -15,20 +15,30 @@ namespace Everest.OpenApi.Schemas
 
         public bool TryGetSchema(Type type, out OpenApiSchema schema)
         {
-            if (!type.IsGenericType || !typeof(IEnumerable).IsAssignableFrom(type) || type.GetGenericArguments().Length > 1)
+            if (!typeof(IEnumerable).IsAssignableFrom(type))
             {
                 schema = null;
                 return false;
             }
 
-            var elementType = type.GetGenericArguments()[0];
-            var itemSchema = getItemSchema(elementType);
+            OpenApiSchema itemSchema = null;
+
+            var args = type.GetGenericArguments();
+            if (args.Length == 1)
+            {
+                var elementType = type.GetGenericArguments()[0];
+                itemSchema = getItemSchema(elementType);
+            }
 
             schema = new OpenApiSchema
             {
-                Type = OpenApiDataType.Array.Type,
-                Items = itemSchema
+                Type = OpenApiDataType.Array.Type
             };
+
+            if (itemSchema != null)
+            {
+                schema.Items = itemSchema;
+            }
 
             return true;
         }

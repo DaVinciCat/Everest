@@ -9,7 +9,7 @@ using Microsoft.OpenApi.Any;
 
 namespace Everest.OpenApi.Filters
 {
-    internal class ResponseExampleDocumentFilter : OpenApiDocumentFilter
+    public class ResponseExampleDocumentFilter : OpenApiDocumentFilter
     {
         public string DefaultExampleName { get; set; } = "Example";
 
