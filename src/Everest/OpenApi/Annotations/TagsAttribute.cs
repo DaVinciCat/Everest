@@ -2,7 +2,7 @@
 
 namespace Everest.OpenApi.Annotations
 {
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true)]
     public class TagsAttribute : Attribute
     {
         public string[] Tags { get; }

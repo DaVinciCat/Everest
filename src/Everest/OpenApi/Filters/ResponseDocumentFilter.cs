@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Everest.OpenApi.Annotations;
 using Everest.Routing;
 using Microsoft.OpenApi.Models;
@@ -37,7 +38,7 @@ namespace Everest.OpenApi.Filters
                 }
                 
                 var key = ((int)attribute.StatusCode).ToString();
-                operation.Responses.Add(key, response);
+                operation.Responses[key] = response;
             }
         }
     }

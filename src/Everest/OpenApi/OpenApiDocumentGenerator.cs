@@ -31,7 +31,8 @@ namespace Everest.OpenApi
                 new ResponseDocumentFilter(),
                 new ResponseExampleDocumentFilter(),
                 new QueryParameterDocumentFilter(),
-                new PathParameterDocumentFilter()
+                new PathParameterDocumentFilter(),
+                new DeprecatedDocumentFilter()
             };
 
             SchemaGenerator = new OpenApiSchemaGenerator();

@@ -4,7 +4,7 @@ using Everest.OpenApi.Examples;
 
 namespace Everest.OpenApi.Annotations
 {
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true)]
     public class ResponseExampleAttribute : Attribute
     {
         public HttpStatusCode StatusCode { get; }
