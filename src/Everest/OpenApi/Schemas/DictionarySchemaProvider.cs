@@ -22,7 +22,7 @@ namespace Everest.OpenApi.Schemas
             }
 
             var keyType = type.GetGenericArguments()[0];
-            if (typeof(string) != type && type.IsEnum)
+            if (typeof(string) != keyType && !keyType.IsEnum)
                 throw new ArgumentException($"Unsupported dictionary key type: {keyType}. Schema supports keys of type {typeof(string)} or {typeof(Enum)} only");
 
             var valueType = type.GetGenericArguments()[1];
