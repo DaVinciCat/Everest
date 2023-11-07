@@ -3,7 +3,7 @@ using System.Net;
 
 namespace Everest.OpenApi.Annotations
 {
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true)]
     public class ResponseAttribute : Attribute
     {
         public HttpStatusCode StatusCode { get; }

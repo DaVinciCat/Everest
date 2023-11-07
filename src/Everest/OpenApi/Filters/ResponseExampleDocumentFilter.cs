@@ -69,7 +69,7 @@ namespace Everest.OpenApi.Filters
                             };
 
                             var key = attribute.Name ?? $"{DefaultExampleName}{++index}";
-                            media.Examples.Add(key, example);
+                            media.Examples[key] = example;
                         }
                     }
                 }
