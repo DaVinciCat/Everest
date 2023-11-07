@@ -12,6 +12,8 @@ using Everest.Files;
 using Everest.Http;
 using Everest.Middlewares;
 using Everest.Mime;
+using Everest.OpenApi;
+using Everest.OpenApi.Swagger;
 using Everest.Routing;
 using Everest.WebSockets;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,7 +24,7 @@ using Microsoft.Extensions.Logging.Console;
 
 namespace Everest.Rest
 {
-	public class RestServerBuilder
+    public class RestServerBuilder
 	{
 		public IList<string> Prefixes { get; } = new List<string>();
 
@@ -58,7 +60,7 @@ namespace Everest.Rest
 			services.TryAddSingleton<IStaticFilesProvider>(provider =>
 			{
 				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
-				return new StaticFilesProvider(loggerFactory.CreateLogger<StaticFilesProvider>());
+				return new StaticFilesProvider("public", loggerFactory.CreateLogger<StaticFilesProvider>());
 			});
 
 			services.TryAddSingleton<IMimeTypesProvider>(_ => new MimeTypesProvider());
@@ -82,8 +84,14 @@ namespace Everest.Rest
 				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
 				return new EndPointInvoker(loggerFactory.CreateLogger<EndPointInvoker>());
 			});
+
+			services.TryAddSingleton<IOpenApiDocumentGenerator>(provider =>
+            {
+                var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
+                return new OpenApiDocumentGenerator(loggerFactory.CreateLogger<OpenApiDocumentGenerator>());
+            });
 			
-			Services = services.BuildServiceProvider();
+            Services = services.BuildServiceProvider();
 		}
 
 		public RestServer Build()
@@ -178,7 +186,7 @@ namespace Everest.Rest
 			services.AddSingleton<IStaticFilesProvider>(provider =>
 			{
 				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
-				var staticFilesProvider = new StaticFilesProvider(loggerFactory.CreateLogger<StaticFilesProvider>());
+				var staticFilesProvider = new StaticFilesProvider("public", loggerFactory.CreateLogger<StaticFilesProvider>());
 				configurator(new StaticFilesProviderConfigurator(staticFilesProvider, provider));
 
 				return staticFilesProvider;
@@ -284,14 +292,34 @@ namespace Everest.Rest
 			services.AddSingleton(builder);
 			return services;
 		}
-
+		
 		public static IServiceCollection AddLoggerFactory(this IServiceCollection services, Func<IServiceProvider, ILoggerFactory> builder)
 		{
 			services.AddSingleton(builder);
 			return services;
 		}
 
-		public static IServiceCollection AddConsoleLoggerFactory(this IServiceCollection services, Action<ILoggingBuilder> configurator = null)
+        public static IServiceCollection AddOpenApiDocumentGenerator(this IServiceCollection services, Func<IServiceProvider, IOpenApiDocumentGenerator> builder)
+        {
+            services.AddSingleton(builder);
+            return services;
+        }
+
+        public static IServiceCollection AddOpenApiDocumentGenerator(this IServiceCollection services, Action<OpenApiDocumentGeneratorConfigurator> configurator)
+        {
+            services.AddSingleton<IOpenApiDocumentGenerator>(provider =>
+            {
+                var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
+				var generator = new OpenApiDocumentGenerator(loggerFactory.CreateLogger<OpenApiDocumentGenerator>());
+                configurator(new OpenApiDocumentGeneratorConfigurator(generator, provider));
+
+                return generator;
+            });
+
+            return services;
+        }
+		
+        public static IServiceCollection AddConsoleLoggerFactory(this IServiceCollection services, Action<ILoggingBuilder> configurator = null)
 		{
 			var factory = LoggerFactory.Create(config =>
 			{
@@ -390,7 +418,7 @@ namespace Everest.Rest
 		public static RestServerBuilder ScanRoutes(this RestServerBuilder builder, Assembly assembly)
 		{
 			var scanner = builder.Services.GetRequiredService<IRouteScanner>();
-			var router = builder.Services.GetService<IRouter>();
+			var router = builder.Services.GetRequiredService<IRouter>();
 
 			foreach (var route in scanner.Scan(assembly).ToArray())
 			{
@@ -399,5 +427,27 @@ namespace Everest.Rest
 
 			return builder;
 		}
-	}
+
+        public static RestServerBuilder ScanRoutes(this RestServerBuilder builder, Assembly assembly, Action<SwaggerGeneratorConfigurator> options)
+        {
+            var scanner = builder.Services.GetRequiredService<IRouteScanner>();
+            var router = builder.Services.GetRequiredService<IRouter>();
+            var documentGenerator = builder.Services.GetRequiredService<IOpenApiDocumentGenerator>();
+            var loggerFactory = builder.Services.GetRequiredService<ILoggerFactory>();
+
+            var generator = new SwaggerGenerator(documentGenerator, loggerFactory.CreateLogger<SwaggerGenerator>());
+			var configurator = new SwaggerGeneratorConfigurator(generator, builder.Services);
+            options(configurator);
+
+            var routes = scanner.Scan(assembly).ToArray();
+            foreach (var route in routes)
+            {
+                router.RegisterRoute(route);
+            }
+
+            generator.Generate(configurator.OpenApiInfo, routes);
+			
+            return builder;
+        }
+    }
 }

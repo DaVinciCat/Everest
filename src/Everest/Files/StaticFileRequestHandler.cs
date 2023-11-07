@@ -97,10 +97,11 @@ namespace Everest.Files
 
 			if (descriptor == null)
 				throw new ArgumentNullException(nameof(descriptor));
-
-			context.Response.StatusCode = HttpStatusCode.OK;
+			
 			await context.Response.WriteFileAsync(descriptor.FileInfo.FullName, descriptor.MimeType.ContentType.MediaType, descriptor.MimeType.ContentDisposition.DispositionType);
-			return true;
+            context.Response.StatusCode = HttpStatusCode.OK;
+
+            return true;
 		};
 
 		#endregion
