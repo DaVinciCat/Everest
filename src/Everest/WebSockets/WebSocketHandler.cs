@@ -174,7 +174,7 @@ namespace Everest.WebSockets
                     await SendAsync(session, text);
                 });
 #else
-                await sessions.ParallelForEachAsync(async session =>
+                await sessions.ParallelForEachAsync(sessions.Count, async session =>
                 {
                     await SendAsync(session, text);
                 });
@@ -198,7 +198,7 @@ namespace Everest.WebSockets
                     await SendAsync(session, bytes);
                 });
 #else
-                await sessions.ParallelForEachAsync(async session =>
+                await sessions.ParallelForEachAsync(sessions.Count, async session =>
                 {
                     await SendAsync(session, bytes);
                 });
