@@ -65,7 +65,7 @@ namespace Everest.Http
 			if (outputStream.Length == 0)
 				await pipe.FlushAsync();
 
-			return outputStream.ToArray();
+			return outputStream.GetBuffer();
 		}
 	}
 

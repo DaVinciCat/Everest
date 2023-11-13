@@ -8,11 +8,6 @@ namespace Everest.Utils
 {
     public static class AsyncExtensions
     {
-        public static Task ParallelForEachAsync<T>(this IEnumerable<T> source, Func<T, Task> body)
-        {
-            return source.ParallelForEachAsync(-1, body);
-        }
-
         public static Task ParallelForEachAsync<T>(this IEnumerable<T> source, int dop, Func<T, Task> body)
         {
             async Task AwaitPartition(IEnumerator<T> partition)

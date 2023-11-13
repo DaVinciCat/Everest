@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.WebSockets;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -91,30 +92,44 @@ namespace Everest.WebSockets
 
                 var bytes = new byte[ReceiveBufferSize];
                 var buffer = new ArraySegment<byte>(bytes);
+                var inputStream = new MemoryStream();
+
                 while (!token.IsCancellationRequested && session.State == WebSocketState.Open)
                 {
                     var result = await session.ReceiveAsync(buffer, token);
 
-                    switch (result.MessageType)
+                    if (result.MessageType == WebSocketMessageType.Close)
                     {
-                        case WebSocketMessageType.Binary:
-                            await OnMessageAsync(session, bytes);
-                            break;
+                        // If we received an incoming CLOSE message, we'll queue a CLOSE frame to be sent.
+                        // We'll give the queued frame some amount of time to go out on the wire, and if a
+                        // timeout occurs we'll give up and abort the connection.
+                        await Task
+                            .WhenAny(CloseAsync(session), Task.Delay(CloseTimeout, token))
+                            .ContinueWith(_ => { }, TaskContinuationOptions.ExecuteSynchronously); // swallow exceptions occurring from sending the CLOSE
+                        break;
+                    }
 
-                        case WebSocketMessageType.Text:
-                            var text = Encoding.UTF8.GetString(bytes);
-                            await OnMessageAsync(session, text);
-                            break;
+                    if (buffer.Array != null)
+                    {
+                        inputStream.Write(buffer.Array, buffer.Offset, result.Count);
+                    }
 
-                        default:
-                            // If we received an incoming CLOSE message, we'll queue a CLOSE frame to be sent.
-                            // We'll give the queued frame some amount of time to go out on the wire, and if a
-                            // timeout occurs we'll give up and abort the connection.
-                            await Task
-                                .WhenAny(CloseAsync(session), Task.Delay(CloseTimeout, token))
-                                .ContinueWith(_ => { }, TaskContinuationOptions.ExecuteSynchronously); // swallow exceptions occurring from sending the CLOSE
-                            RemoveSession(session);
-                            return;
+                    if (result.EndOfMessage)
+                    {
+                        switch (result.MessageType)
+                        {
+                            case WebSocketMessageType.Binary:
+                                await OnMessageAsync(session, inputStream.GetBuffer());
+                                break;
+
+                            case WebSocketMessageType.Text:
+                                var text = Encoding.UTF8.GetString(inputStream.GetBuffer());
+                                await OnMessageAsync(session, text);
+                                break;
+                        }
+
+                        inputStream.SetLength(0);
+                        inputStream.Position = 0;
                     }
                 }
             }
@@ -141,6 +156,7 @@ namespace Everest.WebSockets
                 }
                 finally
                 {
+                    RemoveSession(session);
                     await OnCloseAsync(session);
                 }
             }
@@ -158,7 +174,7 @@ namespace Everest.WebSockets
                     await SendAsync(session, text);
                 });
 #else
-                await sessions.ParallelForEachAsync(async session =>
+                await sessions.ParallelForEachAsync(sessions.Count, async session =>
                 {
                     await SendAsync(session, text);
                 });
@@ -182,7 +198,7 @@ namespace Everest.WebSockets
                     await SendAsync(session, bytes);
                 });
 #else
-                await sessions.ParallelForEachAsync(async session =>
+                await sessions.ParallelForEachAsync(sessions.Count, async session =>
                 {
                     await SendAsync(session, bytes);
                 });
