@@ -56,7 +56,7 @@ namespace Everest.OpenApi
         public static IEnumerable<T> GetAttributes<T>(this RouteDescriptor descriptor)
             where T : Attribute
         {
-            return descriptor.EndPoint.Type.GetAttributes<T>().Union(descriptor.EndPoint.MethodInfo.GetAttributes<T>()).ToArray();
+            return descriptor.EndPoint.Type.GetAttributes<T>().Union(descriptor.EndPoint.MethodInfo.GetAttributes<T>(), ReferenceEqualityComparer<T>.Default).ToArray();
         }
     }
 }
