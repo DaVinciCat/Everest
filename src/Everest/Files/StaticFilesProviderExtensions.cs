@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Everest.Http;
 
 namespace Everest.Files
@@ -26,7 +27,7 @@ namespace Everest.Files
            if (request == null)
                 throw new ArgumentNullException(nameof(request));
 
-           return request.Path.Trim('/').Replace("/", "\\");
+           return request.Path.Trim('/').Replace('/', Path.DirectorySeparatorChar);
         }
     }
 }

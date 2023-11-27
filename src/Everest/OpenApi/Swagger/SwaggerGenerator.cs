@@ -37,8 +37,8 @@ namespace Everest.OpenApi.Swagger
             if (routes == null)
                 throw new ArgumentNullException(nameof(routes));
 
-            var endPointFilePath = Path.Combine(PhysicalPath, SwaggerEndPoint.Trim('/').Replace("/", "\\"));
-            var swaggerUiPath = Path.Combine(PhysicalPath, SwaggerUiPath.Trim('/').Replace("/", "\\"));
+            var endPointFilePath = Path.Combine(PhysicalPath, SwaggerEndPoint.Trim('/').Replace('/', Path.DirectorySeparatorChar));
+            var swaggerUiPath = Path.Combine(PhysicalPath, SwaggerUiPath.Trim('/').Replace('/', Path.DirectorySeparatorChar));
 
             Logger.LogTrace($"Try generate swagger docs: {new { DocumentFilePath = endPointFilePath, SwaggerUiPath = swaggerUiPath }}");
 
