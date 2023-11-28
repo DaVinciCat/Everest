@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Security.Claims;
+using System.Threading;
 using Everest.Collections;
 using Everest.WebSockets;
 using Microsoft.Extensions.Logging;
@@ -24,8 +25,10 @@ namespace Everest.Http
 		public IServiceProvider Services { get; }
 
 		public ILoggerFactory LoggerFactory { get; }
+
+		public CancellationToken CancellationToken { get; }
 		
-		public HttpContext(HttpListenerContext context, IFeatureCollection features, IServiceProvider services, ILoggerFactory loggerFactory)
+		public HttpContext(HttpListenerContext context, IFeatureCollection features, IServiceProvider services, ILoggerFactory loggerFactory, CancellationToken token)
 		{
 			if (context == null) 
 				throw new ArgumentNullException(nameof(context));
@@ -38,6 +41,7 @@ namespace Everest.Http
 			Services = services ?? throw new ArgumentNullException(nameof(services));
 			User = new ClaimsPrincipal();
             WebSockets = new WebSocketContext(context, User);
+			CancellationToken = token;
         }
 	}
 }

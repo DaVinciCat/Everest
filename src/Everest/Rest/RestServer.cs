@@ -14,6 +14,10 @@ namespace Everest.Rest
 	{
 		public ILogger<RestServer> Logger { get; }
 
+        public event EventHandler Started;
+
+        public event EventHandler Stopped;
+		
 		public bool IsDisposed { get; private set; }
 
 		public bool IsStopping { get; private set; }
@@ -33,6 +37,8 @@ namespace Everest.Rest
 		private readonly IServiceProvider serviceProvider;
 
 		private readonly ILoggerFactory loggerFactory;
+
+		private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
 		public RestServer(IMiddleware[] middleware, IServiceProvider serviceProvider, ILoggerFactory loggerFactory)
 		{
@@ -62,7 +68,7 @@ namespace Everest.Rest
 			if (IsDisposed)
 				throw new ObjectDisposedException(GetType().FullName);
 
-			if (IsStopping || IsStarting)
+			if (IsStopping || IsStarting || IsListening)
 				return;
 
 			IsStarting = true;
@@ -89,6 +95,8 @@ namespace Everest.Rest
 
 				if (exceptionWasThrown)
 					Dispose();
+				else
+					Started?.Invoke(this, EventArgs.Empty);
 			}
 		}
 
@@ -107,7 +115,8 @@ namespace Everest.Rest
 				Logger.LogTrace("Stopping server");
 				listener.Stop();
 				listener.Close();
-			}
+				cancellationTokenSource.Cancel();
+            }
 			catch (ObjectDisposedException)
 			{
 				//Ignore
@@ -130,9 +139,16 @@ namespace Everest.Rest
 				Logger.LogError(ex, "Failed while stopping server");
 			}
 
-			IsStopping = false;
-			Logger.LogTrace("Server is stopped");
-		}
+            try
+            {
+                IsStopping = false;
+                Logger.LogTrace("Server is stopped");
+            }
+            finally
+            {
+                Stopped?.Invoke(this, EventArgs.Empty);
+            }
+        }
 
 		private async void ListenAsync()
 		{
@@ -143,7 +159,7 @@ namespace Everest.Rest
 					var context = await listener.GetContextAsync();
 					var features = new FeatureCollection();
 					var services = serviceProvider.CreateScope().ServiceProvider;
-                    var httpContext = new HttpContext(context, features, services, loggerFactory);
+                    var httpContext = new HttpContext(context, features, services, loggerFactory, cancellationTokenSource.Token);
 
 #if NET5_0_OR_GREATER
 					ThreadPool.QueueUserWorkItem(ProcessRequestAsync, httpContext, false);
@@ -215,6 +231,7 @@ namespace Everest.Rest
 			try
 			{
 				Stop();
+				cancellationTokenSource.Dispose();
 			}
 			finally
 			{
