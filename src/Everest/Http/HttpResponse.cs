@@ -231,7 +231,7 @@ namespace Everest.Http
 			await response.WriteAsync(json);
 		}
 
-		public static Task WriteFileAsync(this HttpResponse response, string filename, ContentType contentType, ContentDisposition contentDisposition)
+		public static Task<FileStream> WriteFileAsync(this HttpResponse response, string filename, ContentType contentType, ContentDisposition contentDisposition)
 		{
 			if (response == null)
 				throw new ArgumentNullException(nameof(response));
@@ -246,14 +246,15 @@ namespace Everest.Http
 				throw new ArgumentNullException(nameof(contentDisposition));
 
 			var file = new FileInfo(filename);
+			var fs = file.OpenRead();
 			response.ContentType = contentType.MediaType;
 			response.ContentDisposition = contentDisposition.DispositionType;
-			response.ReadFrom(file.OpenRead());
+			response.ReadFrom(fs);
 
-			return Task.CompletedTask;
+			return Task.FromResult(fs);
 		}
 
-		public static Task WriteFileAsync(this HttpResponse response, string filename, string contentType, string contentDisposition)
+		public static Task<FileStream> WriteFileAsync(this HttpResponse response, string filename, string contentType, string contentDisposition)
 		{
 			if (response == null)
 				throw new ArgumentNullException(nameof(response));
@@ -268,11 +269,12 @@ namespace Everest.Http
 				throw new ArgumentNullException(nameof(contentDisposition));
 
 			var file = new FileInfo(filename);
+			var fs = file.OpenRead();
 			response.ContentType = contentType;
 			response.ContentDisposition = contentDisposition;
-			response.ReadFrom(file.OpenRead());
+			response.ReadFrom(fs);
 
-			return Task.CompletedTask;
+			return Task.FromResult(fs);
 		}
 	}
 }
