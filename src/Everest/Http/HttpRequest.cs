@@ -7,12 +7,11 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Web;
 using Everest.Collections;
-using Everest.Utils;
 using Microsoft.Extensions.Logging;
 
 namespace Everest.Http
 {
-	public class HttpRequest
+    public class HttpRequest
 	{
 		public ILogger<HttpRequest> Logger { get; }
 
@@ -28,8 +27,6 @@ namespace Everest.Http
 
 		public string Description => $"{HttpMethod} {Path}";
 
-		public Stream InputStream => request.InputStream;
-		
 		public Encoding ContentEncoding => request.ContentEncoding;
 
 		public NameValueCollection Headers => request.Headers;
@@ -38,16 +35,13 @@ namespace Everest.Http
 
 		public ParameterCollection PathParameters { get; set; }
 
+		private MemoryStream inputStream;
+
 		private readonly HttpListenerRequest request;
-
-		private readonly StreamPipe pipe;
-
-		private readonly MemoryStream outputStream = new MemoryStream();
 
 		public HttpRequest(HttpListenerRequest request, ILogger<HttpRequest> logger)
 		{
-            this.request = request ?? throw new ArgumentNullException(nameof(request));
-            pipe = new StreamPipe(outputStream).PipeFrom(request.InputStream);
+			this.request = request ?? throw new ArgumentNullException(nameof(request));
 
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			QueryParameters = new ParameterCollection(request.QueryString);
@@ -62,10 +56,25 @@ namespace Everest.Http
 			if (!request.HasEntityBody)
 				return Array.Empty<byte>();
 
-			if (outputStream.Length == 0)
-				await pipe.FlushAsync();
+			if (inputStream == null)
+			{
+				inputStream = new MemoryStream();
 
-			return outputStream.GetBuffer();
+				if (request.InputStream.CanSeek)
+				{
+					request.InputStream.Position = 0;
+				}
+
+				var buffer = new byte[4096];
+				int read;
+
+				while ((read = await request.InputStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+				{
+					await inputStream.WriteAsync(buffer, 0, read);
+				}
+			}
+
+			return inputStream.GetBuffer();
 		}
 	}
 
@@ -81,16 +90,16 @@ namespace Everest.Http
 		{
 			var data = await request.ReadBodyAsync();
 
-			return options == null ? 
-				JsonSerializer.Deserialize<T>(data) : 
+			return options == null ?
+				JsonSerializer.Deserialize<T>(data) :
 				JsonSerializer.Deserialize<T>(data, options);
 		}
 
-        public static async Task<NameValueCollection> ReadFormAsync(this HttpRequest request)
-        {
-            var data = await request.ReadBodyAsync();
-            var content = request.ContentEncoding.GetString(data);
-            return HttpUtility.ParseQueryString(content, request.ContentEncoding);
-        }
+		public static async Task<NameValueCollection> ReadFormAsync(this HttpRequest request)
+		{
+			var data = await request.ReadBodyAsync();
+			var content = request.ContentEncoding.GetString(data);
+			return HttpUtility.ParseQueryString(content, request.ContentEncoding);
+		}
 	}
 }

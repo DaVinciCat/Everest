@@ -86,7 +86,7 @@ namespace Everest.Files
 
 			context.Response.KeepAlive = false;
 			context.Response.StatusCode = HttpStatusCode.NotFound;
-			context.Response.Clear();
+			context.Response.InputStream.SetLength(0);
 			await context.Response.WriteTextAsync($"Requested file not found: {context.Request.Description}");
 		};
 

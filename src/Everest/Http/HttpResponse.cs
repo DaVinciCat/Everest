@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Everest.Http
 {
-    public class HttpResponse
+	public class HttpResponse
 	{
 		public ILogger<HttpResponse> Logger { get; }
 
@@ -34,8 +34,8 @@ namespace Everest.Http
 		//	set => response.ContentLength64 = value;
 		//}
 
-		public long ContentLength => pipe.Length;
-		
+		public long ContentLength => InputStream.Length;
+
 		public bool KeepAlive
 		{
 			get => response.KeepAlive;
@@ -82,22 +82,59 @@ namespace Everest.Http
 			}
 		}
 
+		public Stream InputStream
+		{
+			get => inputStream;
+			set
+			{
+				if (value == null)
+					throw new ArgumentNullException("Input stream cannot be null");
+
+				if (!value.CanRead)
+				{
+					throw new InvalidOperationException("Input stream is not readable");
+				}
+
+				inputStream = value;
+			}
+		}
+
+		public Stream OutputStream
+		{
+			get => outputStream;
+			set
+			{
+				if (value == null)
+					throw new ArgumentNullException("Output stream cannot be null");
+
+				if (!value.CanWrite)
+				{
+					throw new InvalidOperationException("Output stream is not writable");
+				}
+
+				outputStream = value;
+			}
+		}
+
+		private Stream inputStream;
+
+		private Stream outputStream;
+
 		private readonly HttpListenerResponse response;
 
-        private readonly HttpListenerRequest request;
-
-		private readonly StreamPipe pipe;
+		private readonly HttpListenerRequest request;
 
 		public HttpResponse(HttpListenerResponse response, HttpListenerRequest request, ILogger<HttpResponse> logger)
 		{
 			this.response = response ?? throw new ArgumentNullException(nameof(response));
-            this.request = request ?? throw new ArgumentNullException(nameof(request));
-            pipe = new StreamPipe(response.OutputStream);
+			this.request = request ?? throw new ArgumentNullException(nameof(request));
 
+			InputStream = new MemoryStream();
+			OutputStream = response.OutputStream;
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			StatusCode = HttpStatusCode.OK;
 			ContentEncoding = Encoding.UTF8;
-			
+
 			AppendHeader(HttpHeaders.Server, "Everest");
 		}
 
@@ -108,40 +145,33 @@ namespace Everest.Http
 		public void AppendHeader(string name, string value) => response.AppendHeader(name, value);
 
 		public void RemoveHeader(string name) => response.Headers.Remove(name);
-		
-		public void WriteTo(Stream to) => pipe.PipeTo(to);
-		
-		public void WriteTo(Func<Stream, Stream> to) => pipe.PipeTo(to);
 
-		public Task WriteToAsync(Task<Stream> to) => pipe.PipeToAsync(to);
+		public async Task RedirectAsync(string url)
+		{
+			response.Redirect(url);
+			await Task.CompletedTask;
+		}
 
-		public Task WriteToAsync(Func<Stream, Task<Stream>> to) => pipe.PipeToAsync(to);
-
-		public void ReadFrom(Stream from) => pipe.PipeFrom(from);
-
-		public void ReadFrom(Func<Stream, Stream> from) => pipe.PipeFrom(from);
-
-		public Task ReadFromAsync(Task<Stream> from) => pipe.PipeFromAsync(from);
-		
-		public Task ReadFromAsync(Func<Stream, Task<Stream>> from) => pipe.PipeFromAsync(from);
-
-		public void Clear() => pipe.PipeFrom(new MemoryStream());
-
-        public async Task RedirectAsync(string url)
-        { 
-            response.Redirect(url);
-            await Task.CompletedTask;
-        }
-
-        public async Task SendAsync()
+		public async Task SendAsync()
 		{
 			try
 			{
 				try
 				{
 					Logger.LogTrace($"{TraceIdentifier} - Sending response: {new { RemoteEndPoint = request.RemoteEndPoint, ContentLength = ContentLength.ToReadableSize(), StatusCode = response.StatusCode, ContentType = response.ContentType, ContentEncoding = response.ContentEncoding?.EncodingName }}");
-					await pipe.FlushAsync();
-					pipe.Close();
+
+					if (InputStream.CanSeek)
+					{
+						InputStream.Position = 0;
+					}
+
+					var buffer = new byte[4096];
+					int read;
+
+					while ((read = await InputStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+					{
+						await OutputStream.WriteAsync(buffer, 0, read);
+					}
 				}
 				catch
 				{
@@ -150,7 +180,16 @@ namespace Everest.Http
 				}
 				finally
 				{
-					await pipe.DisposeAsync();
+
+#if NET5_0_OR_GREATER
+					await InputStream.DisposeAsync();
+					await OutputStream.DisposeAsync();
+#else
+            		InputStream.Dispose();
+            		OutputStream.Dispose();
+
+           			await Task.CompletedTask;
+#endif
 					ResponseSent = true;
 					Logger.LogTrace($"{TraceIdentifier} - Response sent");
 				}
@@ -171,12 +210,8 @@ namespace Everest.Http
 		{
 			if (content == null)
 				throw new ArgumentNullException(nameof(content));
-			
-			await response.ReadFromAsync(async output =>
-			{
-			 	await output.WriteAsync(content, 0, content.Length);
-			    return output;
-			});
+
+			await response.InputStream.WriteAsync(content, 0, content.Length);
 		}
 
 		public static async Task WriteAsync(this HttpResponse response, string content)
@@ -231,7 +266,7 @@ namespace Everest.Http
 			await response.WriteAsync(json);
 		}
 
-		public static Task<FileStream> WriteFileAsync(this HttpResponse response, string filename, ContentType contentType, ContentDisposition contentDisposition)
+		public static Task WriteFileAsync(this HttpResponse response, string filename, ContentType contentType, ContentDisposition contentDisposition)
 		{
 			if (response == null)
 				throw new ArgumentNullException(nameof(response));
@@ -249,32 +284,32 @@ namespace Everest.Http
 			var fs = file.OpenRead();
 			response.ContentType = contentType.MediaType;
 			response.ContentDisposition = contentDisposition.DispositionType;
-			response.ReadFrom(fs);
+			response.InputStream = fs;
 
-			return Task.FromResult(fs);
+			return Task.CompletedTask;
 		}
 
-		public static Task<FileStream> WriteFileAsync(this HttpResponse response, string filename, string contentType, string contentDisposition)
+		public static Task WriteFileAsync(this HttpResponse response, string filename, string contentType, string contentDisposition)
 		{
 			if (response == null)
 				throw new ArgumentNullException(nameof(response));
 
 			if (filename == null)
 				throw new ArgumentNullException(nameof(filename));
-			
-			if (contentType == null) 
+
+			if (contentType == null)
 				throw new ArgumentNullException(nameof(contentType));
 
-			if (contentDisposition == null) 
+			if (contentDisposition == null)
 				throw new ArgumentNullException(nameof(contentDisposition));
 
 			var file = new FileInfo(filename);
 			var fs = file.OpenRead();
 			response.ContentType = contentType;
 			response.ContentDisposition = contentDisposition;
-			response.ReadFrom(fs);
+			response.InputStream = fs;
 
-			return Task.FromResult(fs);
+			return Task.CompletedTask;
 		}
 	}
 }

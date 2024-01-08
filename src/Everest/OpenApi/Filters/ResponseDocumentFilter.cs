@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using Everest.OpenApi.Annotations;
 using Everest.Routing;
 using Microsoft.OpenApi.Models;

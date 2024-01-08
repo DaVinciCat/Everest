@@ -61,7 +61,7 @@ namespace Everest.Cors
 			}
 
 			context.Response.StatusCode = HttpStatusCode.NoContent;
-			context.Response.Clear();
+			context.Response.InputStream.SetLength(0);
 			return Task.FromResult(true);
 		}
 

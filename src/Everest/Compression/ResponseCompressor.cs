@@ -8,31 +8,31 @@ using Everest.Utils;
 
 namespace Everest.Compression
 {
-	public class ResponseCompressor : IResponseCompressor
+    public class ResponseCompressor : IResponseCompressor
 	{
-        public ILogger<ResponseCompressor> Logger { get; }
+		public ILogger<ResponseCompressor> Logger { get; }
 
-        public int CompressionMinLength { get; set; } = 2048;
+		public int CompressionMinLength { get; set; } = 2048;
 
-        public ContentTypeCollection MediaTypes { get; } = new ContentTypeCollection
-        {
-            "text/plain",
-            "text/css",
-            "application/javascript",
-            "text/javascript",
-            "text/html",
-            "application/xml",
-            "text/xml",
-            "application/json",
-            "text/json",
-            "application/wasm",
+		public ContentTypeCollection MediaTypes { get; } = new ContentTypeCollection
+		{
+			"text/plain",
+			"text/css",
+			"application/javascript",
+			"text/javascript",
+			"text/html",
+			"application/xml",
+			"text/xml",
+			"application/json",
+			"text/json",
+			"application/wasm",
 			"image/x-icon"
-        };
+		};
 
-        public CompressorCollection Compressors { get; } = new CompressorCollection
-        {
-            { "gzip", input => new GZipStream(input, CompressionLevel.Fastest) },
-            { "deflate", input => new DeflateStream(input, CompressionLevel.Fastest) },
+		public CompressorCollection Compressors { get; } = new CompressorCollection
+		{
+			{ "gzip", input => new GZipStream(input, CompressionLevel.Fastest) },
+			{ "deflate", input => new DeflateStream(input, CompressionLevel.Fastest) },
 #if NET5_0_OR_GREATER
 			{ "brotli", input => new BrotliStream(input, CompressionLevel.Fastest) },
 #endif
@@ -42,21 +42,21 @@ namespace Everest.Compression
 		{
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
-		
+
 		public Task<bool> TryCompressResponseAsync(HttpContext context)
 		{
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
-			
+
 			if (context.Response.ContentLength < CompressionMinLength)
 			{
-                return Task.FromResult(false);
+				return Task.FromResult(false);
 			}
 
-            if (!MediaTypes.Has(context.Response.ContentType))
-            {
-                return Task.FromResult(false);
-            }
+			if (!MediaTypes.Has(context.Response.ContentType))
+			{
+				return Task.FromResult(false);
+			}
 
 			//TODO: super naive implementation, should replace it with q values support
 			var acceptEncoding = context.Request.Headers[HttpHeaders.AcceptEncoding];
@@ -79,7 +79,7 @@ namespace Everest.Compression
 			{
 				if (Compressors.TryGet(encoding, out var compression))
 				{
-					context.Response.WriteTo(to => compression(to));
+					context.Response.OutputStream = compression(context.Response.OutputStream);
 					context.Response.RemoveHeader(HttpHeaders.ContentEncoding);
 					context.Response.AddHeader(HttpHeaders.ContentEncoding, encoding);
 
