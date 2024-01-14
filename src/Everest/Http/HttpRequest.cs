@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Everest.Http
 {
-    public class HttpRequest
+	public class HttpRequest
 	{
 		public ILogger<HttpRequest> Logger { get; }
 
@@ -35,8 +35,6 @@ namespace Everest.Http
 
 		public ParameterCollection PathParameters { get; set; }
 
-		private MemoryStream inputStream;
-
 		private readonly HttpListenerRequest request;
 
 		public HttpRequest(HttpListenerRequest request, ILogger<HttpRequest> logger)
@@ -51,53 +49,57 @@ namespace Everest.Http
 		public bool HasHeader(string name) => request.Headers[name] != null;
 
 		/*https://learn.microsoft.com/en-us/dotnet/api/system.net.httplistenerrequest.inputstream?view=net-7.0*/
-		public async Task<byte[]> ReadBodyAsync()
+		public async Task<byte[]> ReadRequestBodyAsync()
 		{
 			if (!request.HasEntityBody)
 				return Array.Empty<byte>();
 
-			if (inputStream == null)
+			if (request.InputStream.CanSeek)
 			{
-				inputStream = new MemoryStream();
-
-				if (request.InputStream.CanSeek)
-				{
-					request.InputStream.Position = 0;
-				}
-
-				var buffer = new byte[4096];
-				int read;
-
-				while ((read = await request.InputStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
-				{
-					await inputStream.WriteAsync(buffer, 0, read);
-				}
+				request.InputStream.Position = 0;
 			}
 
-			return inputStream.GetBuffer();
+			var buffer = new byte[4096];
+			using (var ms = new MemoryStream())
+			{
+				try
+				{
+					int read;
+					while ((read = await request.InputStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+					{
+						ms.Write(buffer, 0, read);
+					}
+
+					return ms.ToArray();
+				}
+				finally
+				{
+					ms.Close();			
+				}
+			}
 		}
 	}
 
 	public static class HttpRequestExtensions
 	{
-		public static async Task<string> ReadTextAsync(this HttpRequest request)
+		public static async Task<string> ReadRequestBodyAsTextAsync(this HttpRequest request)
 		{
-			var data = await request.ReadBodyAsync();
+			var data = await request.ReadRequestBodyAsync();
 			return request.ContentEncoding.GetString(data);
 		}
 
-		public static async Task<T> ReadJsonAsync<T>(this HttpRequest request, JsonSerializerOptions options = null)
+		public static async Task<T> ReadRequestBodyAsJsonAsync<T>(this HttpRequest request, JsonSerializerOptions options = null)
 		{
-			var data = await request.ReadBodyAsync();
+			var data = await request.ReadRequestBodyAsync();
 
 			return options == null ?
 				JsonSerializer.Deserialize<T>(data) :
 				JsonSerializer.Deserialize<T>(data, options);
 		}
 
-		public static async Task<NameValueCollection> ReadFormAsync(this HttpRequest request)
+		public static async Task<NameValueCollection> ReadRequestBodyAsFormAsync(this HttpRequest request)
 		{
-			var data = await request.ReadBodyAsync();
+			var data = await request.ReadRequestBodyAsync();
 			var content = request.ContentEncoding.GetString(data);
 			return HttpUtility.ParseQueryString(content, request.ContentEncoding);
 		}

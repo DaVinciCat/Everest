@@ -23,22 +23,25 @@ namespace Everest.Cors
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 		
-		public Task<bool> TryHandleCorsRequestAsync(HttpContext context)
+		public async Task<bool> TryHandleCorsRequestAsync(HttpContext context)
 		{
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
 
+			if(context.Response.ResponseSent)
+				return false;
+
 			if (!context.Request.IsCorsPreflightRequest())
 			{
 				Logger.LogWarning($"{context.TraceIdentifier} - Not a CORS preflight request");
-				return Task.FromResult(false);
+				return false;
 			}
 			
 			var origin = context.Request.Headers[HttpHeaders.Origin];
 			if (origin == null)
 			{
 				Logger.LogWarning($"{context.TraceIdentifier} - Failed to handle CORS preflight request. Missing header: {new { Header = HttpHeaders.Origin }}");
-				return Task.FromResult(true);
+				return false;
 			}
 
 			Logger.LogTrace($"{context.TraceIdentifier} - Try to match CORS policy: {new { Request = context.Request.Description, Origin = origin, Policies = Policies.Select(p => p.Origin).ToReadableArray() }}");
@@ -60,9 +63,8 @@ namespace Everest.Cors
 				Logger.LogWarning($"{context.TraceIdentifier} - Failed to match CORS policy. Request contains no supported policy: {new { Origin = origin, Policies = Policies.Select(p => p.Origin).ToReadableArray() }}");
 			}
 
-			context.Response.StatusCode = HttpStatusCode.NoContent;
-			context.Response.InputStream.SetLength(0);
-			return Task.FromResult(true);
+			await context.Response.SendStatusResponseAsync(HttpStatusCode.NoContent);
+			return true;
 		}
 
 		#region Headers

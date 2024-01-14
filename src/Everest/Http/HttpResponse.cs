@@ -19,8 +19,6 @@ namespace Everest.Http
 
 		public bool ResponseSent { get; private set; }
 
-		public bool ResponseClosed { get; private set; }
-
 		public bool SendChunked
 		{
 			get => response.SendChunked;
@@ -28,13 +26,11 @@ namespace Everest.Http
 		}
 
 		///*https://learn.microsoft.com/ru-ru/dotnet/api/system.net.httplistenerresponse.contentlength64?view=net-7.0*/
-		//public long ContentLength64
-		//{
-		//	get => response.ContentLength64;
-		//	set => response.ContentLength64 = value;
-		//}
-
-		public long ContentLength => InputStream.Length;
+		public long ContentLength64
+		{
+			get => response.ContentLength64;
+			set => response.ContentLength64 = value;
+		}
 
 		public bool KeepAlive
 		{
@@ -82,43 +78,8 @@ namespace Everest.Http
 			}
 		}
 
-		public Stream InputStream
-		{
-			get => inputStream;
-			set
-			{
-				if (value == null)
-					throw new ArgumentNullException("Input stream cannot be null");
+		public Stream OutputStream => response.OutputStream;
 
-				if (!value.CanRead)
-				{
-					throw new InvalidOperationException("Input stream is not readable");
-				}
-
-				inputStream = value;
-			}
-		}
-
-		public Stream OutputStream
-		{
-			get => outputStream;
-			set
-			{
-				if (value == null)
-					throw new ArgumentNullException("Output stream cannot be null");
-
-				if (!value.CanWrite)
-				{
-					throw new InvalidOperationException("Output stream is not writable");
-				}
-
-				outputStream = value;
-			}
-		}
-
-		private Stream inputStream;
-
-		private Stream outputStream;
 
 		private readonly HttpListenerResponse response;
 
@@ -129,14 +90,14 @@ namespace Everest.Http
 			this.response = response ?? throw new ArgumentNullException(nameof(response));
 			this.request = request ?? throw new ArgumentNullException(nameof(request));
 
-			InputStream = new MemoryStream();
-			OutputStream = response.OutputStream;
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			StatusCode = HttpStatusCode.OK;
 			ContentEncoding = Encoding.UTF8;
 
 			AppendHeader(HttpHeaders.Server, "Everest");
 		}
+
+		public void SetCookie(Cookie cookie) => response.SetCookie(cookie);
 
 		public bool HasHeader(string name) => response.Headers[name] != null;
 
@@ -146,99 +107,159 @@ namespace Everest.Http
 
 		public void RemoveHeader(string name) => response.Headers.Remove(name);
 
+		public void CloseResponse() => response.Close();
+
 		public async Task RedirectAsync(string url)
 		{
 			response.Redirect(url);
 			await Task.CompletedTask;
 		}
 
-		public async Task SendAsync()
+		public Func<HttpResponse, byte[], Task> ResponseContentWriter { get; set; } = async (response, content) =>
 		{
+			response.ContentLength64 = content.Length;
+			await response.OutputStream.WriteAsync(content, 0, content.Length);
+		};
+
+		public Func<HttpResponse, Stream, Task> ResponseStreamWriter { get; set; } = async (response, stream) =>
+		{
+			response.ContentLength64 = stream.Length;
+
+			if (stream.CanSeek)
+			{
+				stream.Position = 0;
+			}
+
+			var buffer = new byte[4096];
+			int read;
+
+			while ((read = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+			{
+				await response.OutputStream.WriteAsync(buffer, 0, read);
+			}
+		};
+
+		public Task SendEmptyResponseAsync()
+		{
+			Logger.LogTrace($"{TraceIdentifier} - Sending response: {new { RemoteEndPoint = request.RemoteEndPoint, ContentLength = ContentLength64.ToReadableSize(), StatusCode = response.StatusCode, ContentType = response.ContentType, ContentEncoding = response.ContentEncoding?.EncodingName }}");
+
+			if (!OutputStream.CanWrite)
+			{
+				throw new InvalidOperationException("Output stream is not writable");
+			}
+
 			try
 			{
-				try
-				{
-					Logger.LogTrace($"{TraceIdentifier} - Sending response: {new { RemoteEndPoint = request.RemoteEndPoint, ContentLength = ContentLength.ToReadableSize(), StatusCode = response.StatusCode, ContentType = response.ContentType, ContentEncoding = response.ContentEncoding?.EncodingName }}");
-
-					if (InputStream.CanSeek)
-					{
-						InputStream.Position = 0;
-					}
-
-					var buffer = new byte[4096];
-					int read;
-
-					while ((read = await InputStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
-					{
-						await OutputStream.WriteAsync(buffer, 0, read);
-					}
-				}
-				catch
-				{
-					StatusCode = HttpStatusCode.InternalServerError;
-					throw;
-				}
-				finally
-				{
-
-#if NET5_0_OR_GREATER
-					await InputStream.DisposeAsync();
-					await OutputStream.DisposeAsync();
-#else
-            		InputStream.Dispose();
-            		OutputStream.Dispose();
-
-           			await Task.CompletedTask;
-#endif
-					ResponseSent = true;
-					Logger.LogTrace($"{TraceIdentifier} - Response sent");
-				}
+				OutputStream.Close();
 			}
 			finally
 			{
-				Logger.LogTrace($"{TraceIdentifier} - Closing response");
+				ResponseSent = true;
 				response.Close();
-				ResponseClosed = true;
-				Logger.LogTrace($"{TraceIdentifier} - Response closed");
+
+				Logger.LogTrace($"{TraceIdentifier} - Response sent");
+			}
+
+			return Task.CompletedTask;
+		}
+
+		public Task SendStatusResponseAsync(HttpStatusCode code)
+		{
+			Logger.LogTrace($"{TraceIdentifier} - Sending response: {new { RemoteEndPoint = request.RemoteEndPoint, ContentLength = ContentLength64.ToReadableSize(), StatusCode = response.StatusCode, ContentType = response.ContentType, ContentEncoding = response.ContentEncoding?.EncodingName }}");
+
+			if (!OutputStream.CanWrite)
+			{
+				throw new InvalidOperationException("Output stream is not writable");
+			}
+
+			try
+			{
+				StatusCode = code;
+				OutputStream.Close();
+			}
+			finally
+			{
+				ResponseSent = true;
+				response.Close();
+
+				Logger.LogTrace($"{TraceIdentifier} - Response sent");
+			}
+
+			return Task.CompletedTask;
+		}
+
+		public async Task SendResponseAsync(byte[] content)
+		{
+			if (content == null)
+				throw new ArgumentNullException(nameof(content));
+
+
+			if (!OutputStream.CanWrite)
+			{
+				throw new InvalidOperationException("Output stream is not writable");
+			}
+
+			Logger.LogTrace($"{TraceIdentifier} - Sending response: {new { RemoteEndPoint = request.RemoteEndPoint, ContentLength = content.ToReadableSize(), StatusCode = response.StatusCode, ContentType = response.ContentType, ContentEncoding = response.ContentEncoding?.EncodingName }}");
+
+			try
+			{
+				await ResponseContentWriter(this, content);
+				response.OutputStream.Close();
+			}
+			catch
+			{
+				StatusCode = HttpStatusCode.InternalServerError;
+				throw;
+			}
+			finally
+			{
+				ResponseSent = true;
+				response.Close();
+
+				Logger.LogTrace($"{TraceIdentifier} - Response sent");
+			}
+		}
+
+		public async Task SendResponseAsync(Stream stream)
+		{
+			if (stream == null)
+				throw new ArgumentNullException(nameof(stream));
+
+			if (!stream.CanRead)
+			{
+				throw new InvalidOperationException("Input stream is not readable");
+			}
+
+			if (!OutputStream.CanWrite)
+			{
+				throw new InvalidOperationException("Output stream is not writable");
+			}
+
+			Logger.LogTrace($"{TraceIdentifier} - Sending response: {new { RemoteEndPoint = request.RemoteEndPoint, ContentLength = stream.Length.ToReadableSize(), StatusCode = response.StatusCode, ContentType = response.ContentType, ContentEncoding = response.ContentEncoding?.EncodingName }}");
+
+			try
+			{
+				await ResponseStreamWriter(this, stream);
+				response.OutputStream.Close();
+			}
+			catch
+			{
+				StatusCode = HttpStatusCode.InternalServerError;
+				throw;
+			}
+			finally
+			{
+				ResponseSent = true;
+				response.Close();
+
+				Logger.LogTrace($"{TraceIdentifier} - Response sent");
 			}
 		}
 	}
 
 	public static class HttpResponseExtensions
 	{
-		public static async Task WriteAsync(this HttpResponse response, byte[] content)
-		{
-			if (content == null)
-				throw new ArgumentNullException(nameof(content));
-
-			await response.InputStream.WriteAsync(content, 0, content.Length);
-		}
-
-		public static async Task WriteAsync(this HttpResponse response, string content)
-		{
-			if (response == null)
-				throw new ArgumentNullException(nameof(response));
-
-			if (content == null)
-				throw new ArgumentNullException(nameof(content));
-
-			var bytes = response.ContentEncoding.GetBytes(content);
-			await response.WriteAsync(bytes);
-		}
-
-		public static async Task WriteTextAsync(this HttpResponse response, string content)
-		{
-			if (response == null)
-				throw new ArgumentNullException(nameof(response));
-
-			if (content == null)
-				throw new ArgumentNullException(nameof(content));
-
-			response.ContentType = "text/plain";
-			await response.WriteAsync(content);
-		}
-
-		public static async Task WriteHtmlAsync(this HttpResponse response, string content)
+		public static async Task SendHtmlResponseAsync(this HttpResponse response, string content)
 		{
 			if (response == null)
 				throw new ArgumentNullException(nameof(response));
@@ -247,10 +268,11 @@ namespace Everest.Http
 				throw new ArgumentNullException(nameof(content));
 
 			response.ContentType = "text/html";
-			await response.WriteAsync(content);
+			var bytes = response.ContentEncoding.GetBytes(content);
+			await response.SendResponseAsync(bytes);
 		}
 
-		public static async Task WriteJsonAsync<T>(this HttpResponse response, T content, JsonSerializerOptions options = null)
+		public static async Task SendTextResponseAsync(this HttpResponse response, string content)
 		{
 			if (response == null)
 				throw new ArgumentNullException(nameof(response));
@@ -258,15 +280,41 @@ namespace Everest.Http
 			if (content == null)
 				throw new ArgumentNullException(nameof(content));
 
-			var json = options == null ?
-				JsonSerializer.Serialize(content) :
-				JsonSerializer.Serialize(content, options);
-
-			response.ContentType = "application/json";
-			await response.WriteAsync(json);
+			response.ContentType = "text/plain";
+			var bytes = response.ContentEncoding.GetBytes(content);
+			await response.SendResponseAsync(bytes);
 		}
 
-		public static Task WriteFileAsync(this HttpResponse response, string filename, ContentType contentType, ContentDisposition contentDisposition)
+		public static async Task SendJsonResponseAsync<T>(this HttpResponse response, T content, JsonSerializerOptions options = null)
+		{
+			if (response == null)
+				throw new ArgumentNullException(nameof(response));
+
+			if (content == null)
+				throw new ArgumentNullException(nameof(content));
+
+			try
+			{
+				var json = options == null ?
+											JsonSerializer.Serialize(content) :
+											JsonSerializer.Serialize(content, options);
+
+				response.ContentType = "application/json";
+				var bytes = response.ContentEncoding.GetBytes(json);
+				await response.SendResponseAsync(bytes);
+			}
+			catch
+			{
+				response.StatusCode = HttpStatusCode.InternalServerError;
+				throw;
+			}
+			finally
+			{
+				response.CloseResponse();
+			}
+		}
+
+		public static async Task SendFileResponseAsync(this HttpResponse response, string filename, ContentType contentType, ContentDisposition contentDisposition)
 		{
 			if (response == null)
 				throw new ArgumentNullException(nameof(response));
@@ -280,16 +328,35 @@ namespace Everest.Http
 			if (contentDisposition == null)
 				throw new ArgumentNullException(nameof(contentDisposition));
 
-			var file = new FileInfo(filename);
-			var fs = file.OpenRead();
-			response.ContentType = contentType.MediaType;
-			response.ContentDisposition = contentDisposition.DispositionType;
-			response.InputStream = fs;
-
-			return Task.CompletedTask;
+			try
+			{
+				var file = new FileInfo(filename);
+				using (var fs = file.OpenRead())
+				{
+					try
+					{
+						response.ContentType = contentType.MediaType;
+						response.ContentDisposition = contentDisposition.DispositionType;
+						await response.SendResponseAsync(fs);
+					}
+					finally
+					{
+						fs.Close();
+					}
+				}
+			}
+			catch
+			{
+				response.StatusCode = HttpStatusCode.InternalServerError;
+				throw;
+			}
+			finally
+			{
+				response.CloseResponse();
+			}
 		}
 
-		public static Task WriteFileAsync(this HttpResponse response, string filename, string contentType, string contentDisposition)
+		public static async Task SendFileResponseAsync(this HttpResponse response, string filename, string contentType, string contentDisposition)
 		{
 			if (response == null)
 				throw new ArgumentNullException(nameof(response));
@@ -303,13 +370,32 @@ namespace Everest.Http
 			if (contentDisposition == null)
 				throw new ArgumentNullException(nameof(contentDisposition));
 
-			var file = new FileInfo(filename);
-			var fs = file.OpenRead();
-			response.ContentType = contentType;
-			response.ContentDisposition = contentDisposition;
-			response.InputStream = fs;
-
-			return Task.CompletedTask;
+			try
+			{
+				var file = new FileInfo(filename);
+				using (var fs = file.OpenRead())
+				{
+					try
+					{
+						response.ContentType = contentType;
+						response.ContentDisposition = contentDisposition;
+						await response.SendResponseAsync(fs);
+					}
+					finally
+					{
+						fs.Close();
+					}
+				}
+			}
+			catch
+			{
+				response.StatusCode = HttpStatusCode.InternalServerError;
+				throw;
+			}
+			finally
+			{
+				response.CloseResponse();
+			}
 		}
 	}
 }

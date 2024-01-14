@@ -208,7 +208,7 @@ namespace Everest.Rest
 				{
 					if (!context.Response.ResponseSent)
 					{
-						await context.Response.SendAsync();
+						await context.Response.SendEmptyResponseAsync();
 					}
 
 					if (!exceptionWasThrown)

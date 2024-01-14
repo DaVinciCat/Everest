@@ -17,9 +17,9 @@ namespace Everest.Routing
 		public string[] Delimiters { get; set; } = { "/" };
 
 		public RouteDescriptor[] Routes => methods.SelectMany(kvp => kvp.Value.Routes).ToArray();
-		
+
 		public RouteSegmentParserCollection SegmentParsers { get; } = new RouteSegmentParserCollection
-        {
+		{
 			{ AlphaNumericRouteSegmentParser.SegmentPattern, segment => new AlphaNumericRouteSegmentParser(segment) },
 			{ StringParameterRouteSegmentParser.SegmentPattern, segment => new StringParameterRouteSegmentParser(segment)},
 			{ IntParameterRouteSegmentParser.SegmentPattern, segment => new IntParameterRouteSegmentParser(segment)},
@@ -36,7 +36,7 @@ namespace Everest.Routing
 		{
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
-		
+
 		public void RegisterRoute(RouteDescriptor descriptor)
 		{
 			if (descriptor == null)
@@ -98,10 +98,12 @@ namespace Everest.Routing
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
 
-			context.Response.KeepAlive = false;
-			context.Response.StatusCode = HttpStatusCode.NotFound;
-			context.Response.InputStream.SetLength(0);
-			await context.Response.WriteTextAsync($"Requested route not found: {context.Request.Description}");
+			if (!context.Response.ResponseSent)
+			{
+				context.Response.KeepAlive = false;
+				context.Response.StatusCode = HttpStatusCode.NotFound;
+				await context.Response.SendTextResponseAsync($"Requested route not found: {context.Request.Description}");
+			}
 		};
 
 		#region Trie

@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Everest.Exceptions
 {
-    public class ExceptionHandler : IExceptionHandler
+	public class ExceptionHandler : IExceptionHandler
 	{
 		public ILogger<ExceptionHandler> Logger { get; }
 
@@ -31,14 +31,16 @@ namespace Everest.Exceptions
 		{
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
-			
-			if (ex == null) 
+
+			if (ex == null)
 				throw new ArgumentNullException(nameof(ex));
 
-			context.Response.KeepAlive = false;
-			context.Response.StatusCode = HttpStatusCode.InternalServerError;
-			context.Response.InputStream.SetLength(0);
-			await context.Response.WriteTextAsync($"Failed to process request: {context.Request.Description}{Environment.NewLine}{ex}");
+			if (!context.Response.ResponseSent)
+			{
+				context.Response.KeepAlive = false;
+				context.Response.StatusCode = HttpStatusCode.InternalServerError;
+				await context.Response.SendTextResponseAsync($"Failed to process request: {context.Request.Description}{Environment.NewLine}{ex}");
+			}
 		};
 	}
 }

@@ -16,6 +16,9 @@ namespace Everest.Mime
 
         public bool Has(string mediaType)
         {
+            if (string.IsNullOrEmpty(mediaType))
+                return false;
+                
             return contentTypes.ContainsKey(mediaType);
         }
 

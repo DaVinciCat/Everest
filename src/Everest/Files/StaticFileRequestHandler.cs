@@ -17,7 +17,7 @@ namespace Everest.Files
 		#endregion
 
 		#region Files
-		
+
 		private readonly IStaticFilesProvider staticFilesProvider;
 
 		#endregion
@@ -42,11 +42,11 @@ namespace Everest.Files
 		#endregion
 
 		#region Handle
-		
-        public async Task<bool> TryServeStaticFileAsync(HttpContext context)
-        {
-            var filePath = context.Request.RequestPathToFilePath();
-            if (!staticFilesProvider.TryGetFile(filePath, out var file))
+
+		public async Task<bool> TryServeStaticFileAsync(HttpContext context)
+		{
+			var filePath = context.Request.RequestPathToFilePath();
+			if (!staticFilesProvider.TryGetFile(filePath, out var file))
 			{
 				Logger.LogWarning($"{context.TraceIdentifier} - Failed to serve file. Requested file not found: {new { RequestPath = context.Request.Path, Request = context.Request.Description }}");
 				await OnFileNotFoundAsync(context);
@@ -66,7 +66,7 @@ namespace Everest.Files
 				Logger.LogWarning($"{context.TraceIdentifier} - Unsupported mime type: {new { FileExtension = file.Extension }}");
 				mimeType = new MimeType(file.Extension, UnknownContentType, true);
 			}
-			
+
 			var descriptor = new StaticFileDescriptor(file, mimeType);
 			var result = await OnServeFileAsync(context, descriptor);
 
@@ -79,15 +79,17 @@ namespace Everest.Files
 			return false;
 		}
 
-        public Func<HttpContext, Task> OnFileNotFoundAsync { get; set; } = async context =>
+		public Func<HttpContext, Task> OnFileNotFoundAsync { get; set; } = async context =>
 		{
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
 
-			context.Response.KeepAlive = false;
-			context.Response.StatusCode = HttpStatusCode.NotFound;
-			context.Response.InputStream.SetLength(0);
-			await context.Response.WriteTextAsync($"Requested file not found: {context.Request.Description}");
+			if (!context.Response.ResponseSent)
+			{
+				context.Response.KeepAlive = false;
+				context.Response.StatusCode = HttpStatusCode.NotFound;
+				await context.Response.SendTextResponseAsync($"Requested file not found: {context.Request.Description}");
+			}
 		};
 
 		public Func<HttpContext, StaticFileDescriptor, Task<bool>> OnServeFileAsync { get; set; } = async (context, descriptor) =>
@@ -97,11 +99,14 @@ namespace Everest.Files
 
 			if (descriptor == null)
 				throw new ArgumentNullException(nameof(descriptor));
-			
-			await context.Response.WriteFileAsync(descriptor.FileInfo.FullName, descriptor.MimeType.ContentType.MediaType, descriptor.MimeType.ContentDisposition.DispositionType);
-            context.Response.StatusCode = HttpStatusCode.OK;
 
-            return true;
+			if (!context.Response.ResponseSent)
+			{
+				context.Response.StatusCode = HttpStatusCode.OK;
+				await context.Response.SendFileResponseAsync(descriptor.FileInfo.FullName, descriptor.MimeType.ContentType.MediaType, descriptor.MimeType.ContentDisposition.DispositionType);
+			}
+			
+			return true;
 		};
 
 		#endregion

@@ -73,13 +73,12 @@ namespace Everest.Shell
         //          await context.Response.WriteTextAsync($"p:{p}");
         //      }
 
-        //[HttpGet("/get/route-with-path-parameter-of-type-int-p/{p:int}")]
-        //public static async Task GetRouteWithPathParameterOfTypeIntP(HttpContext context)
-        //{
-        //	var p = context.Request.PathParameters.GetParameterValue<int>("p");
-        //          await context.Response.WriteTextAsync("route-with-path-parameter-of-type-int-p/{p:int}\n");
-        //          await context.Response.WriteTextAsync($"p:{p}");
-        //      }
+        [HttpGet("/get/route-with-path-parameter-of-type-int-p/{p:int}")]
+        public static async Task GetRouteWithPathParameterOfTypeIntP(HttpContext context)
+        {
+            var p = context.Request.PathParameters.GetParameterValue<int>("p");
+            await context.Response.SendTextResponseAsync($"route-with-path-parameter-of-type-int-p/{p:int}{Environment.NewLine}p:{p}");
+        }
 
         //      [HttpGet("/get/route-with-path-parameter-of-type-guid-p/{p:guid}")]
         //      public static async Task GetRouteWithPathParameterOfTypeGuidP(HttpContext context)
@@ -125,13 +124,12 @@ namespace Everest.Shell
         //	throw new InvalidOperationException("something went wrong ;(");
         //}
 
-        //[HttpGet("/get/request-with-text-payload")]
-        //public static async Task GetRequestWithTextPayload(HttpContext context)
-        //{
-        //	var payload = await context.Request.ReadTextAsync();
-        //          await context.Response.WriteTextAsync("request-with-text-payload\n");
-        //          await context.Response.WriteTextAsync($"payload:{payload}");
-        //      }
+        [HttpPost("/get/request-with-text-payload")]
+        public static async Task GetRequestWithTextPayload(HttpContext context)
+        {
+            var payload = await context.Request.ReadRequestBodyAsTextAsync();
+            await context.Response.SendTextResponseAsync($"request-with-text-payload{Environment.NewLine}payload:{payload}");
+        }
 
         //[HttpGet("/get/request-with-json-payload")]
         //public static async Task GetRequestWithJsonPayload(HttpContext context)
@@ -162,7 +160,7 @@ namespace Everest.Shell
             var greetings = service.Greet();
 
             context.Request.PathParameters.TryGetParameterValue<string>("to", out var to);
-            await context.Response.WriteJsonAsync(new { Message = greetings, From = "Everest", To = to, Success = true });
+            await context.Response.SendJsonResponseAsync(new { Message = greetings, From = "Everest", To = to, Success = true });
         }
 
         [HttpGet("/get/open-api-example/{id:guid}/{name:string}/{value:int}")]

@@ -16,16 +16,16 @@ namespace Everest.Compression
 
         public override async Task InvokeAsync(HttpContext context)
         {
-	        if (context == null) 
-		        throw new ArgumentNullException(nameof(context));
+            if (context == null)
+                throw new ArgumentNullException(nameof(context));
 
-	        if (HasNext)
-		        await Next.InvokeAsync(context);
+            if (!context.Response.ResponseSent && context.Request.SupportsContentCompression())
+            {
+                await responseCompressor.TryCompressResponseAsync(context);
+            }
 
-	        if (!context.Response.ResponseSent && context.Request.SupportsContentCompression())
-	        {
-		        await responseCompressor.TryCompressResponseAsync(context);
-	        }
+            if (HasNext)
+                await Next.InvokeAsync(context);
         }
     }
 }

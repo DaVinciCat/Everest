@@ -5,10 +5,11 @@ using System.IO.Compression;
 using System.Threading.Tasks;
 using Everest.Mime;
 using Everest.Utils;
+using System.IO;
 
 namespace Everest.Compression
 {
-    public class ResponseCompressor : IResponseCompressor
+	public class ResponseCompressor : IResponseCompressor
 	{
 		public ILogger<ResponseCompressor> Logger { get; }
 
@@ -31,10 +32,10 @@ namespace Everest.Compression
 
 		public CompressorCollection Compressors { get; } = new CompressorCollection
 		{
-			{ "gzip", input => new GZipStream(input, CompressionLevel.Fastest) },
-			{ "deflate", input => new DeflateStream(input, CompressionLevel.Fastest) },
+			{ "gzip", output => new GZipStream(output, CompressionLevel.Fastest, true) },
+			{ "deflate", output => new DeflateStream(output, CompressionLevel.Fastest, true) },
 #if NET5_0_OR_GREATER
-			{ "brotli", input => new BrotliStream(input, CompressionLevel.Fastest) },
+			{ "brotli", output => new BrotliStream(output, CompressionLevel.Fastest, true) },
 #endif
         };
 
@@ -47,16 +48,6 @@ namespace Everest.Compression
 		{
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
-
-			if (context.Response.ContentLength < CompressionMinLength)
-			{
-				return Task.FromResult(false);
-			}
-
-			if (!MediaTypes.Has(context.Response.ContentType))
-			{
-				return Task.FromResult(false);
-			}
 
 			//TODO: super naive implementation, should replace it with q values support
 			var acceptEncoding = context.Request.Headers[HttpHeaders.AcceptEncoding];
@@ -79,9 +70,76 @@ namespace Everest.Compression
 			{
 				if (Compressors.TryGet(encoding, out var compression))
 				{
-					context.Response.OutputStream = compression(context.Response.OutputStream);
-					context.Response.RemoveHeader(HttpHeaders.ContentEncoding);
-					context.Response.AddHeader(HttpHeaders.ContentEncoding, encoding);
+					context.Response.ResponseContentWriter = async (response, content) =>
+					{
+						Stream output;
+						var shouldClose = false;
+						if (content.Length >= CompressionMinLength && MediaTypes.Has(context.Response.ContentType))
+						{
+							output = compression(response.OutputStream);
+							shouldClose = true;
+
+							context.Response.RemoveHeader(HttpHeaders.ContentEncoding);
+							context.Response.AddHeader(HttpHeaders.ContentEncoding, encoding);
+						}
+						else
+						{
+							output = context.Response.OutputStream;
+						}
+
+						try
+						{
+							await output.WriteAsync(content, 0, content.Length);
+						}
+						finally
+						{
+							if (shouldClose)
+							{
+								output.Close();
+							}
+						}
+					};
+
+					context.Response.ResponseStreamWriter = async (response, stream) =>
+					{
+						if (stream.CanSeek)
+						{
+							stream.Position = 0;
+						}
+
+						Stream output;
+						var shouldClose = false;
+						if (stream.Length >= CompressionMinLength && MediaTypes.Has(context.Response.ContentType))
+						{
+							output = compression(response.OutputStream);
+							shouldClose = true;
+
+							context.Response.RemoveHeader(HttpHeaders.ContentEncoding);
+							context.Response.AddHeader(HttpHeaders.ContentEncoding, encoding);
+						}
+						else
+						{
+							output = context.Response.OutputStream;
+						}
+
+						try
+						{
+							var buffer = new byte[4096];
+							int read;
+
+							while ((read = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+							{
+								await output.WriteAsync(buffer, 0, read);
+							}
+						}
+						finally
+						{
+							if (shouldClose)
+							{
+								output.Close();
+							}
+						}
+					};
 
 					Logger.LogTrace($"{context.TraceIdentifier} - Successfully created response compression stream: {new { Encoding = encoding }}");
 					return Task.FromResult(true);
