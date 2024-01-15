@@ -15,6 +15,9 @@ namespace Everest.Cors
 
         public bool Has(string origin)
         {
+            if (origin == null)
+                return false;
+
             return policies.ContainsKey(origin);
         }
 

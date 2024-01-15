@@ -16,6 +16,9 @@ namespace Everest.Routing
 
         public bool Has(string pattern)
         {
+            if (pattern == null)
+                return false;
+
             return parsers.ContainsKey(pattern);
         }
 

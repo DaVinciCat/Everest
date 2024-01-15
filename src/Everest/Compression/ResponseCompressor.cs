@@ -53,101 +53,128 @@ namespace Everest.Compression
 			var acceptEncoding = context.Request.Headers[HttpHeaders.AcceptEncoding];
 			if (acceptEncoding == null)
 			{
-				Logger.LogWarning($"{context.TraceIdentifier} - Failed to compress response. Missing header: {new { Header = HttpHeaders.AcceptEncoding }}");
 				return Task.FromResult(false);
 			}
 
 			var encodings = acceptEncoding.Split(',');
 			if (encodings.Length == 0)
 			{
-				Logger.LogWarning($"{context.TraceIdentifier} - Failed to compress response. Empty header: {new { Header = HttpHeaders.AcceptEncoding }}");
 				return Task.FromResult(false);
 			}
 
-			Logger.LogTrace($"{context.TraceIdentifier} - Try to create response compression stream: {new { AcceptEncodings = encodings.ToReadableArray(), SupportedEncodings = Compressors.ToReadableArray() }}");
+			Logger.LogTrace($"{context.TraceIdentifier} - Try to set compressing response writer: {new { AcceptEncodings = encodings.ToReadableArray(), SupportedEncodings = Compressors.ToReadableArray() }}");
 
 			foreach (var encoding in encodings)
 			{
 				if (Compressors.TryGet(encoding, out var compression))
-				{
-					context.Response.ResponseContentWriter = async (response, content) =>
-					{
-						Stream output;
-						var shouldClose = false;
-						if (content.Length >= CompressionMinLength && MediaTypes.Has(context.Response.ContentType))
-						{
-							output = compression(response.OutputStream);
-							shouldClose = true;
+                {
+                    context.Response.ResponseWriter = new CompressingResponseWriter(context.Response, MediaTypes, compression, encoding, CompressionMinLength);
 
-							context.Response.RemoveHeader(HttpHeaders.ContentEncoding);
-							context.Response.AddHeader(HttpHeaders.ContentEncoding, encoding);
-						}
-						else
-						{
-							output = context.Response.OutputStream;
-						}
-
-						try
-						{
-							await output.WriteAsync(content, 0, content.Length);
-						}
-						finally
-						{
-							if (shouldClose)
-							{
-								output.Close();
-							}
-						}
-					};
-
-					context.Response.ResponseStreamWriter = async (response, stream) =>
-					{
-						if (stream.CanSeek)
-						{
-							stream.Position = 0;
-						}
-
-						Stream output;
-						var shouldClose = false;
-						if (stream.Length >= CompressionMinLength && MediaTypes.Has(context.Response.ContentType))
-						{
-							output = compression(response.OutputStream);
-							shouldClose = true;
-
-							context.Response.RemoveHeader(HttpHeaders.ContentEncoding);
-							context.Response.AddHeader(HttpHeaders.ContentEncoding, encoding);
-						}
-						else
-						{
-							output = context.Response.OutputStream;
-						}
-
-						try
-						{
-							var buffer = new byte[4096];
-							int read;
-
-							while ((read = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
-							{
-								await output.WriteAsync(buffer, 0, read);
-							}
-						}
-						finally
-						{
-							if (shouldClose)
-							{
-								output.Close();
-							}
-						}
-					};
-
-					Logger.LogTrace($"{context.TraceIdentifier} - Successfully created response compression stream: {new { Encoding = encoding }}");
-					return Task.FromResult(true);
+                    Logger.LogTrace($"{context.TraceIdentifier} - Successfully set compressing response writer: {new { Encoding = encoding }}");
+                    return Task.FromResult(true);
 				}
 			}
 
-			Logger.LogWarning($"{context.TraceIdentifier} - Failed to create response compression stream. Header contains no supported encodings: {new { Header = HttpHeaders.AcceptEncoding, Encodings = encodings.ToReadableArray(), SupportedEncodings = Compressors.ToReadableArray() }}");
+			Logger.LogWarning($"{context.TraceIdentifier} - Failed to set compressing response writer. Header contains no supported encodings: {new { Header = HttpHeaders.AcceptEncoding, Encodings = encodings.ToReadableArray(), SupportedEncodings = Compressors.ToReadableArray() }}");
 			return Task.FromResult(false);
 		}
-	}
+
+		private class CompressingResponseWriter : HttpResponseWriter
+        {
+            private readonly HttpResponse response;
+
+            private readonly ContentTypeCollection mediaTypes;
+
+            private readonly Func<Stream, Stream> compression;
+
+            private readonly string encoding;
+            
+            private readonly int compressionMinLength;
+
+            public CompressingResponseWriter(HttpResponse response, ContentTypeCollection mediaTypes, Func<Stream, Stream> compression, string encoding, int compressionMinLength)
+                : base(response)
+            {
+                this.response = response;
+                this.mediaTypes = mediaTypes;
+                this.compression = compression;
+                this.encoding = encoding;
+                this.compressionMinLength = compressionMinLength;
+            }
+
+            public override async Task Write(byte[] content)
+            {
+                Stream output;
+                var shouldClose = false;
+                if (content.Length >= compressionMinLength && mediaTypes.Has(response.ContentType))
+                {
+                    output = compression(response.OutputStream);
+                    shouldClose = true;
+
+                    response.RemoveHeader(HttpHeaders.ContentEncoding);
+                    response.AddHeader(HttpHeaders.ContentEncoding, encoding);
+
+                    response.Logger.LogTrace($"{response.TraceIdentifier} - Response successfully compressed: {new { Encoding = encoding }}");
+                }
+                else
+                {
+                    output = response.OutputStream;
+                }
+
+                try
+                {
+                    await output.WriteAsync(content, 0, content.Length);
+                }
+                finally
+                {
+                    if (shouldClose)
+                    {
+                        output.Close();
+                    }
+                }
+            }
+
+            public override async Task Write(Stream stream)
+            {
+                if (stream.CanSeek)
+                {
+                    stream.Position = 0;
+                }
+
+                Stream output;
+                var shouldClose = false;
+                if (stream.Length >= compressionMinLength && mediaTypes.Has(response.ContentType))
+                {
+                    output = compression(response.OutputStream);
+                    shouldClose = true;
+
+                    response.RemoveHeader(HttpHeaders.ContentEncoding);
+                    response.AddHeader(HttpHeaders.ContentEncoding, encoding);
+                }
+                else
+                {
+                    output = response.OutputStream;
+                }
+
+                try
+                {
+                    var buffer = new byte[4096];
+                    int read;
+
+                    while ((read = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                    {
+                        await output.WriteAsync(buffer, 0, read);
+                    }
+
+                    response.Logger.LogTrace($"{response.TraceIdentifier} - Response successfully compressed: {new { Encoding = encoding }}");
+                }
+                finally
+                {
+                    if (shouldClose)
+                    {
+                        output.Close();
+                    }
+                }
+            }
+        }
+    }
 }

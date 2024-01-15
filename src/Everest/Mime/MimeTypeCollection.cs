@@ -15,6 +15,9 @@ namespace Everest.Mime
 
         public bool Has(string fileExtension)
         {
+            if (fileExtension == null)
+                return false;
+
             return mimeTypes.ContainsKey(fileExtension);
         }
 

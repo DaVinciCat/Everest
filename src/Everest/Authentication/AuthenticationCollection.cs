@@ -15,6 +15,9 @@ namespace Everest.Authentication
 
         public bool Has(string scheme)
         {
+            if (scheme == null)
+                return false;
+
             return authentications.ContainsKey(scheme);
         }
 

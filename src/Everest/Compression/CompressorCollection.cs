@@ -17,6 +17,9 @@ namespace Everest.Compression
 
         public bool Has(string encoding)
         {
+            if (encoding == null)
+                return false;
+
             return compressors.ContainsKey(encoding);
         }
 

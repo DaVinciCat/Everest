@@ -78,9 +78,10 @@ namespace Everest.Http
 			}
 		}
 
-		public Stream OutputStream => response.OutputStream;
+		public HttpResponseWriter ResponseWriter { get; set; }
 
-
+        public Stream OutputStream => response.OutputStream;
+		
 		private readonly HttpListenerResponse response;
 
 		private readonly HttpListenerRequest request;
@@ -93,8 +94,9 @@ namespace Everest.Http
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			StatusCode = HttpStatusCode.OK;
 			ContentEncoding = Encoding.UTF8;
-
-			AppendHeader(HttpHeaders.Server, "Everest");
+            ResponseWriter = new HttpResponseWriter(this);
+			
+            AppendHeader(HttpHeaders.Server, "Everest");
 		}
 
 		public void SetCookie(Cookie cookie) => response.SetCookie(cookie);
@@ -114,31 +116,7 @@ namespace Everest.Http
 			response.Redirect(url);
 			await Task.CompletedTask;
 		}
-
-		public Func<HttpResponse, byte[], Task> ResponseContentWriter { get; set; } = async (response, content) =>
-		{
-			response.ContentLength64 = content.Length;
-			await response.OutputStream.WriteAsync(content, 0, content.Length);
-		};
-
-		public Func<HttpResponse, Stream, Task> ResponseStreamWriter { get; set; } = async (response, stream) =>
-		{
-			response.ContentLength64 = stream.Length;
-
-			if (stream.CanSeek)
-			{
-				stream.Position = 0;
-			}
-
-			var buffer = new byte[4096];
-			int read;
-
-			while ((read = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
-			{
-				await response.OutputStream.WriteAsync(buffer, 0, read);
-			}
-		};
-
+		
 		public Task SendEmptyResponseAsync()
 		{
 			Logger.LogTrace($"{TraceIdentifier} - Sending response: {new { RemoteEndPoint = request.RemoteEndPoint, ContentLength = ContentLength64.ToReadableSize(), StatusCode = response.StatusCode, ContentType = response.ContentType, ContentEncoding = response.ContentEncoding?.EncodingName }}");
@@ -203,7 +181,7 @@ namespace Everest.Http
 
 			try
 			{
-				await ResponseContentWriter(this, content);
+				await ResponseWriter.Write(content);
 				response.OutputStream.Close();
 			}
 			catch
@@ -239,7 +217,7 @@ namespace Everest.Http
 
 			try
 			{
-				await ResponseStreamWriter(this, stream);
+				await ResponseWriter.Write(stream);
 				response.OutputStream.Close();
 			}
 			catch

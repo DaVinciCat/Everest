@@ -88,7 +88,7 @@ namespace Everest.Shell
         //          await context.Response.WriteTextAsync($"p:{p}");
         //      }
 
-        //      [HttpOptions("/options/cors-request-response")]
+        //[HttpOptions("/options/cors-request-response")]
         //public static async Task OptionsCorsRequestResponse(HttpContext context)
         //{
         //	context.Response.AddHeader(HttpHeaders.Origin, "*");
