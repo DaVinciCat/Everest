@@ -33,18 +33,23 @@ namespace Everest.Cors
 
 			if (!context.Request.IsCorsPreflightRequest())
 			{
-				Logger.LogWarning($"{context.TraceIdentifier} - Not a CORS preflight request");
+                if (Logger.IsEnabled(LogLevel.Warning))
+                    Logger.LogWarning($"{context.TraceIdentifier} - Not a CORS preflight request");
+
 				return false;
 			}
 			
 			var origin = context.Request.Headers[HttpHeaders.Origin];
 			if (origin == null)
 			{
-				Logger.LogWarning($"{context.TraceIdentifier} - Failed to handle CORS preflight request. Missing header: {new { Header = HttpHeaders.Origin }}");
-				return false;
+                if (Logger.IsEnabled(LogLevel.Warning))
+                    Logger.LogWarning($"{context.TraceIdentifier} - Failed to handle CORS preflight request. Missing header: {new { Header = HttpHeaders.Origin }}");
+				
+                return false;
 			}
 
-			Logger.LogTrace($"{context.TraceIdentifier} - Try to match CORS policy: {new { Request = context.Request.Description, Origin = origin, Policies = Policies.Select(p => p.Origin).ToReadableArray() }}");
+            if (Logger.IsEnabled(LogLevel.Trace))
+                Logger.LogTrace($"{context.TraceIdentifier} - Try to match CORS policy: {new { Request = context.Request.Description, Origin = origin, Policies = Policies.Select(p => p.Origin).ToReadableArray() }}");
 
 			if (Policies.TryGet(origin, out var policy))
 			{
@@ -53,14 +58,18 @@ namespace Everest.Cors
 				context.Response.AddHeader(HttpHeaders.AccessControlAllowHeaders, headers.AllowHeaders);
 				context.Response.AddHeader(HttpHeaders.AccessControlAllowOrigin, headers.Origin);
 				context.Response.AddHeader(HttpHeaders.AccessControlMaxAge, headers.MaxAge);
-				Logger.LogTrace($"{context.TraceIdentifier} - Successfully matched CORS policy: {new { Policy = policy, AllowMethods = policy.AllowMethods.ToReadableArray(), AllowHeaders = policy.AllowHeaders.ToReadableArray(), Origin = policy.Origin, MaxAge = policy.MaxAge }}");
+
+                if (Logger.IsEnabled(LogLevel.Trace))
+                    Logger.LogTrace($"{context.TraceIdentifier} - Successfully matched CORS policy: {new { Policy = policy, AllowMethods = policy.AllowMethods.ToReadableArray(), AllowHeaders = policy.AllowHeaders.ToReadableArray(), Origin = policy.Origin, MaxAge = policy.MaxAge }}");
 			}
 			else
 			{
 				context.Response.AddHeader(HttpHeaders.AccessControlAllowMethods, "");
 				context.Response.AddHeader(HttpHeaders.AccessControlAllowOrigin, "");
 				context.Response.AddHeader(HttpHeaders.AccessControlMaxAge, "");
-				Logger.LogWarning($"{context.TraceIdentifier} - Failed to match CORS policy. Request contains no supported policy: {new { Origin = origin, Policies = Policies.Select(p => p.Origin).ToReadableArray() }}");
+
+                if (Logger.IsEnabled(LogLevel.Warning)) 
+                    Logger.LogWarning($"{context.TraceIdentifier} - Failed to match CORS policy. Request contains no supported policy: {new { Origin = origin, Policies = Policies.Select(p => p.Origin).ToReadableArray() }}");
 			}
 
 			await context.Response.SendStatusResponseAsync(HttpStatusCode.NoContent);

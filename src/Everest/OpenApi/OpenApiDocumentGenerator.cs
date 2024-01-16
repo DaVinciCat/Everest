@@ -52,8 +52,9 @@ namespace Everest.OpenApi
                 Paths = new OpenApiPaths(),
                 Components = new OpenApiComponents(),
             };
-            
-            Logger.LogTrace($"Generating OpenApi document: {new { Title = info.Title, Version = info.Version }}");
+
+            if (Logger.IsEnabled(LogLevel.Trace))
+                Logger.LogTrace($"Generating OpenApi document: {new { Title = info.Title, Version = info.Version }}");
 
             var context = new OpenApiDocumentContext(document, SchemaGenerator, PathParametersGenerator);
             foreach (var descriptor in descriptors)
@@ -64,7 +65,9 @@ namespace Everest.OpenApi
                 }
             }
 
-            Logger.LogTrace($"Successfully generated OpenApi document: {new { Title = info.Title, Version = info.Version }}");
+            if (Logger.IsEnabled(LogLevel.Trace))
+                Logger.LogTrace($"Successfully generated OpenApi document: {new { Title = info.Title, Version = info.Version }}");
+
             return document;
         }
     }

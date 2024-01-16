@@ -25,13 +25,17 @@ namespace Everest.Routing
 
 			var count = 0;
 
-			Logger.LogTrace($"Scanning assembly for routes: {new { Assembly = assembly }}");
-			foreach (var type in GetRestResourceTypes(assembly))
+            if (Logger.IsEnabled(LogLevel.Trace))
+                Logger.LogTrace($"Scanning assembly for routes: {new { Assembly = assembly }}");
+			
+            foreach (var type in GetRestResourceTypes(assembly))
 			{
 				var routePrefixAttribute = GetAttributes<RoutePrefixAttribute>(type).FirstOrDefault();
 
-				Logger.LogTrace($"Scanning type for routes: {new { Type = type }}");
-				foreach (var method in GetRestRouteMethods(type))
+                if (Logger.IsEnabled(LogLevel.Trace))
+                    Logger.LogTrace($"Scanning type for routes: {new { Type = type }}");
+				
+                foreach (var method in GetRestRouteMethods(type))
 				{
 					var routeAttribute = GetAttributes<RestRouteAttribute>(method).FirstOrDefault();
 					var prefixAttribute = GetAttributes<RoutePrefixAttribute>(method).FirstOrDefault() ?? routePrefixAttribute;
@@ -44,7 +48,9 @@ namespace Everest.Routing
 						var endPoint = new EndPoint(type, method, action);
 						var descriptor = new RouteDescriptor(route, endPoint);
 
-						Logger.LogTrace($"Route found: {new { RoutePattern = route.Description, EndPoint = endPoint.Description }}");
+                        if (Logger.IsEnabled(LogLevel.Trace))
+                            Logger.LogTrace($"Route found: {new { RoutePattern = route.Description, EndPoint = endPoint.Description }}");
+
 						count++;
 
 						yield return descriptor;
@@ -52,9 +58,12 @@ namespace Everest.Routing
 				}
 			}
 
-			Logger.LogTrace($"Scan of assembly complete: {new { Assembly = assembly }}");
-			Logger.LogTrace($"Total routes found: {new { Count = count }}");
-		}
+            if (Logger.IsEnabled(LogLevel.Trace))
+            {
+                Logger.LogTrace($"Scan of assembly complete: {new { Assembly = assembly }}");
+                Logger.LogTrace($"Total routes found: {new { Count = count }}");
+            }
+        }
 
 		private static IEnumerable<Type> GetRestResourceTypes(Assembly assembly)
 		{

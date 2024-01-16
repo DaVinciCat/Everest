@@ -40,7 +40,8 @@ namespace Everest.OpenApi.Swagger
             var endPointFilePath = Path.Combine(PhysicalPath, SwaggerEndPoint.Trim('/').Replace('/', Path.DirectorySeparatorChar));
             var swaggerUiPath = Path.Combine(PhysicalPath, SwaggerUiPath.Trim('/').Replace('/', Path.DirectorySeparatorChar));
 
-            Logger.LogTrace($"Try generate swagger docs: {new { DocumentFilePath = endPointFilePath, SwaggerUiPath = swaggerUiPath }}");
+            if (Logger.IsEnabled(LogLevel.Trace))
+                Logger.LogTrace($"Try generate swagger docs: {new { DocumentFilePath = endPointFilePath, SwaggerUiPath = swaggerUiPath }}");
 
             var fi = new FileInfo(endPointFilePath);
             var di = new DirectoryInfo(swaggerUiPath);

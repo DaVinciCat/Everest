@@ -48,22 +48,28 @@ namespace Everest.Files
 			var filePath = context.Request.RequestPathToFilePath();
 			if (!staticFilesProvider.TryGetFile(filePath, out var file))
 			{
-				Logger.LogWarning($"{context.TraceIdentifier} - Failed to serve file. Requested file not found: {new { RequestPath = context.Request.Path, Request = context.Request.Description }}");
-				await OnFileNotFoundAsync(context);
+                if (Logger.IsEnabled(LogLevel.Warning))
+                    Logger.LogWarning($"{context.TraceIdentifier} - Failed to serve file. Requested file not found: {new { RequestPath = context.Request.Path, Request = context.Request.Description }}");
+				
+                await OnFileNotFoundAsync(context);
 				return false;
 			}
 
 			if (!file.Exists)
 			{
-				Logger.LogWarning($"{context.TraceIdentifier} - Failed to serve file. Requested file does not exist: {new { PhysicalPath = file.FullName, Request = context.Request.Description }}");
-				await OnFileNotFoundAsync(context);
+                if (Logger.IsEnabled(LogLevel.Warning))
+                    Logger.LogWarning($"{context.TraceIdentifier} - Failed to serve file. Requested file does not exist: {new { PhysicalPath = file.FullName, Request = context.Request.Description }}");
+				
+                await OnFileNotFoundAsync(context);
 				return false;
 			}
 
 			mimeTypesProvider.TryGetMimeType(file.Extension, out var mimeType);
 			if (mimeType == null)
 			{
-				Logger.LogWarning($"{context.TraceIdentifier} - Unsupported mime type: {new { FileExtension = file.Extension }}");
+                if (Logger.IsEnabled(LogLevel.Warning))
+                    Logger.LogWarning($"{context.TraceIdentifier} - Unsupported mime type: {new { FileExtension = file.Extension }}");
+
 				mimeType = new MimeType(file.Extension, UnknownContentType, true);
 			}
 
@@ -72,8 +78,10 @@ namespace Everest.Files
 
 			if (result)
 			{
-				Logger.LogTrace($"{context.TraceIdentifier} - Successfully served requested file: {new { RequestPath = context.Request.Path, PhysicalPath = file.FullName, Size = file.Length.ToReadableSize() }}");
-				return true;
+                if (Logger.IsEnabled(LogLevel.Trace))
+                    Logger.LogTrace($"{context.TraceIdentifier} - Successfully served requested file: {new { RequestPath = context.Request.Path, PhysicalPath = file.FullName, Size = file.Length.ToReadableSize() }}");
+				
+                return true;
 			}
 
 			return false;

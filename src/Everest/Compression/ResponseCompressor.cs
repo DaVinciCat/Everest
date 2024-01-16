@@ -62,7 +62,8 @@ namespace Everest.Compression
 				return Task.FromResult(false);
 			}
 
-			Logger.LogTrace($"{context.TraceIdentifier} - Try to set compressing response writer: {new { AcceptEncodings = encodings.ToReadableArray(), SupportedEncodings = Compressors.ToReadableArray() }}");
+			if (Logger.IsEnabled(LogLevel.Trace))
+                Logger.LogTrace($"{context.TraceIdentifier} - Try to set compressing response writer: {new { AcceptEncodings = encodings.ToReadableArray(), SupportedEncodings = Compressors.ToReadableArray() }}");
 
 			foreach (var encoding in encodings)
 			{
@@ -70,13 +71,17 @@ namespace Everest.Compression
                 {
                     context.Response.ResponseWriter = new CompressingResponseWriter(context.Response, MediaTypes, compression, encoding, CompressionMinLength);
 
-                    Logger.LogTrace($"{context.TraceIdentifier} - Successfully set compressing response writer: {new { Encoding = encoding }}");
+                    if (Logger.IsEnabled(LogLevel.Trace))
+                        Logger.LogTrace($"{context.TraceIdentifier} - Successfully set compressing response writer: {new { Encoding = encoding }}");
+
                     return Task.FromResult(true);
 				}
 			}
 
-			Logger.LogWarning($"{context.TraceIdentifier} - Failed to set compressing response writer. Header contains no supported encodings: {new { Header = HttpHeaders.AcceptEncoding, Encodings = encodings.ToReadableArray(), SupportedEncodings = Compressors.ToReadableArray() }}");
-			return Task.FromResult(false);
+			if (Logger.IsEnabled(LogLevel.Warning))
+                Logger.LogWarning($"{context.TraceIdentifier} - Failed to set compressing response writer. Header contains no supported encodings: {new { Header = HttpHeaders.AcceptEncoding, Encodings = encodings.ToReadableArray(), SupportedEncodings = Compressors.ToReadableArray() }}");
+			
+            return Task.FromResult(false);
 		}
 
 		private class CompressingResponseWriter : HttpResponseWriter
@@ -113,7 +118,8 @@ namespace Everest.Compression
                     response.RemoveHeader(HttpHeaders.ContentEncoding);
                     response.AddHeader(HttpHeaders.ContentEncoding, encoding);
 
-                    response.Logger.LogTrace($"{response.TraceIdentifier} - Response successfully compressed: {new { Encoding = encoding }}");
+                    if (response.Logger.IsEnabled(LogLevel.Trace))
+                        response.Logger.LogTrace($"{response.TraceIdentifier} - Response successfully compressed: {new { Encoding = encoding }}");
                 }
                 else
                 {
@@ -165,7 +171,8 @@ namespace Everest.Compression
                         await output.WriteAsync(buffer, 0, read);
                     }
 
-                    response.Logger.LogTrace($"{response.TraceIdentifier} - Response successfully compressed: {new { Encoding = encoding }}");
+                    if (response.Logger.IsEnabled(LogLevel.Trace))
+                        response.Logger.LogTrace($"{response.TraceIdentifier} - Response successfully compressed: {new { Encoding = encoding }}");
                 }
                 finally
                 {

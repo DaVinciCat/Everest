@@ -74,7 +74,8 @@ namespace Everest.Routing
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
 
-			Logger.LogTrace($"{context.TraceIdentifier} - Try to match requested route: {new { Request = context.Request.Description }}");
+            if (Logger.IsEnabled(LogLevel.Trace))
+                Logger.LogTrace($"{context.TraceIdentifier} - Try to match requested route: {new { Request = context.Request.Description }}");
 
 			if (methods.TryGetValue(context.Request.HttpMethod, out var routes))
 			{
@@ -83,14 +84,20 @@ namespace Everest.Routing
 				{
 					context.Request.PathParameters = parameters;
 					context.Features.Set<IRouteDescriptorFeature>(new RouteDescriptorFeature(descriptor));
-					Logger.LogTrace($"{context.TraceIdentifier} - Successfully matched requested route: {new { Request = context.Request.Description, RoutePattern = descriptor.Route.Description, EndPoint = descriptor.EndPoint.Description }}");
-					return true;
+
+                    if (Logger.IsEnabled(LogLevel.Trace))
+                        Logger.LogTrace($"{context.TraceIdentifier} - Successfully matched requested route: {new { Request = context.Request.Description, RoutePattern = descriptor.Route.Description, EndPoint = descriptor.EndPoint.Description }}");
+					
+                    return true;
 				}
 			}
 
 			await OnRouteNotFoundAsync(context);
-			Logger.LogWarning($"{context.TraceIdentifier} - Failed to match requested route. Requested route not found: {new { Request = context.Request.Description }}");
-			return false;
+
+            if (Logger.IsEnabled(LogLevel.Warning))
+                Logger.LogWarning($"{context.TraceIdentifier} - Failed to match requested route. Requested route not found: {new { Request = context.Request.Description }}");
+			
+            return false;
 		}
 
 		public Func<HttpContext, Task> OnRouteNotFoundAsync { get; set; } = async context =>

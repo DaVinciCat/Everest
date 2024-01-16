@@ -77,16 +77,22 @@ namespace Everest.Rest
 
 			try
 			{
-				Logger.LogTrace($"Starting server at {Prefixes.ToReadableArray()}");
+                if (Logger.IsEnabled(LogLevel.Trace))
+                    Logger.LogTrace($"Starting server at {Prefixes.ToReadableArray()}");
+
 				listener.Start();
 				listenerThread.Start();
-				Logger.LogTrace("Server is started");
+
+                if (Logger.IsEnabled(LogLevel.Trace))
+                    Logger.LogTrace("Server is started");
 			}
 			catch (Exception ex)
 			{
 				exceptionWasThrown = true;
 
-				Logger.LogCritical(ex, "Failed while starting server");
+                if (Logger.IsEnabled(LogLevel.Critical))
+                    Logger.LogCritical(ex, "Failed while starting server");
+
 				throw;
 			}
 			finally
@@ -112,7 +118,9 @@ namespace Everest.Rest
 			
 			try
 			{
-				Logger.LogTrace("Stopping server");
+                if (Logger.IsEnabled(LogLevel.Trace))
+                    Logger.LogTrace("Stopping server");
+
 				listener.Stop();
 				listener.Close();
 				cancellationTokenSource.Cancel();
@@ -123,7 +131,8 @@ namespace Everest.Rest
 			}
 			catch (Exception ex)
 			{
-				Logger.LogError(ex, "Failed while stopping server");
+                if (Logger.IsEnabled(LogLevel.Error))
+                    Logger.LogError(ex, "Failed while stopping server");
 			}
 
 			try
@@ -136,13 +145,16 @@ namespace Everest.Rest
 			}
 			catch (Exception ex)
 			{
-				Logger.LogError(ex, "Failed while stopping server");
+				if (Logger.IsEnabled(LogLevel.Error))
+                    Logger.LogError(ex, "Failed while stopping server");
 			}
 
             try
             {
                 IsStopping = false;
-                Logger.LogTrace("Server is stopped");
+
+                if (Logger.IsEnabled(LogLevel.Trace))
+                    Logger.LogTrace("Server is stopped");
             }
             finally
             {
@@ -169,11 +181,13 @@ namespace Everest.Rest
                 }
 				catch (HttpListenerException ex) when (ex.ErrorCode == 995 && (IsStopping || !IsListening))
 				{
-					Logger.LogWarning(ex, $"{ex.ErrorCode}");
+                    if (Logger.IsEnabled(LogLevel.Warning))
+                        Logger.LogWarning(ex, $"{ex.ErrorCode}");
 				}
 				catch (Exception ex)
 				{
-					Logger.LogError(ex, "Failed to process incoming request");
+					if (Logger.IsEnabled(LogLevel.Error))
+                        Logger.LogError(ex, "Failed to process incoming request");
 				}
 			}
 		}
@@ -195,13 +209,18 @@ namespace Everest.Rest
 			{
 				try
 				{
-					Logger.LogTrace($"{context.TraceIdentifier} - Try to process incoming request");
-					await aggregateMiddleware.InvokeAsync(context);
+                    if (Logger.IsEnabled(LogLevel.Trace))
+                        Logger.LogTrace($"{context.TraceIdentifier} - Try to process incoming request");
+					
+                    await aggregateMiddleware.InvokeAsync(context);
 				}
 				catch(Exception ex) 
 				{
 					exceptionWasThrown = true;
-					Logger.LogError(ex, $"{context.TraceIdentifier} - Failed to process incoming request");
+
+					if (Logger.IsEnabled(LogLevel.Error))
+                        Logger.LogError(ex, $"{context.TraceIdentifier} - Failed to process incoming request");
+
 					context.Response.StatusCode = HttpStatusCode.InternalServerError;
 				}
 				finally
@@ -213,13 +232,15 @@ namespace Everest.Rest
 
 					if (!exceptionWasThrown)
 					{
-						Logger.LogTrace($"{context.TraceIdentifier} - Successfully processed incoming request");
+                        if (Logger.IsEnabled(LogLevel.Trace))
+                            Logger.LogTrace($"{context.TraceIdentifier} - Successfully processed incoming request");
 					}
 				}
 			}
 			catch (Exception ex)
 			{
-				Logger.LogError(ex, $"{context.TraceIdentifier} - Failed to process incoming request");
+				if (Logger.IsEnabled(LogLevel.Error))
+                    Logger.LogError(ex, $"{context.TraceIdentifier} - Failed to process incoming request");
 			}
 		}
 

@@ -119,7 +119,8 @@ namespace Everest.Http
 		
 		public Task SendEmptyResponseAsync()
 		{
-			Logger.LogTrace($"{TraceIdentifier} - Sending response: {new { RemoteEndPoint = request.RemoteEndPoint, ContentLength = ContentLength64.ToReadableSize(), StatusCode = response.StatusCode, ContentType = response.ContentType, ContentEncoding = response.ContentEncoding?.EncodingName }}");
+            if (Logger.IsEnabled(LogLevel.Trace))
+                Logger.LogTrace($"{TraceIdentifier} - Sending response: {new { RemoteEndPoint = request.RemoteEndPoint, ContentLength = ContentLength64.ToReadableSize(), StatusCode = response.StatusCode, ContentType = response.ContentType, ContentEncoding = response.ContentEncoding?.EncodingName }}");
 
 			if (!OutputStream.CanWrite)
 			{
@@ -135,7 +136,8 @@ namespace Everest.Http
 				ResponseSent = true;
 				response.Close();
 
-				Logger.LogTrace($"{TraceIdentifier} - Response sent");
+                if (Logger.IsEnabled(LogLevel.Trace))
+                    Logger.LogTrace($"{TraceIdentifier} - Response sent");
 			}
 
 			return Task.CompletedTask;
@@ -143,7 +145,8 @@ namespace Everest.Http
 
 		public Task SendStatusResponseAsync(HttpStatusCode code)
 		{
-			Logger.LogTrace($"{TraceIdentifier} - Sending response: {new { RemoteEndPoint = request.RemoteEndPoint, ContentLength = ContentLength64.ToReadableSize(), StatusCode = response.StatusCode, ContentType = response.ContentType, ContentEncoding = response.ContentEncoding?.EncodingName }}");
+            if (Logger.IsEnabled(LogLevel.Trace))
+                Logger.LogTrace($"{TraceIdentifier} - Sending response: {new { RemoteEndPoint = request.RemoteEndPoint, ContentLength = ContentLength64.ToReadableSize(), StatusCode = response.StatusCode, ContentType = response.ContentType, ContentEncoding = response.ContentEncoding?.EncodingName }}");
 
 			if (!OutputStream.CanWrite)
 			{
@@ -160,7 +163,8 @@ namespace Everest.Http
 				ResponseSent = true;
 				response.Close();
 
-				Logger.LogTrace($"{TraceIdentifier} - Response sent");
+                if (Logger.IsEnabled(LogLevel.Trace))
+                    Logger.LogTrace($"{TraceIdentifier} - Response sent");
 			}
 
 			return Task.CompletedTask;
@@ -177,7 +181,8 @@ namespace Everest.Http
 				throw new InvalidOperationException("Output stream is not writable");
 			}
 
-			Logger.LogTrace($"{TraceIdentifier} - Sending response: {new { RemoteEndPoint = request.RemoteEndPoint, ContentLength = content.ToReadableSize(), StatusCode = response.StatusCode, ContentType = response.ContentType, ContentEncoding = response.ContentEncoding?.EncodingName }}");
+            if (Logger.IsEnabled(LogLevel.Trace))
+                Logger.LogTrace($"{TraceIdentifier} - Sending response: {new { RemoteEndPoint = request.RemoteEndPoint, ContentLength = content.ToReadableSize(), StatusCode = response.StatusCode, ContentType = response.ContentType, ContentEncoding = response.ContentEncoding?.EncodingName }}");
 
 			try
 			{
@@ -194,7 +199,8 @@ namespace Everest.Http
 				ResponseSent = true;
 				response.Close();
 
-				Logger.LogTrace($"{TraceIdentifier} - Response sent");
+                if (Logger.IsEnabled(LogLevel.Trace))
+                    Logger.LogTrace($"{TraceIdentifier} - Response sent");
 			}
 		}
 
@@ -213,7 +219,8 @@ namespace Everest.Http
 				throw new InvalidOperationException("Output stream is not writable");
 			}
 
-			Logger.LogTrace($"{TraceIdentifier} - Sending response: {new { RemoteEndPoint = request.RemoteEndPoint, ContentLength = stream.Length.ToReadableSize(), StatusCode = response.StatusCode, ContentType = response.ContentType, ContentEncoding = response.ContentEncoding?.EncodingName }}");
+            if (Logger.IsEnabled(LogLevel.Trace))
+                Logger.LogTrace($"{TraceIdentifier} - Sending response: {new { RemoteEndPoint = request.RemoteEndPoint, ContentLength = stream.Length.ToReadableSize(), StatusCode = response.StatusCode, ContentType = response.ContentType, ContentEncoding = response.ContentEncoding?.EncodingName }}");
 
 			try
 			{
@@ -230,7 +237,8 @@ namespace Everest.Http
 				ResponseSent = true;
 				response.Close();
 
-				Logger.LogTrace($"{TraceIdentifier} - Response sent");
+                if (Logger.IsEnabled(LogLevel.Trace))
+                    Logger.LogTrace($"{TraceIdentifier} - Response sent");
 			}
 		}
 	}
