@@ -109,9 +109,19 @@ namespace Everest.Http
 
 		public void RemoveHeader(string name) => response.Headers.Remove(name);
 
-		public void CloseResponse() => response.Close();
+		public void CloseResponse()
+        {
+			if(ResponseSent)
+				return;
 
-		public async Task RedirectAsync(string url)
+            ResponseSent = true;
+            response.Close();
+
+            if (Logger.IsEnabled(LogLevel.Trace))
+                Logger.LogTrace($"{TraceIdentifier} - Response closed");
+        }
+
+        public async Task RedirectAsync(string url)
 		{
 			response.Redirect(url);
 			await Task.CompletedTask;
@@ -132,13 +142,12 @@ namespace Everest.Http
 				OutputStream.Close();
 			}
 			finally
-			{
-				ResponseSent = true;
-				response.Close();
-
+            {
                 if (Logger.IsEnabled(LogLevel.Trace))
                     Logger.LogTrace($"{TraceIdentifier} - Response sent");
-			}
+
+                CloseResponse();
+            }
 
 			return Task.CompletedTask;
 		}
@@ -159,13 +168,12 @@ namespace Everest.Http
 				OutputStream.Close();
 			}
 			finally
-			{
-				ResponseSent = true;
-				response.Close();
-
+            {
                 if (Logger.IsEnabled(LogLevel.Trace))
                     Logger.LogTrace($"{TraceIdentifier} - Response sent");
-			}
+
+                CloseResponse();
+            }
 
 			return Task.CompletedTask;
 		}
@@ -196,12 +204,11 @@ namespace Everest.Http
 			}
 			finally
 			{
-				ResponseSent = true;
-				response.Close();
-
                 if (Logger.IsEnabled(LogLevel.Trace))
                     Logger.LogTrace($"{TraceIdentifier} - Response sent");
-			}
+
+                CloseResponse();
+            }
 		}
 
 		public async Task SendResponseAsync(Stream stream)
@@ -234,12 +241,11 @@ namespace Everest.Http
 			}
 			finally
 			{
-				ResponseSent = true;
-				response.Close();
-
                 if (Logger.IsEnabled(LogLevel.Trace))
                     Logger.LogTrace($"{TraceIdentifier} - Response sent");
-			}
+
+                CloseResponse();
+            }
 		}
 	}
 
@@ -265,8 +271,8 @@ namespace Everest.Http
 
 			if (content == null)
 				throw new ArgumentNullException(nameof(content));
-
-			response.ContentType = "text/plain";
+            
+            response.ContentType = "text/plain";
 			var bytes = response.ContentEncoding.GetBytes(content);
 			await response.SendResponseAsync(bytes);
 		}
@@ -284,7 +290,7 @@ namespace Everest.Http
 				var json = options == null ?
 											JsonSerializer.Serialize(content) :
 											JsonSerializer.Serialize(content, options);
-
+               
 				response.ContentType = "application/json";
 				var bytes = response.ContentEncoding.GetBytes(json);
 				await response.SendResponseAsync(bytes);
