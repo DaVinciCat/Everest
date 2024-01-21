@@ -15,7 +15,7 @@ namespace Everest.EndPoints
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
-		public async Task<bool> TryInvokeEndPointAsync(HttpContext context)
+		public async Task<bool> TryInvokeEndPointAsync(IHttpContext context)
 		{
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));

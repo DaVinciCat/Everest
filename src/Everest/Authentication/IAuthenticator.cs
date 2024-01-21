@@ -5,8 +5,8 @@ namespace Everest.Authentication
 {
     public interface IAuthenticator
 	{
-		Task<bool> TryAuthenticateAsync(HttpContext context);
+		Task<bool> TryAuthenticateAsync(IHttpContext context);
 
-        Task ChallengeAsync(HttpContext context);
+        Task ChallengeAsync(IHttpContext context);
     }
 }

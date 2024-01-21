@@ -22,7 +22,7 @@ namespace Everest.Authentication
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 		
-		public Task<bool> TryAuthenticateAsync(HttpContext context)
+		public Task<bool> TryAuthenticateAsync(IHttpContext context)
 		{
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));

@@ -18,7 +18,7 @@ namespace Everest.Files
             this.staticFilesProvider = staticFilesProvider ?? throw new ArgumentNullException(nameof(staticFilesProvider));
         }
 
-		public override async Task InvokeAsync(HttpContext context)
+		public override async Task InvokeAsync(IHttpContext context)
 		{
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));

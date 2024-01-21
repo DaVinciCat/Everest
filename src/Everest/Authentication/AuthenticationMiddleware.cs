@@ -14,7 +14,7 @@ namespace Everest.Authentication
 			this.authenticator = authenticator ?? throw new ArgumentNullException(nameof(authenticator));
 		}
 
-		public override async Task InvokeAsync(HttpContext context)
+		public override async Task InvokeAsync(IHttpContext context)
 		{
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));

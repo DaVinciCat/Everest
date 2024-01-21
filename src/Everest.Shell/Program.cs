@@ -23,19 +23,19 @@ namespace Everest.Shell
     {
         //[HttpGet("/")]
         //[RoutePrefix("/")]
-        //public static async Task GetDefaultRoute(HttpContext context)
+        //public static async Task GetDefaultRoute(IHttpContext context)
         //{
         //	await context.Response.WriteTextAsync("default-route");
         //}
 
         //[HttpGet("/get/simple-route")]
-        //public static async Task GetSimpleRoute(HttpContext context)
+        //public static async Task GetSimpleRoute(IHttpContext context)
         //{
         //          await context.Response.WriteTextAsync("simple-route");
         //      }
 
         //[HttpGet("/get/route-with-mandatory-query-parameter-p")]
-        //public static async Task GetRouteWithMandatoryQueryParameterP(HttpContext context)
+        //public static async Task GetRouteWithMandatoryQueryParameterP(IHttpContext context)
         //{
         //	var p = context.Request.QueryParameters.GetParameterValue<string>("p");
         //          await context.Response.WriteTextAsync("route-with-mandatory-query-parameter-p\n");
@@ -43,7 +43,7 @@ namespace Everest.Shell
         //      }
 
         //      [HttpGet("/get/route-with-optional-query-parameter-p")]
-        //      public static async Task GetRouteWithOptionalQueryParameterP(HttpContext context)
+        //      public static async Task GetRouteWithOptionalQueryParameterP(IHttpContext context)
         //      {
         //          if (!context.Request.QueryParameters.TryGetParameterValue<string>("p", out var p))
         //          {
@@ -58,7 +58,7 @@ namespace Everest.Shell
         //      }
 
         //      [HttpGet("/get/route-with-mandatory-query-parameter-of-type-int-p")]
-        //      public static async Task GetRouteWithMandatoryQueryParameterOfTypeIntP(HttpContext context)
+        //      public static async Task GetRouteWithMandatoryQueryParameterOfTypeIntP(IHttpContext context)
         //      {
         //          var p = context.Request.QueryParameters.GetParameterValue<int>("p");
         //          await context.Response.WriteTextAsync("route-with-mandatory-query-parameter-of-type-int-p\n");
@@ -66,7 +66,7 @@ namespace Everest.Shell
         //      }
 
         //      [HttpGet("/get/route-with-path-parameter-p/{p:string}")]
-        //public static async Task GetRouteWithPathParameterP(HttpContext context)
+        //public static async Task GetRouteWithPathParameterP(IHttpContext context)
         //{
         //	    var p = context.Request.PathParameters.GetParameterValue<string>("p");
         //          await context.Response.WriteTextAsync("route-with-path-parameter-p/{p:string}\n");
@@ -74,14 +74,14 @@ namespace Everest.Shell
         //      }
 
         [HttpGet("/get/route-with-path-parameter-of-type-int-p/{p:int}")]
-        public static async Task GetRouteWithPathParameterOfTypeIntP(HttpContext context)
+        public static async Task GetRouteWithPathParameterOfTypeIntP(IHttpContext context)
         {
             var p = context.Request.PathParameters.GetParameterValue<int>("p");
             await context.Response.SendTextResponseAsync($"route-with-path-parameter-of-type-int-p/{p:int}{Environment.NewLine}p:{p}");
         }
 
         //      [HttpGet("/get/route-with-path-parameter-of-type-guid-p/{p:guid}")]
-        //      public static async Task GetRouteWithPathParameterOfTypeGuidP(HttpContext context)
+        //      public static async Task GetRouteWithPathParameterOfTypeGuidP(IHttpContext context)
         //      {
         //          var p = context.Request.PathParameters.GetParameterValue<Guid>("p");
         //          await context.Response.WriteTextAsync("route-with-path-parameter-of-type-guid-p/{p:guid}\n");
@@ -89,7 +89,7 @@ namespace Everest.Shell
         //      }
 
         //[HttpOptions("/options/cors-request-response")]
-        //public static async Task OptionsCorsRequestResponse(HttpContext context)
+        //public static async Task OptionsCorsRequestResponse(IHttpContext context)
         //{
         //	context.Response.AddHeader(HttpHeaders.Origin, "*");
         //	context.Response.AddHeader(HttpHeaders.AccessControlAllowHeaders, string.Join(" ", HttpHeaders.ContentType, HttpHeaders.Accept, HttpHeaders.XRequestedWith));
@@ -99,40 +99,40 @@ namespace Everest.Shell
         //}
 
         //[HttpGet("/get/compressed-response")]
-        //public static async Task GetCompressedResponse(HttpContext context)
+        //public static async Task GetCompressedResponse(IHttpContext context)
         //{
         //          await context.Response.WriteTextAsync("compressed-response\n");
         //          await context.Response.WriteTextAsync(string.Concat(Enumerable.Repeat("text", 10000)));
         //}
 
         //[HttpGet("/get/send-response")]
-        //public static async Task GetSendResponse(HttpContext context)
+        //public static async Task GetSendResponse(IHttpContext context)
         //{
         //          await context.Response.WriteTextAsync("send-response");
         //	await context.Response.SendAsync();
         //}
 
         //[HttpGet("/get/empty-response")]
-        //public static async Task GetEmptyResponse(HttpContext context)
+        //public static async Task GetEmptyResponse(IHttpContext context)
         //{
         //	await context.Response.SendAsync();
         //}
 
         //[HttpGet("/get/exception-response")]
-        //public static Task GetExceptionResponse(HttpContext context)
+        //public static Task GetExceptionResponse(IHttpContext context)
         //{
         //	throw new InvalidOperationException("something went wrong ;(");
         //}
 
         [HttpPost("/get/request-with-text-payload")]
-        public static async Task GetRequestWithTextPayload(HttpContext context)
+        public static async Task GetRequestWithTextPayload(IHttpContext context)
         {
             var payload = await context.Request.ReadRequestBodyAsTextAsync();
             await context.Response.SendTextResponseAsync($"request-with-text-payload{Environment.NewLine}payload:{payload}");
         }
 
         //[HttpGet("/get/request-with-json-payload")]
-        //public static async Task GetRequestWithJsonPayload(HttpContext context)
+        //public static async Task GetRequestWithJsonPayload(IHttpContext context)
         //{
         //	var payload = await context.Request.ReadJsonAsync<object>();
         //          await context.Response.WriteTextAsync("request-with-json-payload\n");
@@ -141,7 +141,7 @@ namespace Everest.Shell
         //}
 
         //      [HttpPost("/post/request-with-form-payload")]
-        //      public static async Task PostRequestWithFormPayload(HttpContext context)
+        //      public static async Task PostRequestWithFormPayload(IHttpContext context)
         //      {
         //          var payload = await context.Request.ReadFormAsync();
         //          await context.Response.WriteTextAsync("request-with-form-payload\n");
@@ -154,7 +154,7 @@ namespace Everest.Shell
         //      }
 
         //      [HttpGet("/get/greetings-request/{to:string}")]
-        public static async Task GetGreetingsRequest(HttpContext context)
+        public static async Task GetGreetingsRequest(IHttpContext context)
         {
             var service = context.GetGreetingsService();
             var greetings = service.Greet();
@@ -167,9 +167,9 @@ namespace Everest.Shell
         [Operation(Summary = "Operation summary", Description = "Operation description")]
         [PathParameter("id", Description = "Some int array parameter description")]
         [Tags("OpenApi", "Examples")]
-        public static async Task GetOpenApiExample1(HttpContext context)
+        public static async Task GetOpenApiExample1(IHttpContext context)
         {
-
+            
         }
 
 
@@ -197,7 +197,7 @@ namespace Everest.Shell
         [QueryParameter("b-array", typeof(B[]), Description = "Some enum parameter description")]
         [QueryParameter("b-enumerable", typeof(IEnumerable<B>), Description = "Some enum parameter description")]
         [QueryParameter("b-hashset", typeof(HashSet<B>), Description = "Some enum parameter description")]
-        public static async Task PostOpenApiExample(HttpContext context)
+        public static async Task PostOpenApiExample(IHttpContext context)
         {
 
         }
@@ -418,7 +418,7 @@ namespace Everest.Shell
 
     public static class HttpContextExtensions
     {
-        public static GreetingsService GetGreetingsService(this HttpContext context)
+        public static GreetingsService GetGreetingsService(this IHttpContext context)
         {
             return context.Services.GetRequiredService<GreetingsService>();
         }

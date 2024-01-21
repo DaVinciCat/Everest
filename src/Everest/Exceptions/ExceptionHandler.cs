@@ -15,7 +15,7 @@ namespace Everest.Exceptions
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
-		public async Task HandleExceptionAsync(HttpContext context, Exception ex)
+		public async Task HandleExceptionAsync(IHttpContext context, Exception ex)
 		{
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
@@ -29,7 +29,7 @@ namespace Everest.Exceptions
 			await OnExceptionAsync(context, ex);
 		}
 
-		public Func<HttpContext, Exception, Task> OnExceptionAsync { get; set; } = async (context, ex) =>
+		public Func<IHttpContext, Exception, Task> OnExceptionAsync { get; set; } = async (context, ex) =>
 		{
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));

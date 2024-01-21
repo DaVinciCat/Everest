@@ -23,7 +23,7 @@ namespace Everest.Cors
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 		
-		public async Task<bool> TryHandleCorsRequestAsync(HttpContext context)
+		public async Task<bool> TryHandleCorsRequestAsync(IHttpContext context)
 		{
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));

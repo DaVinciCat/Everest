@@ -16,7 +16,7 @@ namespace Everest.Security
 
     public static class EndPointFeatureExtensions
     {
-        public static BasicIdentity GetBasicIdentity(this HttpContext context)
+        public static BasicIdentity GetBasicIdentity(this IHttpContext context)
         {
             return context.User.Identity as BasicIdentity;
         }

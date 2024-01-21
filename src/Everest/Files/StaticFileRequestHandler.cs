@@ -43,7 +43,7 @@ namespace Everest.Files
 
 		#region Handle
 
-		public async Task<bool> TryServeStaticFileAsync(HttpContext context)
+		public async Task<bool> TryServeStaticFileAsync(IHttpContext context)
 		{
 			var filePath = context.Request.RequestPathToFilePath();
 			if (!staticFilesProvider.TryGetFile(filePath, out var file))
@@ -87,7 +87,7 @@ namespace Everest.Files
 			return false;
 		}
 
-		public Func<HttpContext, Task> OnFileNotFoundAsync { get; set; } = async context =>
+		public Func<IHttpContext, Task> OnFileNotFoundAsync { get; set; } = async context =>
 		{
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
@@ -100,7 +100,7 @@ namespace Everest.Files
 			}
 		};
 
-		public Func<HttpContext, StaticFileDescriptor, Task<bool>> OnServeFileAsync { get; set; } = async (context, descriptor) =>
+		public Func<IHttpContext, StaticFileDescriptor, Task<bool>> OnServeFileAsync { get; set; } = async (context, descriptor) =>
 		{
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));

@@ -15,7 +15,7 @@ namespace Everest.WebSockets
             this.handler = handler;
         }
         
-        public override async Task InvokeAsync(HttpContext context)
+        public override async Task InvokeAsync(IHttpContext context)
         {
             if (await handler.Handle(context, CancellationToken.None))
             {

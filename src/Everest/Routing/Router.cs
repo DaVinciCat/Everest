@@ -69,7 +69,7 @@ namespace Everest.Routing
 			}
 		}
 
-		public async Task<bool> TryRouteAsync(HttpContext context)
+		public async Task<bool> TryRouteAsync(IHttpContext context)
 		{
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
@@ -100,7 +100,7 @@ namespace Everest.Routing
             return false;
 		}
 
-		public Func<HttpContext, Task> OnRouteNotFoundAsync { get; set; } = async context =>
+		public Func<IHttpContext, Task> OnRouteNotFoundAsync { get; set; } = async context =>
 		{
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));

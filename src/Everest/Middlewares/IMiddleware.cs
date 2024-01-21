@@ -7,6 +7,6 @@ namespace Everest.Middlewares
 	{
 		void SetNextMiddleware(IMiddleware next);
 
-		Task InvokeAsync(HttpContext context);
+		Task InvokeAsync(IHttpContext context);
 	}
 }

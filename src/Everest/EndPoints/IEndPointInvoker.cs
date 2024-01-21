@@ -5,6 +5,6 @@ namespace Everest.EndPoints
 {
 	public interface IEndPointInvoker
 	{
-		Task<bool> TryInvokeEndPointAsync(HttpContext context);
+		Task<bool> TryInvokeEndPointAsync(IHttpContext context);
 	}
 }

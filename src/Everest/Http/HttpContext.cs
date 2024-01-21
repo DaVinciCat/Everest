@@ -8,17 +8,17 @@ using Microsoft.Extensions.Logging;
 
 namespace Everest.Http
 {
-    public class HttpContext
+    public class HttpContext : IHttpContext
     {
 	    public Guid TraceIdentifier { get; }
 
 		public ClaimsPrincipal User { get; }
 
-		public HttpRequest Request { get; }
+		public IHttpRequest Request { get; }
 
-		public HttpResponse Response { get; }
+		public IHttpResponse Response { get; }
 
-		public WebSocketContext WebSockets { get; }
+		public IWebSocketContext WebSockets { get; }
 
         public IFeatureCollection Features { get; }
 

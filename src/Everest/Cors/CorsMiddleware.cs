@@ -15,7 +15,7 @@ namespace Everest.Cors
            this.corsRequestHandler = corsRequestHandler ?? throw new ArgumentNullException(nameof(corsRequestHandler));
         }
 
-        public override async Task InvokeAsync(HttpContext context)
+        public override async Task InvokeAsync(IHttpContext context)
         {
 	        if (context == null) 
 		        throw new ArgumentNullException(nameof(context));

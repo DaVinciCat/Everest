@@ -5,7 +5,7 @@ namespace Everest.Authentication
 {
 	public static class AuthenticationExtensions
 	{
-		public static bool TryGetAuthenticationScheme(this HttpRequest request, out string scheme)
+		public static bool TryGetAuthenticationScheme(this IHttpRequest request, out string scheme)
 		{
 			scheme = null;
 
@@ -19,7 +19,7 @@ namespace Everest.Authentication
 			return true;
 		}
 
-		public static bool SupportsAuthentication(this HttpRequest request)
+		public static bool SupportsAuthentication(this IHttpRequest request)
 		{
 			if (request == null)
 				throw new ArgumentNullException(nameof(request));

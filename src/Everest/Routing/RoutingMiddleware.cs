@@ -14,7 +14,7 @@ namespace Everest.Routing
             this.router = router ?? throw new ArgumentNullException(nameof(router));
         }
 
-        public override async Task InvokeAsync(HttpContext context)
+        public override async Task InvokeAsync(IHttpContext context)
         {
 	        if (context == null) 
 		        throw new ArgumentNullException(nameof(context));

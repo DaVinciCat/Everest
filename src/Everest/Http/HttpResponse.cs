@@ -11,9 +11,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Everest.Http
 {
-	public class HttpResponse
-	{
-		public ILogger<HttpResponse> Logger { get; }
+	public class HttpResponse : IHttpResponse
+    {
+        ILogger<IHttpResponse> IHttpResponse.Logger => Logger;
+
+        public ILogger<HttpResponse> Logger { get; }
 
 		public Guid TraceIdentifier => request.RequestTraceIdentifier;
 
@@ -60,7 +62,9 @@ namespace Everest.Http
 			}
 		}
 
-		public Encoding ContentEncoding
+        public IPEndPoint RemoteEndPoint => request.RemoteEndPoint;
+
+        public Encoding ContentEncoding
 		{
 			get => response.ContentEncoding ?? Encoding.UTF8;
 			set => response.ContentEncoding = value;
@@ -78,11 +82,9 @@ namespace Everest.Http
 			}
 		}
 
-		public HttpResponseWriter ResponseWriter { get; set; }
-
         public Stream OutputStream => response.OutputStream;
 		
-		private readonly HttpListenerResponse response;
+        private readonly HttpListenerResponse response;
 
 		private readonly HttpListenerRequest request;
 
@@ -94,7 +96,6 @@ namespace Everest.Http
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			StatusCode = HttpStatusCode.OK;
 			ContentEncoding = Encoding.UTF8;
-            ResponseWriter = new HttpResponseWriter(this);
 			
             AppendHeader(HttpHeaders.Server, "Everest");
 		}
@@ -121,16 +122,16 @@ namespace Everest.Http
                 Logger.LogTrace($"{TraceIdentifier} - Response closed");
         }
 
-        public async Task RedirectAsync(string url)
+        public virtual async Task RedirectAsync(string url)
 		{
 			response.Redirect(url);
 			await Task.CompletedTask;
 		}
 		
-		public Task SendEmptyResponseAsync()
+		public virtual Task SendEmptyResponseAsync()
 		{
             if (Logger.IsEnabled(LogLevel.Trace))
-                Logger.LogTrace($"{TraceIdentifier} - Sending response: {new { RemoteEndPoint = request.RemoteEndPoint, ContentLength = ContentLength64.ToReadableSize(), StatusCode = response.StatusCode, ContentType = response.ContentType, ContentEncoding = response.ContentEncoding?.EncodingName }}");
+                Logger.LogTrace($"{TraceIdentifier} - Sending response: {new { RemoteEndPoint = RemoteEndPoint, ContentLength = ContentLength64.ToReadableSize(), StatusCode = response.StatusCode, ContentType = response.ContentType, ContentEncoding = response.ContentEncoding?.EncodingName }}");
 
 			if (!OutputStream.CanWrite)
 			{
@@ -152,10 +153,10 @@ namespace Everest.Http
 			return Task.CompletedTask;
 		}
 
-		public Task SendStatusResponseAsync(HttpStatusCode code)
+		public virtual Task SendStatusResponseAsync(HttpStatusCode code)
 		{
             if (Logger.IsEnabled(LogLevel.Trace))
-                Logger.LogTrace($"{TraceIdentifier} - Sending response: {new { RemoteEndPoint = request.RemoteEndPoint, ContentLength = ContentLength64.ToReadableSize(), StatusCode = response.StatusCode, ContentType = response.ContentType, ContentEncoding = response.ContentEncoding?.EncodingName }}");
+                Logger.LogTrace($"{TraceIdentifier} - Sending response: {new { RemoteEndPoint = RemoteEndPoint, ContentLength = ContentLength64.ToReadableSize(), StatusCode = StatusCode, ContentType = ContentType, ContentEncoding = ContentEncoding?.EncodingName }}");
 
 			if (!OutputStream.CanWrite)
 			{
@@ -178,7 +179,7 @@ namespace Everest.Http
 			return Task.CompletedTask;
 		}
 
-		public async Task SendResponseAsync(byte[] content)
+		public virtual async Task SendResponseAsync(byte[] content)
 		{
 			if (content == null)
 				throw new ArgumentNullException(nameof(content));
@@ -190,13 +191,20 @@ namespace Everest.Http
 			}
 
             if (Logger.IsEnabled(LogLevel.Trace))
-                Logger.LogTrace($"{TraceIdentifier} - Sending response: {new { RemoteEndPoint = request.RemoteEndPoint, ContentLength = content.ToReadableSize(), StatusCode = response.StatusCode, ContentType = response.ContentType, ContentEncoding = response.ContentEncoding?.EncodingName }}");
+                Logger.LogTrace($"{TraceIdentifier} - Sending response: {new { RemoteEndPoint = RemoteEndPoint, ContentLength = content.ToReadableSize(), StatusCode = StatusCode, ContentType = ContentType, ContentEncoding = ContentEncoding?.EncodingName }}");
 
 			try
 			{
-				await ResponseWriter.Write(content);
-				response.OutputStream.Close();
-			}
+                try
+                {
+                    ContentLength64 = content.Length;
+                    await OutputStream.WriteAsync(content, 0, content.Length);
+                }
+                finally
+                {
+                    OutputStream.Close();
+                }
+            }
 			catch
 			{
 				StatusCode = HttpStatusCode.InternalServerError;
@@ -211,7 +219,7 @@ namespace Everest.Http
             }
 		}
 
-		public async Task SendResponseAsync(Stream stream)
+		public virtual async Task SendResponseAsync(Stream stream)
 		{
 			if (stream == null)
 				throw new ArgumentNullException(nameof(stream));
@@ -227,13 +235,32 @@ namespace Everest.Http
 			}
 
             if (Logger.IsEnabled(LogLevel.Trace))
-                Logger.LogTrace($"{TraceIdentifier} - Sending response: {new { RemoteEndPoint = request.RemoteEndPoint, ContentLength = stream.Length.ToReadableSize(), StatusCode = response.StatusCode, ContentType = response.ContentType, ContentEncoding = response.ContentEncoding?.EncodingName }}");
+                Logger.LogTrace($"{TraceIdentifier} - Sending response: {new { RemoteEndPoint = RemoteEndPoint, ContentLength = stream.Length.ToReadableSize(), StatusCode = StatusCode, ContentType = ContentType, ContentEncoding = ContentEncoding?.EncodingName }}");
 
 			try
 			{
-				await ResponseWriter.Write(stream);
-				response.OutputStream.Close();
-			}
+                try
+                {
+                    ContentLength64 = stream.Length;
+
+                    if (stream.CanSeek)
+                    {
+                        stream.Position = 0;
+                    }
+
+                    var buffer = new byte[4096];
+                    int read;
+
+                    while ((read = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                    {
+                        await OutputStream.WriteAsync(buffer, 0, read);
+                    }
+                }
+                finally
+                {
+                    OutputStream.Close();
+                }
+            }
 			catch
 			{
 				StatusCode = HttpStatusCode.InternalServerError;
@@ -251,7 +278,7 @@ namespace Everest.Http
 
 	public static class HttpResponseExtensions
 	{
-		public static async Task SendHtmlResponseAsync(this HttpResponse response, string content)
+		public static async Task SendHtmlResponseAsync(this IHttpResponse response, string content)
 		{
 			if (response == null)
 				throw new ArgumentNullException(nameof(response));
@@ -264,7 +291,7 @@ namespace Everest.Http
 			await response.SendResponseAsync(bytes);
 		}
 
-		public static async Task SendTextResponseAsync(this HttpResponse response, string content)
+		public static async Task SendTextResponseAsync(this IHttpResponse response, string content)
 		{
 			if (response == null)
 				throw new ArgumentNullException(nameof(response));
@@ -277,7 +304,7 @@ namespace Everest.Http
 			await response.SendResponseAsync(bytes);
 		}
 
-		public static async Task SendJsonResponseAsync<T>(this HttpResponse response, T content, JsonSerializerOptions options = null)
+		public static async Task SendJsonResponseAsync<T>(this IHttpResponse response, T content, JsonSerializerOptions options = null)
 		{
 			if (response == null)
 				throw new ArgumentNullException(nameof(response));
@@ -306,7 +333,7 @@ namespace Everest.Http
 			}
 		}
 
-		public static async Task SendFileResponseAsync(this HttpResponse response, string filename, ContentType contentType, ContentDisposition contentDisposition)
+		public static async Task SendFileResponseAsync(this IHttpResponse response, string filename, ContentType contentType, ContentDisposition contentDisposition)
 		{
 			if (response == null)
 				throw new ArgumentNullException(nameof(response));
@@ -348,7 +375,7 @@ namespace Everest.Http
 			}
 		}
 
-		public static async Task SendFileResponseAsync(this HttpResponse response, string filename, string contentType, string contentDisposition)
+		public static async Task SendFileResponseAsync(this IHttpResponse response, string filename, string contentType, string contentDisposition)
 		{
 			if (response == null)
 				throw new ArgumentNullException(nameof(response));

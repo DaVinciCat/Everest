@@ -5,6 +5,6 @@ namespace Everest.Authentication
 {
     public interface IAuthentication
 	{
-        Task<bool> TryAuthenticateAsync(HttpContext context);
+        Task<bool> TryAuthenticateAsync(IHttpContext context);
 	}
 }

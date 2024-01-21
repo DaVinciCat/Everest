@@ -6,6 +6,6 @@ namespace Everest.WebSockets
 {
     public interface IWebSocketRequestHandler
     {
-        Task<bool> Handle(HttpContext context, CancellationToken token);
+        Task<bool> Handle(IHttpContext context, CancellationToken token);
     }
 }

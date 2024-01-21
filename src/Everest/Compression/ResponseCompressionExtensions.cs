@@ -5,7 +5,7 @@ namespace Everest.Compression
 {
 	public static class ResponseCompressionExtensions
 	{
-		public static bool SupportsContentCompression(this HttpRequest request)
+		public static bool SupportsContentCompression(this IHttpRequest request)
 		{
 			if (request == null) 
 				throw new ArgumentNullException(nameof(request));

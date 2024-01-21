@@ -17,7 +17,7 @@ namespace Everest.WebSockets
             Logger = logger;
         }
 
-        public virtual async Task<bool> Handle(HttpContext context, CancellationToken token)
+        public virtual async Task<bool> Handle(IHttpContext context, CancellationToken token)
         {
             if (context == null)
             {

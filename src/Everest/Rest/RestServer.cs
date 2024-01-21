@@ -195,10 +195,10 @@ namespace Everest.Rest
 #if !NET5_0_OR_GREATER
 		private void ProcessRequestAsync(object state)
         {
-			ProcessRequestAsync(state as HttpContext);
+			ProcessRequestAsync(state as IHttpContext);
         }
 #endif
-		private async void ProcessRequestAsync(HttpContext context)
+		private async void ProcessRequestAsync(IHttpContext context)
 		{
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));

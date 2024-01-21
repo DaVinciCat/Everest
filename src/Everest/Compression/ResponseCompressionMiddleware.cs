@@ -7,21 +7,21 @@ namespace Everest.Compression
 {
     public class ResponseCompressionMiddleware : Middleware
     {
-        private readonly IResponseCompressor responseCompressor;
+        private readonly IResponseCompressorProvider provider;
 
-        public ResponseCompressionMiddleware(IResponseCompressor responseCompressor)
+        public ResponseCompressionMiddleware(IResponseCompressorProvider provider)
         {
-            this.responseCompressor = responseCompressor ?? throw new ArgumentNullException(nameof(responseCompressor));
+            this.provider = provider ?? throw new ArgumentNullException(nameof(provider));
         }
 
-        public override async Task InvokeAsync(HttpContext context)
+        public override async Task InvokeAsync(IHttpContext context)
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
 
             if (!context.Response.ResponseSent && context.Request.SupportsContentCompression())
             {
-                await responseCompressor.TryCompressResponseAsync(context);
+                context = new CompressingHttpContextWrapper(context, provider);
             }
 
             if (HasNext)

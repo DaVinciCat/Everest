@@ -18,7 +18,7 @@ namespace Everest.Authentication
 			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 		
-		public async Task<bool> TryAuthenticateAsync(HttpContext context)
+		public async Task<bool> TryAuthenticateAsync(IHttpContext context)
 		{
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
@@ -37,7 +37,7 @@ namespace Everest.Authentication
             return false;
         }
 
-        public Task ChallengeAsync(HttpContext context)
+        public Task ChallengeAsync(IHttpContext context)
         {
             context.Response.StatusCode = HttpStatusCode.Unauthorized;
 

@@ -14,6 +14,6 @@ namespace Everest.Middlewares
 			Next = next;
 		}
 
-		public abstract Task InvokeAsync(HttpContext context);
+		public abstract Task InvokeAsync(IHttpContext context);
 	}
 }

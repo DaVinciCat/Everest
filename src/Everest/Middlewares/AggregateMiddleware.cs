@@ -39,7 +39,7 @@ namespace Everest.Middlewares
 			collection.Add(middleware);
 		}
 		
-		public override async Task InvokeAsync(HttpContext request)
+		public override async Task InvokeAsync(IHttpContext request)
 		{
 			if (request == null) 
 				throw new ArgumentNullException(nameof(request));

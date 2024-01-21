@@ -6,7 +6,7 @@ namespace Everest.Files
 {
     public static class StaticFilesProviderExtensions
     {
-        public static bool IsStaticFileRequest(this IStaticFilesProvider staticFilesProvider, HttpRequest request)
+        public static bool IsStaticFileRequest(this IStaticFilesProvider staticFilesProvider, IHttpRequest request)
         {
             if (staticFilesProvider == null) 
                 throw new ArgumentNullException(nameof(staticFilesProvider));
@@ -22,7 +22,7 @@ namespace Everest.Files
 
         }
 
-        public static string RequestPathToFilePath(this HttpRequest request)
+        public static string RequestPathToFilePath(this IHttpRequest request)
         {
            if (request == null)
                 throw new ArgumentNullException(nameof(request));

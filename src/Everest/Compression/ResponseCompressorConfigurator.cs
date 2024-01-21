@@ -5,18 +5,18 @@ using System.IO.Compression;
 
 namespace Everest.Compression
 {
-	public class ResponseCompressorConfigurator : ServiceConfigurator<ResponseCompressor>
+	public class ResponseCompressorConfigurator : ServiceConfigurator<ResponseCompressorProvider>
 	{
-		public ResponseCompressor ResponseCompressor => Service;
+		public ResponseCompressorProvider ResponseCompressorProvider => Service;
 
-		public ResponseCompressorConfigurator(ResponseCompressor responseCompressor, IServiceProvider services)
-			: base(responseCompressor, services)
+		public ResponseCompressorConfigurator(ResponseCompressorProvider responseCompressorProvider, IServiceProvider services)
+			: base(responseCompressorProvider, services)
 		{
 		}
 
 		public ResponseCompressorConfigurator AddCompressor(string encoding, Func<Stream, Stream> compressor)
 		{
-			ResponseCompressor.Compressors.Add(encoding, compressor);
+			ResponseCompressorProvider.Compressors.Add(encoding, compressor);
 			return this;
 		}
 	}
@@ -25,22 +25,22 @@ namespace Everest.Compression
 	{
 		public static ResponseCompressorConfigurator AddGzipCompressor(this ResponseCompressorConfigurator configurator)
 		{
-			configurator.AddCompressor("gzip", input => new GZipStream(input, CompressionLevel.Fastest));
+			configurator.AddCompressor("gzip", output => new GZipStream(output, CompressionLevel.Fastest));
 			return configurator;
 		}
 
 		public static ResponseCompressorConfigurator AddDeflateCompressor(this ResponseCompressorConfigurator configurator)
 		{
-			configurator.AddCompressor("deflate", input => new DeflateStream(input, CompressionLevel.Fastest));
+			configurator.AddCompressor("deflate", output => new DeflateStream(output, CompressionLevel.Fastest));
 			return configurator;
 		}
 
 #if NET5_0_OR_GREATER
 		public static ResponseCompressorConfigurator AddBrotliCompressor(this ResponseCompressorConfigurator configurator)
 		{
-			configurator.AddCompressor("brotli", input => new BrotliStream(input, CompressionLevel.Fastest));
+			configurator.AddCompressor("brotli", output => new BrotliStream(output, CompressionLevel.Fastest));
 			return configurator;
 		}
 #endif
-	}
+    }
 }

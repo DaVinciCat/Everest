@@ -11,11 +11,13 @@ using Microsoft.Extensions.Logging;
 
 namespace Everest.Http
 {
-	public class HttpRequest
-	{
-		public ILogger<HttpRequest> Logger { get; }
+	public class HttpRequest : IHttpRequest
+    {
+        ILogger<IHttpRequest> IHttpRequest.Logger => Logger;
 
-		public Guid TraceIdentifier => request.RequestTraceIdentifier;
+        public ILogger<HttpRequest> Logger { get; }
+		
+        public Guid TraceIdentifier => request.RequestTraceIdentifier;
 
 		public string HttpMethod => request.HttpMethod;
 
@@ -34,8 +36,8 @@ namespace Everest.Http
 		public ParameterCollection QueryParameters { get; set; }
 
 		public ParameterCollection PathParameters { get; set; }
-
-		private readonly HttpListenerRequest request;
+		
+        private readonly HttpListenerRequest request;
 
 		public HttpRequest(HttpListenerRequest request, ILogger<HttpRequest> logger)
 		{
@@ -49,7 +51,7 @@ namespace Everest.Http
 		public bool HasHeader(string name) => request.Headers[name] != null;
 
 		/*https://learn.microsoft.com/en-us/dotnet/api/system.net.httplistenerrequest.inputstream?view=net-7.0*/
-		public async Task<byte[]> ReadRequestBodyAsync()
+		public virtual async Task<byte[]> ReadRequestBodyAsync()
 		{
 			if (!request.HasEntityBody)
 				return Array.Empty<byte>();
@@ -82,13 +84,13 @@ namespace Everest.Http
 
 	public static class HttpRequestExtensions
 	{
-		public static async Task<string> ReadRequestBodyAsTextAsync(this HttpRequest request)
+		public static async Task<string> ReadRequestBodyAsTextAsync(this IHttpRequest request)
 		{
 			var data = await request.ReadRequestBodyAsync();
 			return request.ContentEncoding.GetString(data);
 		}
 
-		public static async Task<T> ReadRequestBodyAsJsonAsync<T>(this HttpRequest request, JsonSerializerOptions options = null)
+		public static async Task<T> ReadRequestBodyAsJsonAsync<T>(this IHttpRequest request, JsonSerializerOptions options = null)
 		{
 			var data = await request.ReadRequestBodyAsync();
 
@@ -97,7 +99,7 @@ namespace Everest.Http
 				JsonSerializer.Deserialize<T>(data, options);
 		}
 
-		public static async Task<NameValueCollection> ReadRequestBodyAsFormAsync(this HttpRequest request)
+		public static async Task<NameValueCollection> ReadRequestBodyAsFormAsync(this IHttpRequest request)
 		{
 			var data = await request.ReadRequestBodyAsync();
 			var content = request.ContentEncoding.GetString(data);

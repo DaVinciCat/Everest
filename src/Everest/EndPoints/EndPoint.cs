@@ -13,16 +13,16 @@ namespace Everest.EndPoints
 
 		public MethodInfo MethodInfo { get; }
 
-		public Func<HttpContext, Task> Action { get; }
+		public Func<IHttpContext, Task> Action { get; }
 		
-		public EndPoint(Type type, MethodInfo methodInfo, Func<HttpContext, Task> action)
+		public EndPoint(Type type, MethodInfo methodInfo, Func<IHttpContext, Task> action)
 		{
 			Type = type ?? throw new ArgumentNullException(nameof(type));
 			MethodInfo = methodInfo ?? throw new ArgumentNullException(nameof(methodInfo));
 			Action = action ?? throw new ArgumentNullException(nameof(action));
 		}
 
-		public async Task InvokeAsync(HttpContext context)
+		public async Task InvokeAsync(IHttpContext context)
 		{
 			if(context == null)
 				throw new ArgumentNullException(nameof(context));

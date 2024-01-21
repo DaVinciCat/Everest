@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Everest.WebSockets
 {
-    public class WebSocketContext
+    public class WebSocketContext : IWebSocketContext
     {
         public bool IsWebSocketRequest => context.Request.IsWebSocketRequest;
 

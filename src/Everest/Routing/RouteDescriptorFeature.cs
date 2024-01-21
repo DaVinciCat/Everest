@@ -21,7 +21,7 @@ namespace Everest.Routing
 
 	public static class HttpContextRouteDescriptorFeatureExtensions
 	{
-		public static RouteDescriptor GetRouteDescriptor(this HttpContext context)
+		public static RouteDescriptor GetRouteDescriptor(this IHttpContext context)
 		{
 			if (context == null) 
 				throw new ArgumentNullException(nameof(context));
@@ -29,7 +29,7 @@ namespace Everest.Routing
 			return context.Features.Get<IRouteDescriptorFeature>()?.RouteDescriptor ?? throw new ArgumentNullException(nameof(IRouteDescriptorFeature));
 		}
 
-		public static bool TryGetRouteDescriptor(this HttpContext context, out RouteDescriptor descriptor)
+		public static bool TryGetRouteDescriptor(this IHttpContext context, out RouteDescriptor descriptor)
 		{
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));

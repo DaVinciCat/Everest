@@ -9,6 +9,6 @@ namespace Everest.Routing
 
 		void RegisterRoute(RouteDescriptor descriptor);
 
-		Task<bool> TryRouteAsync(HttpContext context);
+		Task<bool> TryRouteAsync(IHttpContext context);
 	}
 }
