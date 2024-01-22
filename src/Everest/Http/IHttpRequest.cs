@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Specialized;
+using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,7 +21,7 @@ namespace Everest.Http
 
         string Description { get; }
 
-        bool HasBody { get; }
+        bool HasRequestBody { get; }
 
         bool HasHeader(string name);
 
@@ -34,6 +35,8 @@ namespace Everest.Http
 
         ParameterCollection PathParameters { get; set; }
     
+        Stream InputStream { get; }
+
         Task<byte[]> ReadRequestBodyAsync();
     }
 }

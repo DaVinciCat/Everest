@@ -21,7 +21,7 @@ namespace Everest.Http
 
 		public string HttpMethod => request.HttpMethod;
 
-		public bool HasBody => request.HasEntityBody;
+		public bool HasRequestBody => request.HasEntityBody;
 
 		public string Path => request.Url?.AbsolutePath.TrimEnd('/');
 
@@ -36,6 +36,8 @@ namespace Everest.Http
 		public ParameterCollection QueryParameters { get; set; }
 
 		public ParameterCollection PathParameters { get; set; }
+
+		public Stream InputStream => request.InputStream;
 		
         private readonly HttpListenerRequest request;
 
@@ -53,12 +55,12 @@ namespace Everest.Http
 		/*https://learn.microsoft.com/en-us/dotnet/api/system.net.httplistenerrequest.inputstream?view=net-7.0*/
 		public virtual async Task<byte[]> ReadRequestBodyAsync()
 		{
-			if (!request.HasEntityBody)
+			if (!HasRequestBody)
 				return Array.Empty<byte>();
 
-			if (request.InputStream.CanSeek)
+			if (InputStream.CanSeek)
 			{
-				request.InputStream.Position = 0;
+				InputStream.Position = 0;
 			}
 
 			var buffer = new byte[4096];
@@ -67,7 +69,7 @@ namespace Everest.Http
 				try
 				{
 					int read;
-					while ((read = await request.InputStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+					while ((read = await InputStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
 					{
 						ms.Write(buffer, 0, read);
 					}
@@ -77,7 +79,8 @@ namespace Everest.Http
 				finally
 				{
 					ms.Close();			
-				}
+					InputStream.Close();
+                }
 			}
 		}
 	}
