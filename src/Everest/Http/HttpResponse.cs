@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 using System.Collections.Specialized;
 using System.IO;
 using System.Net;
@@ -293,11 +294,27 @@ namespace Everest.Http
 				throw new ArgumentNullException(nameof(content));
 
 			response.ContentType = "text/html";
-			var bytes = response.ContentEncoding.GetBytes(content);
-			await response.SendResponseAsync(bytes);
-		}
 
-		public static async Task SendTextResponseAsync(this IHttpResponse response, string content)
+#if NET5_0_OR_GREATER
+			var byteCount = response.ContentEncoding.GetByteCount(content);
+			var buffer = ArrayPool<byte>.Shared.Rent(byteCount);
+
+			try
+			{
+				response.ContentEncoding.GetBytes(content, 0, content.Length, buffer, 0);
+				await response.SendResponseAsync(buffer, 0, byteCount);
+			}
+			finally
+			{
+				ArrayPool<byte>.Shared.Return(buffer);
+			}
+#else
+            var bytes = response.ContentEncoding.GetBytes(content);
+            await response.SendResponseAsync(bytes);
+#endif
+        }
+
+        public static async Task SendTextResponseAsync(this IHttpResponse response, string content)
 		{
 			if (response == null)
 				throw new ArgumentNullException(nameof(response));
@@ -306,11 +323,27 @@ namespace Everest.Http
 				throw new ArgumentNullException(nameof(content));
             
             response.ContentType = "text/plain";
-			var bytes = response.ContentEncoding.GetBytes(content);
-			await response.SendResponseAsync(bytes);
-		}
 
-		public static async Task SendJsonResponseAsync<T>(this IHttpResponse response, T content, JsonSerializerOptions options = null)
+#if NET5_0_OR_GREATER
+            var byteCount = response.ContentEncoding.GetByteCount(content);
+            var buffer = ArrayPool<byte>.Shared.Rent(byteCount);
+
+            try
+            {
+                response.ContentEncoding.GetBytes(content, 0, content.Length, buffer, 0);
+                await response.SendResponseAsync(buffer, 0, byteCount);
+            }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(buffer);
+            }
+#else
+            var bytes = response.ContentEncoding.GetBytes(content);
+            await response.SendResponseAsync(bytes);
+#endif
+        }
+
+        public static async Task SendJsonResponseAsync<T>(this IHttpResponse response, T content, JsonSerializerOptions options = null)
 		{
 			if (response == null)
 				throw new ArgumentNullException(nameof(response));
@@ -325,10 +358,26 @@ namespace Everest.Http
 											JsonSerializer.Serialize(content, options);
                
 				response.ContentType = "application/json";
-				var bytes = response.ContentEncoding.GetBytes(json);
-				await response.SendResponseAsync(bytes);
-			}
-			catch
+
+#if NET5_0_OR_GREATER
+                var byteCount = response.ContentEncoding.GetByteCount(json);
+                var buffer = ArrayPool<byte>.Shared.Rent(byteCount);
+
+                try
+                {
+                    response.ContentEncoding.GetBytes(json, 0, json.Length, buffer, 0);
+                    await response.SendResponseAsync(buffer, 0, byteCount);
+                }
+                finally
+                {
+                    ArrayPool<byte>.Shared.Return(buffer);
+                }
+#else
+            var bytes = response.ContentEncoding.GetBytes(json);
+            await response.SendResponseAsync(bytes);
+#endif
+            }
+            catch
 			{
 				response.StatusCode = HttpStatusCode.InternalServerError;
 				throw;

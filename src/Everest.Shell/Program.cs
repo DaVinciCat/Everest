@@ -201,6 +201,15 @@ namespace Everest.Shell
         {
 
         }
+
+        private static readonly string Text = new string('a', 100000);
+
+        [RoutePrefix("")]
+        [HttpGet("/test")]
+        public static async Task Test(IHttpContext context)
+        {
+            await context.Response.SendTextResponseAsync(Text);
+        }
     }
 
     class Program
