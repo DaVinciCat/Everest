@@ -179,26 +179,32 @@ namespace Everest.Http
 			return Task.CompletedTask;
 		}
 
-		public virtual async Task SendResponseAsync(byte[] content)
+        public virtual async Task SendResponseAsync(byte[] content)
+        {
+            await SendResponseAsync(content, 0, content.Length);
+        }
+		
+        public virtual async Task SendResponseAsync(byte[] content, int offset, int count)
 		{
 			if (content == null)
 				throw new ArgumentNullException(nameof(content));
-
-
+			
 			if (!OutputStream.CanWrite)
 			{
 				throw new InvalidOperationException("Output stream is not writable");
 			}
 
+			var length = count - offset;
+
             if (Logger.IsEnabled(LogLevel.Trace))
-                Logger.LogTrace($"{TraceIdentifier} - Sending response: {new { RemoteEndPoint = RemoteEndPoint, ContentLength = content.ToReadableSize(), StatusCode = StatusCode, ContentType = ContentType, ContentEncoding = ContentEncoding?.EncodingName }}");
+                Logger.LogTrace($"{TraceIdentifier} - Sending response: {new { RemoteEndPoint = RemoteEndPoint, ContentLength = length.ToReadableSize(), StatusCode = StatusCode, ContentType = ContentType, ContentEncoding = ContentEncoding?.EncodingName }}");
 
 			try
 			{
                 try
                 {
-                    ContentLength64 = content.Length;
-                    await OutputStream.WriteAsync(content, 0, content.Length);
+                    ContentLength64 = length;
+                    await OutputStream.WriteAsync(content, offset, count);
                 }
                 finally
                 {

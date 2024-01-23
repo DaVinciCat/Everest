@@ -56,6 +56,8 @@ namespace Everest.Http
 
         Task SendResponseAsync(byte[] content);
 
+        Task SendResponseAsync(byte[] content, int offset, int count);
+
         Task SendResponseAsync(Stream stream);
     }
 }
