@@ -84,6 +84,8 @@ namespace Everest.Http
 
         public virtual Task SendResponseAsync(byte[] content) => response.SendResponseAsync(content);
 
+        public virtual Task SendResponseAsync(byte[] content, int offset, int count) => response.SendResponseAsync(content, offset, count);
+
         public virtual Task SendResponseAsync(Stream stream) => response.SendResponseAsync(stream);
 
         private readonly IHttpResponse response;

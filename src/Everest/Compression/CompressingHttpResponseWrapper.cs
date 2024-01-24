@@ -21,7 +21,7 @@ namespace Everest.Compression
             this.provider = provider ?? throw new ArgumentNullException(nameof(provider));
         }
 
-        public override async Task SendResponseAsync(byte[] content)
+        public override async Task SendResponseAsync(byte[] content, int offset, int count)
         {
             if (content == null)
                 throw new ArgumentNullException(nameof(content));
@@ -34,12 +34,13 @@ namespace Everest.Compression
 
             try
             {
-                Stream output; 
+                Stream output;
+                var length = count - offset;
 
                 if (await provider.TryGetResponseCompressorAsync(context, content, out var encoding, out var compressor))
                 {
                     if (Logger.IsEnabled(LogLevel.Trace))
-                        Logger.LogTrace($"{TraceIdentifier} - Sending compressed response: {new { RemoteEndPoint = RemoteEndPoint, ContentLength = content.ToReadableSize(), StatusCode = StatusCode, ContentType = ContentType, ContentEncoding = ContentEncoding?.EncodingName }}");
+                        Logger.LogTrace($"{TraceIdentifier} - Sending compressed response: {new { RemoteEndPoint = RemoteEndPoint, ContentLength = length.ToReadableSize(), StatusCode = StatusCode, ContentType = ContentType, ContentEncoding = ContentEncoding?.EncodingName }}");
 
                     context.Response.RemoveHeader(HttpHeaders.ContentEncoding);
                     context.Response.AddHeader(HttpHeaders.ContentEncoding, encoding);
@@ -48,15 +49,15 @@ namespace Everest.Compression
                 else
                 {
                     if (Logger.IsEnabled(LogLevel.Trace))
-                        Logger.LogTrace($"{TraceIdentifier} - Sending response: {new { RemoteEndPoint = RemoteEndPoint, ContentLength = content.Length.ToReadableSize(), StatusCode = StatusCode, ContentType = ContentType, ContentEncoding = ContentEncoding?.EncodingName }}");
+                        Logger.LogTrace($"{TraceIdentifier} - Sending response: {new { RemoteEndPoint = RemoteEndPoint, ContentLength = length.ToReadableSize(), StatusCode = StatusCode, ContentType = ContentType, ContentEncoding = ContentEncoding?.EncodingName }}");
 
-                    ContentLength64 = content.Length;
+                    ContentLength64 = length;
                     output = OutputStream;
                 }
 
                 try
                 {
-                    await output.WriteAsync(content, 0, content.Length);
+                    await output.WriteAsync(content, offset, length);
                 }
                 finally
                 {
