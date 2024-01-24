@@ -1,5 +1,6 @@
 ﻿using Everest.Http;
 using System;
+using System.Data;
 using System.Net;
 using System.Threading;
 using Everest.Collections;
@@ -205,58 +206,57 @@ namespace Everest.Rest
 
 			var exceptionWasThrown = false;
 
-			try
-			{
-				try
-				{
-                    if (Logger.IsEnabled(LogLevel.Trace))
-                        Logger.LogTrace($"{context.TraceIdentifier} - Try to process incoming request");
-					
-                    await aggregateMiddleware.InvokeAsync(context);
-				}
-                catch (HttpListenerException ex)
-                {
-                    exceptionWasThrown = true;
+            try
+            {
+                if (Logger.IsEnabled(LogLevel.Trace))
+                    Logger.LogTrace($"{context.TraceIdentifier} - Try to process incoming request");
 
-                    if (Logger.IsEnabled(LogLevel.Error))
-                        Logger.LogError(ex, $"{context.TraceIdentifier} - Failed to process incoming request");
-                }
-                catch (Exception ex) 
-				{
-					exceptionWasThrown = true;
+                await aggregateMiddleware.InvokeAsync(context);
+            }
+            catch (HttpListenerException ex)
+            {
+                exceptionWasThrown = true;
 
-					if (Logger.IsEnabled(LogLevel.Error))
-                        Logger.LogError(ex, $"{context.TraceIdentifier} - Failed to process incoming request");
-
-					context.Response.StatusCode = HttpStatusCode.InternalServerError;
-				}
-				finally
-				{
-					if (!context.Response.ResponseSent)
-					{
-                        try
-                        {
-                            context.Response.OutputStream.Close();
-                        }
-                        finally
-                        {
-                            context.Response.CloseResponse();
-                        }
-                    }
-
-					if (!exceptionWasThrown)
-					{
-                        if (Logger.IsEnabled(LogLevel.Trace))
-                            Logger.LogTrace($"{context.TraceIdentifier} - Successfully processed incoming request");
-					}
-				}
-			}
-			catch (Exception ex)
-			{
-				if (Logger.IsEnabled(LogLevel.Error))
+                if (Logger.IsEnabled(LogLevel.Error))
                     Logger.LogError(ex, $"{context.TraceIdentifier} - Failed to process incoming request");
-			}
-		}
+            }
+            catch (Exception ex)
+            {
+                exceptionWasThrown = true;
+
+                if (Logger.IsEnabled(LogLevel.Error))
+                    Logger.LogError(ex, $"{context.TraceIdentifier} - Failed to process incoming request");
+
+                context.Response.StatusCode = HttpStatusCode.InternalServerError;
+            }
+            finally
+            {
+                if (!context.Response.ResponseSent)
+                {
+                    try
+                    {
+                        context.Response.OutputStream.Close();
+                    }
+                    catch (Exception ex)
+                    {
+                        exceptionWasThrown = true;
+
+                        if (Logger.IsEnabled(LogLevel.Error))
+                            Logger.LogError(ex, $"{context.TraceIdentifier} - Failed to close output stream");
+                    }
+                    finally
+                    {
+                        context.Response.CloseResponse();
+                    }
+                }
+
+                if (!exceptionWasThrown)
+                {
+                    if (Logger.IsEnabled(LogLevel.Trace))
+                        Logger.LogTrace($"{context.TraceIdentifier} - Successfully processed incoming request");
+                }
+            }
+        }
 
 		public void Dispose()
 		{
