@@ -214,7 +214,14 @@ namespace Everest.Rest
 					
                     await aggregateMiddleware.InvokeAsync(context);
 				}
-				catch(Exception ex) 
+                catch (HttpListenerException ex)
+                {
+                    exceptionWasThrown = true;
+
+                    if (Logger.IsEnabled(LogLevel.Error))
+                        Logger.LogError(ex, $"{context.TraceIdentifier} - Failed to process incoming request");
+                }
+                catch (Exception ex) 
 				{
 					exceptionWasThrown = true;
 
@@ -227,8 +234,15 @@ namespace Everest.Rest
 				{
 					if (!context.Response.ResponseSent)
 					{
-						await context.Response.SendEmptyResponseAsync();
-					}
+                        try
+                        {
+                            context.Response.OutputStream.Close();
+                        }
+                        finally
+                        {
+                            context.Response.CloseResponse();
+                        }
+                    }
 
 					if (!exceptionWasThrown)
 					{

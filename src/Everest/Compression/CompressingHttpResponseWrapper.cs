@@ -63,6 +63,10 @@ namespace Everest.Compression
                     output.Close();
                 }
             }
+            catch (HttpListenerException)
+            {
+                throw;
+            }
             catch
             {
                 StatusCode = HttpStatusCode.InternalServerError;
@@ -133,6 +137,10 @@ namespace Everest.Compression
                 {
                     output.Close();
                 }
+            }
+            catch (HttpListenerException)
+            {
+                throw;
             }
             catch
             {

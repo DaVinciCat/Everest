@@ -193,8 +193,8 @@ namespace Everest.Http
             if (Logger.IsEnabled(LogLevel.Trace))
                 Logger.LogTrace($"{TraceIdentifier} - Sending response: {new { RemoteEndPoint = RemoteEndPoint, ContentLength = content.ToReadableSize(), StatusCode = StatusCode, ContentType = ContentType, ContentEncoding = ContentEncoding?.EncodingName }}");
 
-			try
-			{
+            try
+            {
                 try
                 {
                     ContentLength64 = content.Length;
@@ -204,6 +204,10 @@ namespace Everest.Http
                 {
                     OutputStream.Close();
                 }
+            }
+            catch (HttpListenerException)
+            {
+                throw;
             }
 			catch
 			{
@@ -261,7 +265,11 @@ namespace Everest.Http
                     OutputStream.Close();
                 }
             }
-			catch
+            catch (HttpListenerException)
+            {
+                throw;
+            }
+            catch
 			{
 				StatusCode = HttpStatusCode.InternalServerError;
 				throw;
@@ -312,16 +320,20 @@ namespace Everest.Http
 			if (content == null)
 				throw new ArgumentNullException(nameof(content));
 
-			try
-			{
-				var json = options == null ?
-											JsonSerializer.Serialize(content) :
-											JsonSerializer.Serialize(content, options);
-               
-				response.ContentType = "application/json";
-				var bytes = response.ContentEncoding.GetBytes(json);
-				await response.SendResponseAsync(bytes);
-			}
+            try
+            {
+                var json = options == null
+                    ? JsonSerializer.Serialize(content)
+                    : JsonSerializer.Serialize(content, options);
+
+                response.ContentType = "application/json";
+                var bytes = response.ContentEncoding.GetBytes(json);
+                await response.SendResponseAsync(bytes);
+            }
+            catch (HttpListenerException)
+            {
+                throw;
+            }
 			catch
 			{
 				response.StatusCode = HttpStatusCode.InternalServerError;
@@ -364,7 +376,11 @@ namespace Everest.Http
 					}
 				}
 			}
-			catch
+            catch (HttpListenerException)
+            {
+                throw;
+            }
+            catch
 			{
 				response.StatusCode = HttpStatusCode.InternalServerError;
 				throw;
@@ -406,7 +422,11 @@ namespace Everest.Http
 					}
 				}
 			}
-			catch
+            catch (HttpListenerException)
+            {
+                throw;
+            }
+            catch
 			{
 				response.StatusCode = HttpStatusCode.InternalServerError;
 				throw;

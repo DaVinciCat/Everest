@@ -37,6 +37,9 @@ namespace Everest.Exceptions
 			if (ex == null)
 				throw new ArgumentNullException(nameof(ex));
 
+			if(ex is HttpListenerException)
+				return;
+
 			if (!context.Response.ResponseSent)
 			{
 				context.Response.KeepAlive = false;
