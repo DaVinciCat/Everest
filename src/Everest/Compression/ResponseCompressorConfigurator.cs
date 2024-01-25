@@ -5,18 +5,18 @@ using System.IO.Compression;
 
 namespace Everest.Compression
 {
-	public class ResponseCompressorConfigurator : ServiceConfigurator<ResponseCompressorProvider>
+	public class ResponseCompressorConfigurator : ServiceConfigurator<ResponseCompressor>
 	{
-		public ResponseCompressorProvider ResponseCompressorProvider => Service;
+		public ResponseCompressor ResponseCompressor => Service;
 
-		public ResponseCompressorConfigurator(ResponseCompressorProvider responseCompressorProvider, IServiceProvider services)
-			: base(responseCompressorProvider, services)
+		public ResponseCompressorConfigurator(ResponseCompressor responseCompressor, IServiceProvider services)
+			: base(responseCompressor, services)
 		{
 		}
 
 		public ResponseCompressorConfigurator AddCompressor(string encoding, Func<Stream, Stream> compressor)
 		{
-			ResponseCompressorProvider.Compressors.Add(encoding, compressor);
+            ResponseCompressor.Compressors.Add(encoding, compressor);
 			return this;
 		}
 	}

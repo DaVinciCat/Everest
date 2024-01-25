@@ -73,10 +73,10 @@ namespace Everest.Rest
 				return new StaticFileRequestHandler(staticFilesProvider, mimeTypesProvider, loggerFactory.CreateLogger<StaticFileRequestHandler>());
 			});
 
-			services.TryAddSingleton<IResponseCompressorProvider>(provider =>
+			services.TryAddSingleton<IResponseCompressor>(provider =>
 			{
 				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
-				return new ResponseCompressorProvider(loggerFactory.CreateLogger<ResponseCompressorProvider>());
+				return new ResponseCompressor(loggerFactory.CreateLogger<ResponseCompressor>());
 			});
 
 			services.TryAddSingleton<IEndPointInvoker>(provider =>
@@ -220,21 +220,21 @@ namespace Everest.Rest
 			return services;
 		}
 		
-		public static IServiceCollection AddResponseCompressorProvider(this IServiceCollection services, Func<IServiceProvider, IResponseCompressorProvider> builder)
+		public static IServiceCollection AddResponseCompressor(this IServiceCollection services, Func<IServiceProvider, IResponseCompressor> builder)
 		{
 			services.AddSingleton(builder);
 			return services;
 		}
 
-		public static IServiceCollection AddResponseCompressorProvider(this IServiceCollection services, Action<ResponseCompressorConfigurator> configurator)
+		public static IServiceCollection AddResponseCompressor(this IServiceCollection services, Action<ResponseCompressorConfigurator> configurator)
 		{
-			services.AddSingleton<IResponseCompressorProvider>(provider =>
+			services.AddSingleton<IResponseCompressor>(provider =>
 			{
 				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
-				var responseCompressorProvider = new ResponseCompressorProvider(loggerFactory.CreateLogger<ResponseCompressorProvider>());
-				configurator(new ResponseCompressorConfigurator(responseCompressorProvider, provider));
+				var responseCompressor = new ResponseCompressor(loggerFactory.CreateLogger<ResponseCompressor>());
+				configurator(new ResponseCompressorConfigurator(responseCompressor, provider));
 
-				return responseCompressorProvider;
+				return responseCompressor;
 			});
 
 			return services;
@@ -381,8 +381,8 @@ namespace Everest.Rest
 		
 		public static RestServerBuilder UseResponseCompressionMiddleware(this RestServerBuilder builder)
 		{
-			var responseCompressorProvider = builder.Services.GetRequiredService<IResponseCompressorProvider>();
-			builder.Middleware.Add(new ResponseCompressionMiddleware(responseCompressorProvider));
+			var responseCompressor = builder.Services.GetRequiredService<IResponseCompressor>();
+			builder.Middleware.Add(new ResponseCompressionMiddleware(responseCompressor));
 			return builder;
 		}
 

@@ -6,10 +6,10 @@ namespace Everest.Compression
     {
         public override IHttpResponse Response { get; }
 
-        public CompressingHttpContextWrapper(IHttpContext context, IResponseCompressorProvider provider)
+        public CompressingHttpContextWrapper(IHttpContext context, IResponseCompressor compressor)
             : base(context)
         {
-            Response = new CompressingHttpResponseWrapper(context, provider);
+            Response = new CompressingHttpResponseWrapper(context, compressor);
         }
     }
 }

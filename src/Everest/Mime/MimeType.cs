@@ -226,7 +226,7 @@ namespace Everest.Mime
 		public static MimeType Jpe = new MimeType(".jpe", "image/jpeg", true);
 		public static MimeType Jpeg = new MimeType(".jpeg", "image/jpeg", true);
 		public static MimeType Jpg = new MimeType(".jpg", "image/jpeg", true);
-		public static MimeType Js = new MimeType(".js", "application/x-javascript", false);
+		public static MimeType Js = new MimeType(".js", "text/javascript", false);
 		public static MimeType Json = new MimeType(".json", "application/json", false);
 		public static MimeType Jsx = new MimeType(".jsx", "text/jscript", false);
 		public static MimeType Jsxbin = new MimeType(".jsxbin", "text/plain", false);

@@ -1,8 +1,5 @@
-﻿using Everest.Utils;
-using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.IO;
-using System.Net;
 using System.Threading.Tasks;
 using Everest.Http;
 
@@ -10,76 +7,26 @@ namespace Everest.Compression
 {
     public sealed class CompressingHttpResponseWrapper : HttpResponseWrapper
     {
-        private readonly IResponseCompressorProvider provider;
+        private readonly IResponseCompressor compressor;
 
         private readonly IHttpContext context;
 
-        public CompressingHttpResponseWrapper(IHttpContext context, IResponseCompressorProvider provider)
+        public CompressingHttpResponseWrapper(IHttpContext context, IResponseCompressor compressor)
             : base(context.Response)
         {
             this.context = context;
-            this.provider = provider ?? throw new ArgumentNullException(nameof(provider));
+            this.compressor = compressor ?? throw new ArgumentNullException(nameof(compressor));
         }
 
         public override async Task SendResponseAsync(byte[] content, int offset, int count)
         {
             if (content == null)
                 throw new ArgumentNullException(nameof(content));
+            
+            if(await compressor.TrySendCompressedResponseAsync(context, content, offset, count))
+                return;
 
-
-            if (!OutputStream.CanWrite)
-            {
-                throw new InvalidOperationException("Output stream is not writable");
-            }
-
-            try
-            {
-                Stream output;
-                var length = count - offset;
-
-                if (await provider.TryGetResponseCompressorAsync(context, content, out var encoding, out var compressor))
-                {
-                    if (Logger.IsEnabled(LogLevel.Trace))
-                        Logger.LogTrace($"{TraceIdentifier} - Sending compressed response: {new { RemoteEndPoint = RemoteEndPoint, ContentLength = length.ToReadableSize(), StatusCode = StatusCode, ContentType = ContentType, ContentEncoding = ContentEncoding?.EncodingName }}");
-
-                    context.Response.RemoveHeader(HttpHeaders.ContentEncoding);
-                    context.Response.AddHeader(HttpHeaders.ContentEncoding, encoding);
-                    output = compressor(context.Response.OutputStream);
-                }
-                else
-                {
-                    if (Logger.IsEnabled(LogLevel.Trace))
-                        Logger.LogTrace($"{TraceIdentifier} - Sending response: {new { RemoteEndPoint = RemoteEndPoint, ContentLength = length.ToReadableSize(), StatusCode = StatusCode, ContentType = ContentType, ContentEncoding = ContentEncoding?.EncodingName }}");
-
-                    ContentLength64 = length;
-                    output = OutputStream;
-                }
-
-                try
-                {
-                    await output.WriteAsync(content, offset, length);
-                }
-                finally
-                {
-                    output.Close();
-                }
-            }
-            catch (HttpListenerException)
-            {
-                throw;
-            }
-            catch
-            {
-                StatusCode = HttpStatusCode.InternalServerError;
-                throw;
-            }
-            finally
-            {
-                if (Logger.IsEnabled(LogLevel.Trace))
-                    Logger.LogTrace($"{TraceIdentifier} - Response sent");
-
-                CloseResponse();
-            }
+            await context.Response.SendResponseAsync(content, offset, count);
         }
 
         public override async Task SendResponseAsync(Stream stream)
@@ -87,74 +34,10 @@ namespace Everest.Compression
             if (stream == null)
                 throw new ArgumentNullException(nameof(stream));
 
-            if (!stream.CanRead)
-            {
-                throw new InvalidOperationException("Input stream is not readable");
-            }
+            if (await compressor.TrySendCompressedResponseAsync(context, stream))
+                return;
 
-            if (!OutputStream.CanWrite)
-            {
-                throw new InvalidOperationException("Output stream is not writable");
-            }
-
-            try
-            {
-                Stream output;
-
-                if (await provider.TryGetResponseCompressorAsync(context, stream, out var encoding, out var compressor))
-                {
-                    if (Logger.IsEnabled(LogLevel.Trace))
-                        Logger.LogTrace($"{TraceIdentifier} - Sending compressed response: {new { RemoteEndPoint = RemoteEndPoint, ContentLength = stream.Length.ToReadableSize(), StatusCode = StatusCode, ContentType = ContentType, ContentEncoding = ContentEncoding?.EncodingName }}");
-
-                    context.Response.RemoveHeader(HttpHeaders.ContentEncoding);
-                    context.Response.AddHeader(HttpHeaders.ContentEncoding, encoding);
-                    output = compressor(context.Response.OutputStream);
-                }
-                else
-                {
-                    if (Logger.IsEnabled(LogLevel.Trace))
-                        Logger.LogTrace($"{TraceIdentifier} - Sending response: {new { RemoteEndPoint = RemoteEndPoint, ContentLength = stream.Length.ToReadableSize(), StatusCode = StatusCode, ContentType = ContentType, ContentEncoding = ContentEncoding?.EncodingName }}");
-
-                    ContentLength64 = stream.Length;
-                    output = OutputStream;
-                }
-
-                try
-                {
-                    if (stream.CanSeek)
-                    {
-                        stream.Position = 0;
-                    }
-
-                    var buffer = new byte[4096];
-                    int read;
-
-                    while ((read = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
-                    {
-                        await output.WriteAsync(buffer, 0, read);
-                    }
-                }
-                finally
-                {
-                    output.Close();
-                }
-            }
-            catch (HttpListenerException)
-            {
-                throw;
-            }
-            catch
-            {
-                StatusCode = HttpStatusCode.InternalServerError;
-                throw;
-            }
-            finally
-            {
-                if (Logger.IsEnabled(LogLevel.Trace))
-                    Logger.LogTrace($"{TraceIdentifier} - Response sent");
-
-                CloseResponse();
-            }
+            await context.Response.SendResponseAsync(stream);
         }
     }
 }
