@@ -15,6 +15,8 @@ namespace Everest.Compression
 
         public int CompressionMinLength { get; set; } = 2048;
 
+        public int CompressionMaxLength { get; set; } = 1024 * 1024 * 1024;
+
         public ContentTypeCollection MediaTypes { get; } = new ContentTypeCollection
                 {
                     "text/plain",
@@ -54,7 +56,7 @@ namespace Everest.Compression
 
             var length = count - offset;
 
-            if (length < CompressionMinLength || !MediaTypes.Has(context.Response.ContentType))
+            if (length < CompressionMinLength  || length > CompressionMaxLength || !MediaTypes.Has(context.Response.ContentType))
             {
                 return false;
             }
@@ -123,7 +125,7 @@ namespace Everest.Compression
 
             var length = stream.Length;
 
-            if (length < CompressionMinLength || !MediaTypes.Has(context.Response.ContentType))
+            if (length < CompressionMinLength || length > CompressionMaxLength || !MediaTypes.Has(context.Response.ContentType))
             {
                 return false;
             }
