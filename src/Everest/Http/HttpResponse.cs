@@ -305,7 +305,6 @@ namespace Everest.Http
             {
                 response.ContentType = "text/html";
 
-#if NET5_0_OR_GREATER
                 var byteCount = response.ContentEncoding.GetByteCount(content);
                 var buffer = ArrayPool<byte>.Shared.Rent(byteCount);
 
@@ -318,10 +317,6 @@ namespace Everest.Http
                 {
                     ArrayPool<byte>.Shared.Return(buffer);
                 }
-#else
-                var bytes = response.ContentEncoding.GetBytes(content);
-                await response.SendResponseAsync(bytes);
-#endif
             }
             catch (HttpListenerException)
             {
@@ -350,7 +345,6 @@ namespace Everest.Http
             {
                 response.ContentType = "text/plain";
 
-#if NET5_0_OR_GREATER
                 var byteCount = response.ContentEncoding.GetByteCount(content);
                 var buffer = ArrayPool<byte>.Shared.Rent(byteCount);
 
@@ -363,10 +357,6 @@ namespace Everest.Http
                 {
                     ArrayPool<byte>.Shared.Return(buffer);
                 }
-#else
-                var bytes = response.ContentEncoding.GetBytes(content);
-                await response.SendResponseAsync(bytes);
-#endif
             }
             catch (HttpListenerException)
             {
@@ -399,10 +389,8 @@ namespace Everest.Http
                                             JsonSerializer.Serialize(content) :
                                             JsonSerializer.Serialize(content, options);
 
-#if NET5_0_OR_GREATER
                 var byteCount = response.ContentEncoding.GetByteCount(json);
                 var buffer = ArrayPool<byte>.Shared.Rent(byteCount);
-
                 try
                 {
                     response.ContentEncoding.GetBytes(json, 0, json.Length, buffer, 0);
@@ -412,10 +400,6 @@ namespace Everest.Http
                 {
                     ArrayPool<byte>.Shared.Return(buffer);
                 }
-#else
-                var bytes = response.ContentEncoding.GetBytes(json);
-                await response.SendResponseAsync(bytes);
-#endif
             }
             catch (HttpListenerException)
             {
