@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Everest.Http
 {
-    public class HttpResponseWrapper : IHttpResponse
+    public class HttpResponseProxy : IHttpResponse
     {
         public virtual ILogger<IHttpResponse> Logger => response.Logger;
 
@@ -46,7 +46,7 @@ namespace Everest.Http
             set => response.ContentDisposition = value;
         }
 
-        public IPEndPoint RemoteEndPoint => response.RemoteEndPoint;
+        public virtual IPEndPoint RemoteEndPoint => response.RemoteEndPoint;
 
         public virtual Encoding ContentEncoding
         {
@@ -90,7 +90,7 @@ namespace Everest.Http
 
         private readonly IHttpResponse response;
 
-        public HttpResponseWrapper(IHttpResponse response)
+        public HttpResponseProxy(IHttpResponse response)
         {
             this.response = response;
         }

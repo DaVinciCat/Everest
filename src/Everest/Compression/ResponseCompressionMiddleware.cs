@@ -21,7 +21,7 @@ namespace Everest.Compression
 
             if (!context.Response.ResponseSent && context.Request.SupportsContentCompression())
             {
-                context = new CompressingHttpContextWrapper(context, compressor);
+                context = new CompressingHttpContext(context, compressor);
             }
 
             if (HasNext)

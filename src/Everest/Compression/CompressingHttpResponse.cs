@@ -5,13 +5,13 @@ using Everest.Http;
 
 namespace Everest.Compression
 {
-    public sealed class CompressingHttpResponseWrapper : HttpResponseWrapper
+    public sealed class CompressingHttpResponse : HttpResponseProxy
     {
         private readonly IResponseCompressor compressor;
 
         private readonly IHttpContext context;
 
-        public CompressingHttpResponseWrapper(IHttpContext context, IResponseCompressor compressor)
+        public CompressingHttpResponse(IHttpContext context, IResponseCompressor compressor)
             : base(context.Response)
         {
             this.context = context;

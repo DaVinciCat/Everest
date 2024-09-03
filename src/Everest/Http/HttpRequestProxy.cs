@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Everest.Http
 {
-    public class HttpRequestWrapper : IHttpRequest
+    public class HttpRequestProxy : IHttpRequest
     {
         public virtual ILogger<IHttpRequest> Logger => request.Logger;
 
@@ -43,13 +43,13 @@ namespace Everest.Http
             set => request.PathParameters = value;
         }
 
-        public Stream InputStream => request.InputStream;
+        public virtual Stream InputStream => request.InputStream;
 
         public virtual Task<byte[]> ReadRequestBodyAsync() => request.ReadRequestBodyAsync();
         
         private readonly IHttpRequest request;
 
-        public HttpRequestWrapper(IHttpRequest request)
+        public HttpRequestProxy(IHttpRequest request)
         {
             this.request = request;
         }

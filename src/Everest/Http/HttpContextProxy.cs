@@ -7,7 +7,7 @@ using Everest.WebSockets;
 
 namespace Everest.Http
 {
-    public class HttpContextWrapper : IHttpContext
+    public class HttpContextProxy : IHttpContext
     {
         public virtual Guid TraceIdentifier => context.Request.TraceIdentifier;
 
@@ -29,7 +29,7 @@ namespace Everest.Http
         
         private readonly IHttpContext context;
 
-        public HttpContextWrapper(IHttpContext context)
+        public HttpContextProxy(IHttpContext context)
         {
             this.context = context;
         }
