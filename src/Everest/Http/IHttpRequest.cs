@@ -21,7 +21,7 @@ namespace Everest.Http
 
         string Description { get; }
 
-        bool HasRequestBody { get; }
+        bool HasBody { get; }
 
         bool HasHeader(string name);
 
@@ -37,6 +37,6 @@ namespace Everest.Http
     
         Stream InputStream { get; }
 
-        Task<byte[]> ReadRequestBodyAsync();
+        Task<byte[]> ReadBodyAsync();
     }
 }

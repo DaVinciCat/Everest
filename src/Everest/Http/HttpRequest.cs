@@ -21,7 +21,7 @@ namespace Everest.Http
 
 		public string HttpMethod => request.HttpMethod;
 
-		public bool HasRequestBody => request.HasEntityBody;
+		public bool HasBody => request.HasEntityBody;
 
 		public string Path => request.Url?.AbsolutePath.TrimEnd('/');
 
@@ -53,9 +53,9 @@ namespace Everest.Http
 		public bool HasHeader(string name) => request.Headers[name] != null;
 
 		/*https://learn.microsoft.com/en-us/dotnet/api/system.net.httplistenerrequest.inputstream?view=net-7.0*/
-		public virtual async Task<byte[]> ReadRequestBodyAsync()
+		public virtual async Task<byte[]> ReadBodyAsync()
 		{
-			if (!HasRequestBody)
+			if (!HasBody)
 				return Array.Empty<byte>();
 
 			if (InputStream.CanSeek)
@@ -89,13 +89,13 @@ namespace Everest.Http
 	{
 		public static async Task<string> ReadRequestBodyAsTextAsync(this IHttpRequest request)
 		{
-			var data = await request.ReadRequestBodyAsync();
+			var data = await request.ReadBodyAsync();
 			return request.ContentEncoding.GetString(data);
 		}
 
 		public static async Task<T> ReadRequestBodyAsJsonAsync<T>(this IHttpRequest request, JsonSerializerOptions options = null)
 		{
-			var data = await request.ReadRequestBodyAsync();
+			var data = await request.ReadBodyAsync();
 
 			return options == null ?
 				JsonSerializer.Deserialize<T>(data) :
@@ -104,7 +104,7 @@ namespace Everest.Http
 
 		public static async Task<NameValueCollection> ReadRequestBodyAsFormAsync(this IHttpRequest request)
 		{
-			var data = await request.ReadRequestBodyAsync();
+			var data = await request.ReadBodyAsync();
 			var content = request.ContentEncoding.GetString(data);
 			return HttpUtility.ParseQueryString(content, request.ContentEncoding);
 		}

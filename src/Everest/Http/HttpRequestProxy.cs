@@ -21,7 +21,7 @@ namespace Everest.Http
 
         public virtual string Description => request.Description;
 
-        public virtual bool HasRequestBody => request.HasRequestBody;
+        public virtual bool HasBody => request.HasBody;
 
         public virtual bool HasHeader(string name) => request.HasHeader(name);
         
@@ -45,7 +45,7 @@ namespace Everest.Http
 
         public virtual Stream InputStream => request.InputStream;
 
-        public virtual Task<byte[]> ReadRequestBodyAsync() => request.ReadRequestBodyAsync();
+        public virtual Task<byte[]> ReadBodyAsync() => request.ReadBodyAsync();
         
         private readonly IHttpRequest request;
 
