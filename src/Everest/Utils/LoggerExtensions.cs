@@ -68,6 +68,15 @@ namespace Everest.Utils
             }
         }
 
+        public static void LogTraceIfEnabled(this ILogger logger, Func<string> func)
+        {
+            if(logger.IsEnabled(LogLevel.Trace))
+            {
+                var @params = func();
+                logger.LogTrace(@params);
+            }
+        }
+
         public static void LogInformationIfEnabled(this ILogger logger, Func<(Exception Exception, string Message, object[] Args)> func)
         {
             if(logger.IsEnabled(LogLevel.Information))
@@ -110,6 +119,15 @@ namespace Everest.Utils
             {   
                 var @params = func(); 
                 logger.LogWarning(@params.Exception, @params.Message, @params.Args);
+            }
+        }
+
+        public static void LogWarningIfEnabled(this ILogger logger, Func<(Exception Exception, string Message)> func)
+        {
+            if(logger.IsEnabled(LogLevel.Warning))
+            {   
+                var @params = func(); 
+                logger.LogWarning(@params.Exception, @params.Message);
             }
         }
 

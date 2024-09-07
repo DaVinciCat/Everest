@@ -3,6 +3,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Everest.Http;
 using Everest.Security;
+using Everest.Utils;
 using Microsoft.Extensions.Logging;
 
 namespace Everest.Authentication
@@ -30,25 +31,19 @@ namespace Everest.Authentication
 			var header = context.Request.Headers[HttpHeaders.Authorization];
 			if (string.IsNullOrWhiteSpace(header))
 			{
-                if (Logger.IsEnabled(LogLevel.Warning))
-                    Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. Missing header: {new { Header = HttpHeaders.Authorization, Scheme = Scheme }}");
-				
+            	Logger.LogWarningIfEnabled(() => $"{context.TraceIdentifier} - Failed to authenticate. Missing header: {new { Header = HttpHeaders.Authorization, Scheme = Scheme }}");
                 return Task.FromResult(false);
 			}
 
 			if (header == Scheme)
 			{
-                if (Logger.IsEnabled(LogLevel.Warning))
-                    Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. No credentials supplied: {new { Scheme = Scheme }}");
-
+                Logger.LogWarningIfEnabled(() => $"{context.TraceIdentifier} - Failed to authenticate. No credentials supplied: {new { Scheme = Scheme }}");
 				return Task.FromResult(false);
 			}
 
 			if (!header.StartsWith(Scheme + ' ', StringComparison.OrdinalIgnoreCase))
 			{
-                if (Logger.IsEnabled(LogLevel.Warning))
-                    Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. Incorrect header: {new { Header = HttpHeaders.Authorization, Scheme = Scheme }}");
-				
+                Logger.LogWarningIfEnabled(() => $"{context.TraceIdentifier} - Failed to authenticate. Incorrect header: {new { Header = HttpHeaders.Authorization, Scheme = Scheme }}");
                 return Task.FromResult(false);
 			}
 
@@ -60,9 +55,7 @@ namespace Everest.Authentication
 			}
 			catch (Exception ex)
 			{
-                if (Logger.IsEnabled(LogLevel.Error))
-                    Logger.LogError(ex, $"{context.TraceIdentifier} - Failed to authenticate. Failed to convert credentials from Base64: {new { Scheme = Scheme }}");
-
+                Logger.LogErrorIfEnabled(() => (ex, $"{context.TraceIdentifier} - Failed to authenticate. Failed to convert credentials from Base64: {new { Scheme = Scheme }}"));
 				return Task.FromResult(false);
 			}
 
@@ -73,18 +66,14 @@ namespace Everest.Authentication
 			}
 			catch (Exception ex)
 			{
-                if (Logger.IsEnabled(LogLevel.Error))
-                    Logger.LogError(ex, $"{context.TraceIdentifier} - Failed to authenticate. Failed to decode Base64 credentials: {new { Encoding = Encoding.EncodingName, Scheme = Scheme }}");
-				
+                Logger.LogErrorIfEnabled(() => (ex, $"{context.TraceIdentifier} - Failed to authenticate. Failed to decode Base64 credentials: {new { Encoding = Encoding.EncodingName, Scheme = Scheme }}"));
                 return Task.FromResult(false);
 			}
 
 			var delimiterIndex = decodedCredentials.IndexOf(CredentialsDelimiter, StringComparison.OrdinalIgnoreCase);
 			if (delimiterIndex == -1)
 			{
-                if (Logger.IsEnabled(LogLevel.Warning))
-                    Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. Missing credentials delimiter: {new { Delimiter = CredentialsDelimiter, Scheme = Scheme }}");
-				
+                Logger.LogWarningIfEnabled(() => $"{context.TraceIdentifier} - Failed to authenticate. Missing credentials delimiter: {new { Delimiter = CredentialsDelimiter, Scheme = Scheme }}");
                 return Task.FromResult(false);
 			}
 
@@ -93,9 +82,7 @@ namespace Everest.Authentication
 			var identity = new BasicIdentity(username, password);
 			context.User.AddIdentity(identity);
 
-            if (Logger.IsEnabled(LogLevel.Trace))
-                Logger.LogTrace($"{context.TraceIdentifier} - Successfully authenticated: {new { Scheme = Scheme }}");
-
+            Logger.LogTraceIfEnabled(() => $"{context.TraceIdentifier} - Successfully authenticated: {new { Scheme = Scheme }}");
 			return Task.FromResult(true);
 		}
 	}

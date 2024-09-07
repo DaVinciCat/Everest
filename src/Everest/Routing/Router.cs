@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Everest.Collections;
 using Everest.Http;
+using Everest.Utils;
 using Microsoft.Extensions.Logging;
 
 namespace Everest.Routing
@@ -74,8 +75,7 @@ namespace Everest.Routing
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
 
-            if (Logger.IsEnabled(LogLevel.Trace))
-                Logger.LogTrace($"{context.TraceIdentifier} - Try to match requested route: {new { Request = context.Request.Description }}");
+            Logger.LogTraceIfEnabled(() => $"{context.TraceIdentifier} - Try to match requested route: {new { Request = context.Request.Description }}");
 
 			if (methods.TryGetValue(context.Request.HttpMethod, out var routes))
 			{
@@ -85,18 +85,14 @@ namespace Everest.Routing
 					context.Request.PathParameters = parameters;
 					context.Features.Set<IRouteDescriptorFeature>(new RouteDescriptorFeature(descriptor));
 
-                    if (Logger.IsEnabled(LogLevel.Trace))
-                        Logger.LogTrace($"{context.TraceIdentifier} - Successfully matched requested route: {new { Request = context.Request.Description, RoutePattern = descriptor.Route.Description, EndPoint = descriptor.EndPoint.Description }}");
-					
+                    Logger.LogTraceIfEnabled(() => $"{context.TraceIdentifier} - Successfully matched requested route: {new { Request = context.Request.Description, RoutePattern = descriptor.Route.Description, EndPoint = descriptor.EndPoint.Description }}");
                     return true;
 				}
 			}
 
 			await OnRouteNotFoundAsync(context);
 
-            if (Logger.IsEnabled(LogLevel.Warning))
-                Logger.LogWarning($"{context.TraceIdentifier} - Failed to match requested route. Requested route not found: {new { Request = context.Request.Description }}");
-			
+            Logger.LogWarningIfEnabled(() => $"{context.TraceIdentifier} - Failed to match requested route. Requested route not found: {new { Request = context.Request.Description }}");
             return false;
 		}
 

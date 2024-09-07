@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using Everest.OpenApi.Filters;
 using Everest.Routing;
+using Everest.Utils;
 
 namespace Everest.OpenApi
 {
@@ -53,8 +54,7 @@ namespace Everest.OpenApi
                 Components = new OpenApiComponents(),
             };
 
-            if (Logger.IsEnabled(LogLevel.Trace))
-                Logger.LogTrace($"Generating OpenApi document: {new { Title = info.Title, Version = info.Version }}");
+            Logger.LogTraceIfEnabled(() => $"Generating OpenApi document: {new { Title = info.Title, Version = info.Version }}");
 
             var context = new OpenApiDocumentContext(document, SchemaGenerator, PathParametersGenerator);
             foreach (var descriptor in descriptors)
@@ -65,9 +65,7 @@ namespace Everest.OpenApi
                 }
             }
 
-            if (Logger.IsEnabled(LogLevel.Trace))
-                Logger.LogTrace($"Successfully generated OpenApi document: {new { Title = info.Title, Version = info.Version }}");
-
+            Logger.LogTraceIfEnabled(() => $"Successfully generated OpenApi document: {new { Title = info.Title, Version = info.Version }}");
             return document;
         }
     }

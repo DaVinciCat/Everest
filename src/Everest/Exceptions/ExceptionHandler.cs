@@ -2,6 +2,7 @@
 using System.Net;
 using System.Threading.Tasks;
 using Everest.Http;
+using Everest.Utils;
 using Microsoft.Extensions.Logging;
 
 namespace Everest.Exceptions
@@ -23,9 +24,7 @@ namespace Everest.Exceptions
 			if (ex == null)
 				throw new ArgumentNullException(nameof(ex));
 
-            if (Logger.IsEnabled(LogLevel.Error))
-                Logger.LogError(ex, $"{context.TraceIdentifier} - {new { ExceptionMessage = ex.Message }}");
-
+            Logger.LogErrorIfEnabled(() => (ex, $"{context.TraceIdentifier} - {new { ExceptionMessage = ex.Message }}"));
 			await OnExceptionAsync(context, ex);
 		}
 

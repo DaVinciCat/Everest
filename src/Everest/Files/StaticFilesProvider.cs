@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Everest.Utils;
+using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -28,9 +29,7 @@ namespace Everest.Files
 			{
 				if(!Directory.Exists(value))
 				{
-                    if (Logger.IsEnabled(LogLevel.Warning))
-                        Logger.LogWarning($"Static files directory does not exist: {new {PhysicalPath = value}}");
-
+                    Logger.LogWarningIfEnabled(() => $"Static files directory does not exist: {new {PhysicalPath = value}}");
 					return;
 				}
 
@@ -122,9 +121,7 @@ namespace Everest.Files
 		private void OnError(object sender, ErrorEventArgs e)
 		{
 			var ex = e.GetException();
-
-            if (Logger.IsEnabled(LogLevel.Error))
-                Logger.LogError(ex, $"File watcher error occurred {new { Error = ex.Message }}");
+            Logger.LogErrorIfEnabled(() => (ex, $"File watcher error occurred {new { Error = ex.Message }}"));
 		}
 
 		private void OnRenamed(object sender, RenamedEventArgs e)

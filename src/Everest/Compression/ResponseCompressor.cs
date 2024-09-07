@@ -74,8 +74,7 @@ namespace Everest.Compression
                 return false;
             }
 
-            if (Logger.IsEnabled(LogLevel.Trace))
-                Logger.LogTrace($"{context.TraceIdentifier} - Try to compress response: {new { AcceptEncodings = encodings.ToReadableArray(), SupportedEncodings = Compressors.ToReadableArray() }}");
+            Logger.LogTraceIfEnabled(() => $"{context.TraceIdentifier} - Try to compress response: {new { AcceptEncodings = encodings.ToReadableArray(), SupportedEncodings = Compressors.ToReadableArray() }}");
 
             foreach (var encoding in encodings)
             {
@@ -93,9 +92,7 @@ namespace Everest.Compression
                                 await cp.WriteAsync(content, offset, count);
                                 cp.Close();
 
-                                if (Logger.IsEnabled(LogLevel.Trace))
-                                    Logger.LogTrace($"{context.TraceIdentifier} - Successfully compressed response: {new { Encoding = encoding, Length = length.ToReadableSize(), CompressedLength = ms.Length.ToReadableSize() }}");
-
+                                Logger.LogTraceIfEnabled(() => $"{context.TraceIdentifier} - Successfully compressed response: {new { Encoding = encoding, Length = length.ToReadableSize(), CompressedLength = ms.Length.ToReadableSize() }}");
                                 await context.Response.SendResponseAsync(ms);
                             }
                             finally
@@ -109,9 +106,7 @@ namespace Everest.Compression
                 }
             }
 
-            if (Logger.IsEnabled(LogLevel.Warning))
-                Logger.LogWarning($"{context.TraceIdentifier} - Failed to compress response. Header contains no supported encodings: {new { Header = HttpHeaders.AcceptEncoding, Encodings = encodings.ToReadableArray(), SupportedEncodings = Compressors.ToReadableArray() }}");
-
+            Logger.LogWarningIfEnabled(() => $"{context.TraceIdentifier} - Failed to compress response. Header contains no supported encodings: {new { Header = HttpHeaders.AcceptEncoding, Encodings = encodings.ToReadableArray(), SupportedEncodings = Compressors.ToReadableArray() }}");
             return false;
         }
 
@@ -143,8 +138,7 @@ namespace Everest.Compression
                 return false;
             }
 
-            if (Logger.IsEnabled(LogLevel.Trace))
-                Logger.LogTrace($"{context.TraceIdentifier} - Try to compress response: {new { AcceptEncodings = encodings.ToReadableArray(), SupportedEncodings = Compressors.ToReadableArray() }}");
+            Logger.LogTraceIfEnabled(() => $"{context.TraceIdentifier} - Try to compress response: {new { AcceptEncodings = encodings.ToReadableArray(), SupportedEncodings = Compressors.ToReadableArray() }}");
 
             foreach (var encoding in encodings)
             {
@@ -173,9 +167,7 @@ namespace Everest.Compression
                                 }
                                 cp.Close();
 
-                                if (Logger.IsEnabled(LogLevel.Trace))
-                                    Logger.LogTrace($"{context.TraceIdentifier} - Successfully compressed response: {new { Encoding = encoding, Length = length.ToReadableSize(), CompressedLength = ms.Length.ToReadableSize() }}");
-
+                                Logger.LogTraceIfEnabled(() => $"{context.TraceIdentifier} - Successfully compressed response: {new { Encoding = encoding, Length = length.ToReadableSize(), CompressedLength = ms.Length.ToReadableSize() }}");
                                 await context.Response.SendResponseAsync(ms);
                             }
                             finally
@@ -189,9 +181,7 @@ namespace Everest.Compression
                 }
             }
 
-            if (Logger.IsEnabled(LogLevel.Warning))
-                Logger.LogWarning($"{context.TraceIdentifier} - Failed to compress response. Header contains no supported encodings: {new { Header = HttpHeaders.AcceptEncoding, Encodings = encodings.ToReadableArray(), SupportedEncodings = Compressors.ToReadableArray() }}");
-
+            Logger.LogWarningIfEnabled(() => $"{context.TraceIdentifier} - Failed to compress response. Header contains no supported encodings: {new { Header = HttpHeaders.AcceptEncoding, Encodings = encodings.ToReadableArray(), SupportedEncodings = Compressors.ToReadableArray() }}");
             return false;
         }
     }

@@ -31,8 +31,7 @@ namespace Everest.Authentication
                 }
 			}
 
-			if(Logger.IsEnabled(LogLevel.Warning))
-                Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. No supported authentication schemes {new { Scheme = scheme, SupportedSchemes = Authentications.ToReadableArray() }}");
+            Logger.LogWarningIfEnabled(() => $"{context.TraceIdentifier} - Failed to authenticate. No supported authentication schemes {new { Scheme = scheme, SupportedSchemes = Authentications.ToReadableArray() }}");
             
             return false;
         }

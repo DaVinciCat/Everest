@@ -3,6 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Threading.Tasks;
 using Everest.Http;
 using Everest.Security;
+using Everest.Utils;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
@@ -29,25 +30,19 @@ namespace Everest.Authentication
 			var header = context.Request.Headers[HttpHeaders.Authorization];
 			if (string.IsNullOrWhiteSpace(header))
 			{
-                if (Logger.IsEnabled(LogLevel.Warning))
-                    Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. Missing header: {new { Header = HttpHeaders.Authorization, Scheme = Scheme }}");
-				
+                Logger.LogWarningIfEnabled(() => $"{context.TraceIdentifier} - Failed to authenticate. Missing header: {new { Header = HttpHeaders.Authorization, Scheme = Scheme }}");
                 return false;
 			}
 
 			if (Scheme == HttpHeaders.Authorization)
 			{
-                if (Logger.IsEnabled(LogLevel.Warning))
-                    Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. No token supplied: {new { Scheme = Scheme }}");
-				
+                Logger.LogWarningIfEnabled(() => $"{context.TraceIdentifier} - Failed to authenticate. No token supplied: {new { Scheme = Scheme }}");
                 return false;
 			}
 
 			if (!header.StartsWith(Scheme + ' ', StringComparison.OrdinalIgnoreCase))
 			{
-                if (Logger.IsEnabled(LogLevel.Warning))
-                    Logger.LogWarning($"{context.TraceIdentifier} - Failed to authenticate. Incorrect header: {new { Header = HttpHeaders.Authorization, Scheme = Scheme }}");
-				
+                Logger.LogWarningIfEnabled(() => $"{context.TraceIdentifier} - Failed to authenticate. Incorrect header: {new { Header = HttpHeaders.Authorization, Scheme = Scheme }}");
                 return false;
 			}
 
@@ -60,16 +55,12 @@ namespace Everest.Authentication
 				var identity = new JwtTokenIdentity(jwtToken, validationResult.ClaimsIdentity);
 				context.User.AddIdentity(identity);
 
-                if (Logger.IsEnabled(LogLevel.Trace))
-                    Logger.LogTrace($"{context.TraceIdentifier} - Successfully authenticated: {new { Scheme = Scheme }}");
-
+                Logger.LogTraceIfEnabled(() => $"{context.TraceIdentifier} - Successfully authenticated: {new { Scheme = Scheme }}");
 				return true;
 			}
 			catch (Exception ex)
 			{
-                if (Logger.IsEnabled(LogLevel.Error))
-                    Logger.LogError(ex, $"{context.TraceIdentifier} - Failed to authenticate. Failed to validate token: {new { Scheme = Scheme }}");
-
+                Logger.LogErrorIfEnabled(() => (ex, $"{context.TraceIdentifier} - Failed to authenticate. Failed to validate token: {new { Scheme = Scheme }}"));
 				return false;
 			}
 		}

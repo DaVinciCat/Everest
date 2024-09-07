@@ -1,4 +1,5 @@
 ﻿using Everest.Http;
+using Everest.Utils;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
@@ -30,28 +31,21 @@ namespace Everest.WebSockets
                 {
                     if (context.WebSockets.IsWebSocketRequest)
                     {
-                        if (Logger.IsEnabled(LogLevel.Trace))
-                            Logger.LogTrace($"{context.TraceIdentifier} - Try to accept WebSocket request: {new { RequestPath = context.Request.Path, RemoteEndPoint = context.Request.RemoteEndPoint }}");
+                        Logger.LogTraceIfEnabled(() => $"{context.TraceIdentifier} - Try to accept WebSocket request: {new { RequestPath = context.Request.Path, RemoteEndPoint = context.Request.RemoteEndPoint }}");
                         
                         var session = await context.WebSockets.AcceptWebSocketAsync();
 
-                        if (Logger.IsEnabled(LogLevel.Trace)) 
-                            Logger.LogTrace($"{context.TraceIdentifier} - Successfully opened WebSocket session: {new { Id = session.Id, State = session.State, IsLocal = session.IsLocal }}");
-                        
+                        Logger.LogTraceIfEnabled(() => $"{context.TraceIdentifier} - Successfully opened WebSocket session: {new { Id = session.Id, State = session.State, IsLocal = session.IsLocal }}");
                         await ReceiveAsync(session, token);
 
-                        if (Logger.IsEnabled(LogLevel.Trace))
-                            Logger.LogTrace($"{context.TraceIdentifier} - Successfully closed WebSocket session: {new { Is = session.Id, State = session.State, CloseStatus = session.CloseStatus, CloseDescription = session.CloseStatusDescription }}");
-                        
+                        Logger.LogTraceIfEnabled(() => $"{context.TraceIdentifier} - Successfully closed WebSocket session: {new { Is = session.Id, State = session.State, CloseStatus = session.CloseStatus, CloseDescription = session.CloseStatusDescription }}");
                         return true;
                     }
                 }
             }
             catch(Exception ex)
             {
-                if (Logger.IsEnabled(LogLevel.Error))
-                    Logger.LogError(ex, $"{context.TraceIdentifier} - Failed to accept WebSocket");
-
+                Logger.LogErrorIfEnabled(() => (ex, $"{context.TraceIdentifier} - Failed to accept WebSocket"));
                 return false;
             }
             

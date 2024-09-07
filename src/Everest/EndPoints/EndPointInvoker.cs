@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Everest.Http;
 using Everest.Routing;
+using Everest.Utils;
 using Microsoft.Extensions.Logging;
 
 namespace Everest.EndPoints
@@ -22,20 +23,14 @@ namespace Everest.EndPoints
 
 			if (!context.TryGetRouteDescriptor(out var descriptor))
 			{
-                if (Logger.IsEnabled(LogLevel.Trace))
-                    Logger.LogTrace($"{context.TraceIdentifier} - Failed to invoke endpoint. No route descriptor");
-
+                Logger.LogTraceIfEnabled(() => $"{context.TraceIdentifier} - Failed to invoke endpoint. No route descriptor");
 				return false;
 			}
 
-            if (Logger.IsEnabled(LogLevel.Trace))
-                Logger.LogTrace($"{context.TraceIdentifier} - Try to invoke endpoint: {new { Request = context.Request.Description, Endpoint = descriptor.EndPoint.Description }}");
-			
+            Logger.LogTraceIfEnabled(() => $"{context.TraceIdentifier} - Try to invoke endpoint: {new { Request = context.Request.Description, Endpoint = descriptor.EndPoint.Description }}");
             await descriptor.EndPoint.InvokeAsync(context);
 
-            if (Logger.IsEnabled(LogLevel.Trace)) 
-                Logger.LogTrace($"{context.TraceIdentifier} - Successfully invoked endpoint: {new { Endpoint = descriptor.EndPoint.Description }}");
-
+            Logger.LogTraceIfEnabled(() => $"{context.TraceIdentifier} - Successfully invoked endpoint: {new { Endpoint = descriptor.EndPoint.Description }}");
 			return true;
 		}
 	}
