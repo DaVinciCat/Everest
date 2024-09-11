@@ -165,7 +165,7 @@ namespace Everest.Utils
             if (logger.IsEnabled(LogLevel.Error))
             {
                 var @params = func();
-                logger.LogError(@params.Exception, @params.Message, null);
+                logger.LogError(@params.Exception, @params.Message);
             }
         }
 
@@ -269,11 +269,6 @@ namespace Everest.Utils
     {
         ILogger Logger { get; }
     }
-
-    public static class HasLoggerExtensions
-    {
-        public static ILogger GetLogger(this object instance) => (instance as IHasLogger)?.Logger;
-    }
-
+    
     #endregion
 }

@@ -5,6 +5,8 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Everest.Collections;
+using Everest.Utils;
+using Microsoft.Extensions.Logging;
 
 namespace Everest.Http
 {
@@ -35,5 +37,10 @@ namespace Everest.Http
         Stream InputStream { get; }
 
         Task<byte[]> ReadBodyAsync();
+    }
+
+    public static partial class HasLoggerExtensions
+    {
+        public static ILogger GetLogger(this IHttpRequest instance) => (instance as IHasLogger)?.Logger;
     }
 }

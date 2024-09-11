@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Everest.Utils;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Specialized;
 using System.IO;
 using System.Net;
@@ -56,5 +58,10 @@ namespace Everest.Http
         Task SendResponseAsync(byte[] content, int offset, int count);
 
         Task SendResponseAsync(Stream stream);
+    }
+
+    public static partial class HasLoggerExtensions
+    {
+        public static ILogger GetLogger(this IHttpResponse instance) => (instance as IHasLogger)?.Logger;
     }
 }
