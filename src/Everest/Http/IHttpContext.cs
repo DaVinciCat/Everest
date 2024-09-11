@@ -4,7 +4,6 @@ using System.Security.Claims;
 using System.Threading;
 using Everest.Collections;
 using Everest.WebSockets;
-using Everest.Utils;
 
 namespace Everest.Http
 {
@@ -27,10 +26,5 @@ namespace Everest.Http
         ILoggerFactory LoggerFactory { get; }
 
         CancellationToken CancellationToken { get; }
-    }
-
-    public static partial class HasLoggerExtensions
-    {
-        public static ILogger GetLogger(this IHttpContext instance) => (instance as IHasLogger)?.Logger;
     }
 }
