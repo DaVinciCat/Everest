@@ -8,9 +8,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Everest.Authentication
 {
-	public class BasicAuthentication : IAuthentication
+	public class BasicAuthentication : IAuthentication, IHasLogger
 	{
-		public ILogger<BasicAuthentication> Logger { get; }
+        ILogger IHasLogger.Logger => Logger;
+
+        public ILogger<BasicAuthentication> Logger { get; }
 
 		public string Scheme { get; set; } = "Basic";
 

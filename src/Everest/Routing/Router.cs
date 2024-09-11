@@ -11,9 +11,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Everest.Routing
 {
-	public class Router : IRouter
+	public class Router : IRouter, IHasLogger
 	{
-		public ILogger<Router> Logger { get; }
+        ILogger IHasLogger.Logger => Logger;
+
+        public ILogger<Router> Logger { get; }
 
 		public string[] Delimiters { get; set; } = { "/" };
 

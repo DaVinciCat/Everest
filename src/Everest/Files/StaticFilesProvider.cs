@@ -6,11 +6,13 @@ using System.Linq;
 
 namespace Everest.Files
 {
-	public class StaticFilesProvider : IStaticFilesProvider
+	public class StaticFilesProvider : IStaticFilesProvider, IHasLogger
 	{
-		#region Logger
+        #region Logger
 
-		public ILogger<StaticFilesProvider> Logger { get; }
+        ILogger IHasLogger.Logger => Logger;
+
+        public ILogger<StaticFilesProvider> Logger { get; }
 
 		#endregion
 

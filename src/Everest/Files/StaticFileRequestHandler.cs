@@ -8,11 +8,13 @@ using Everest.Utils;
 
 namespace Everest.Files
 {
-	public class StaticFileRequestHandler : IStaticFileRequestHandler
+	public class StaticFileRequestHandler : IStaticFileRequestHandler, IHasLogger
 	{
-		#region Logger
+        #region Logger
 
-		public ILogger<StaticFileRequestHandler> Logger { get; }
+        ILogger IHasLogger.Logger => Logger;
+
+        public ILogger<StaticFileRequestHandler> Logger { get; }
 
 		#endregion
 

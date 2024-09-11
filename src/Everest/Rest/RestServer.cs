@@ -1,6 +1,5 @@
 ﻿using Everest.Http;
 using System;
-using System.Data;
 using System.Net;
 using System.Threading;
 using Everest.Collections;
@@ -11,9 +10,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Everest.Rest
 {
-	public class RestServer : IDisposable
+    public class RestServer : IDisposable, IHasLogger
 	{
-		public ILogger<RestServer> Logger { get; }
+        ILogger IHasLogger.Logger => Logger;
+
+        public ILogger<RestServer> Logger { get; }
 
         public event EventHandler Started;
 

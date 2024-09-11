@@ -7,13 +7,14 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Web;
 using Everest.Collections;
+using Everest.Utils;
 using Microsoft.Extensions.Logging;
 
 namespace Everest.Http
 {
-	public class HttpRequest : IHttpRequest
+	public class HttpRequest : IHttpRequest, IHasLogger
     {
-        ILogger<IHttpRequest> IHttpRequest.Logger => Logger;
+        ILogger IHasLogger.Logger => Logger;
 
         public ILogger<HttpRequest> Logger { get; }
 		
@@ -38,7 +39,7 @@ namespace Everest.Http
 		public ParameterCollection PathParameters { get; set; }
 
 		public Stream InputStream => request.InputStream;
-		
+
         private readonly HttpListenerRequest request;
 
 		public HttpRequest(HttpListenerRequest request, ILogger<HttpRequest> logger)

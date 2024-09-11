@@ -7,9 +7,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Everest.EndPoints
 {
-	public class EndPointInvoker : IEndPointInvoker
+	public class EndPointInvoker : IEndPointInvoker, IHasLogger
 	{
-		public ILogger<EndPointInvoker> Logger { get; }
+        ILogger IHasLogger.Logger => Logger;
+
+        public ILogger<EndPointInvoker> Logger { get; }
 
 		public EndPointInvoker(ILogger<EndPointInvoker> logger)
 		{

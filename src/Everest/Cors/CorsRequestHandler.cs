@@ -12,8 +12,10 @@ namespace Everest.Cors
 	   https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request
     */
 
-    public class CorsRequestHandler : ICorsRequestHandler
+    public class CorsRequestHandler : ICorsRequestHandler, IHasLogger
 	{
+        ILogger IHasLogger.Logger => Logger;
+
         public ILogger<CorsRequestHandler> Logger { get; }
 
         public CorsPolicyCollection Policies { get; } = new CorsPolicyCollection();

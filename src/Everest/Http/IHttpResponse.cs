@@ -4,14 +4,11 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 
 namespace Everest.Http
 {
     public interface IHttpResponse
     {
-        ILogger<IHttpResponse> Logger { get; }
-
         Guid TraceIdentifier { get; }
 
         bool ResponseSent { get; }

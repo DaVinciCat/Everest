@@ -7,8 +7,10 @@ using Microsoft.Extensions.Logging;
 
 namespace Everest.Authentication
 {
-	public class Authenticator : IAuthenticator
+	public class Authenticator : IAuthenticator, IHasLogger
 	{
+        ILogger IHasLogger.Logger => Logger;
+
         public ILogger<Authenticator> Logger { get; }
 
         public AuthenticationCollection Authentications { get; } = new AuthenticationCollection();

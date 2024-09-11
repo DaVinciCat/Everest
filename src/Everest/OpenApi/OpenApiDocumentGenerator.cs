@@ -8,8 +8,10 @@ using Everest.Utils;
 
 namespace Everest.OpenApi
 {
-    public class OpenApiDocumentGenerator : IOpenApiDocumentGenerator
+    public class OpenApiDocumentGenerator : IOpenApiDocumentGenerator, IHasLogger
     {
+        ILogger IHasLogger.Logger => Logger;
+
         public ILogger<OpenApiDocumentGenerator> Logger { get; }
 
         public IList<IOpenApiDocumentFilter> DocumentFilters { get; }

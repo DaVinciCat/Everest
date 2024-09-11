@@ -10,9 +10,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Everest.Routing
 {
-	public class RouteScanner : IRouteScanner
+	public class RouteScanner : IRouteScanner, IHasLogger
 	{
-		public ILogger<RouteScanner> Logger { get; }
+        ILogger IHasLogger.Logger => Logger;
+
+        public ILogger<RouteScanner> Logger { get; }
 
 		public RouteScanner(ILogger<RouteScanner> logger)
 		{

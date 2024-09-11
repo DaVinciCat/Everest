@@ -9,9 +9,11 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Everest.Authentication
 {
-	public class JwtAuthentication : IAuthentication
+	public class JwtAuthentication : IAuthentication, IHasLogger
 	{
-		public ILogger<JwtAuthentication> Logger { get; }
+        ILogger IHasLogger.Logger => Logger;
+
+        public ILogger<JwtAuthentication> Logger { get; }
 
 		public string Scheme { get; set; } = "Bearer";
 

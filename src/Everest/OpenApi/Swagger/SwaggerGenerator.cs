@@ -10,8 +10,10 @@ using Microsoft.Extensions.Logging;
 
 namespace Everest.OpenApi.Swagger
 {
-    public class SwaggerGenerator : ISwaggerGenerator
+    public class SwaggerGenerator : ISwaggerGenerator, IHasLogger
     {
+        ILogger IHasLogger.Logger => Logger;
+
         public ILogger<SwaggerGenerator> Logger { get; }
 
         public string SwaggerEndPoint { get; set; } = "/api/swagger.json";

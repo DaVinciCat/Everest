@@ -12,9 +12,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Everest.Http
 {
-    public class HttpResponse : IHttpResponse
+    public class HttpResponse : IHttpResponse, IHasLogger
     {
-        ILogger<IHttpResponse> IHttpResponse.Logger => Logger;
+        ILogger IHasLogger.Logger => Logger;
 
         public ILogger<HttpResponse> Logger { get; }
 

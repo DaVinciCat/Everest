@@ -5,14 +5,11 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Everest.Collections;
-using Microsoft.Extensions.Logging;
 
 namespace Everest.Http
 {
     public interface IHttpRequest
     {
-        ILogger<IHttpRequest> Logger { get; }
-
         Guid TraceIdentifier { get; }
 
         string HttpMethod { get; }

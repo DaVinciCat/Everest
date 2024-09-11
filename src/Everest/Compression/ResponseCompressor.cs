@@ -9,8 +9,10 @@ using Microsoft.Extensions.Logging;
 
 namespace Everest.Compression
 {
-    public class ResponseCompressor : IResponseCompressor
+    public class ResponseCompressor : IResponseCompressor, IHasLogger
     {
+        ILogger IHasLogger.Logger => Logger;
+
         public ILogger<ResponseCompressor> Logger { get; }
 
         public int CompressionMinLength { get; set; } = 2048;

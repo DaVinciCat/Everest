@@ -4,11 +4,14 @@ using System.Security.Claims;
 using System.Threading;
 using Everest.Collections;
 using Everest.WebSockets;
+using Everest.Utils;
 
 namespace Everest.Http
 {
-    public class HttpContextProxy : IHttpContext
+    public class HttpContextProxy : IHttpContext, IHasLogger
     {
+        public virtual ILogger Logger => context.GetLogger();
+
         public virtual Guid TraceIdentifier => context.Request.TraceIdentifier;
 
         public virtual ClaimsPrincipal User => context.User;

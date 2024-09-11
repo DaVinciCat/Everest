@@ -5,13 +5,14 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Everest.Collections;
+using Everest.Utils;
 using Microsoft.Extensions.Logging;
 
 namespace Everest.Http
 {
-    public class HttpRequestProxy : IHttpRequest
+    public class HttpRequestProxy : IHttpRequest, IHasLogger
     {
-        public virtual ILogger<IHttpRequest> Logger => request.Logger;
+        public virtual ILogger Logger => request.GetLogger();
 
         public virtual Guid TraceIdentifier => request.TraceIdentifier;
 

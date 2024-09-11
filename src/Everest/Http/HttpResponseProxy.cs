@@ -1,16 +1,17 @@
-﻿using System;
+﻿using Everest.Utils;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Specialized;
 using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 
 namespace Everest.Http
 {
-    public class HttpResponseProxy : IHttpResponse
+    public class HttpResponseProxy : IHttpResponse, IHasLogger
     {
-        public virtual ILogger<IHttpResponse> Logger => response.Logger;
+        public virtual ILogger Logger => response.GetLogger();
 
         public virtual Guid TraceIdentifier => response.TraceIdentifier;
 

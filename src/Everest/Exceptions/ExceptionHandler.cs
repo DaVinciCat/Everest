@@ -7,9 +7,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Everest.Exceptions
 {
-	public class ExceptionHandler : IExceptionHandler
+	public class ExceptionHandler : IExceptionHandler, IHasLogger
 	{
-		public ILogger<ExceptionHandler> Logger { get; }
+        ILogger IHasLogger.Logger => Logger;
+
+        public ILogger<ExceptionHandler> Logger { get; }
 
 		public ExceptionHandler(ILogger<ExceptionHandler> logger)
 		{
