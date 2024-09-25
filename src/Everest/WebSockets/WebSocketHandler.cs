@@ -47,17 +47,17 @@ namespace Everest.WebSockets
             await Task.CompletedTask;
         }
 
-        protected virtual async Task SendAsync(WebSocketSession session, byte[] message)
+        protected virtual async Task SendAsync(WebSocketSession session, byte[] message, CancellationToken token)
         {
             if (message == null)
             {
                 throw new ArgumentNullException(nameof(message));
             }
 
-            await session.SendAsync(new ArraySegment<byte>(message), WebSocketMessageType.Binary, true, CancellationToken.None);
+            await session.SendAsync(new ArraySegment<byte>(message), WebSocketMessageType.Binary, true, token);
         }
 
-        protected virtual async Task SendAsync(WebSocketSession session, string message)
+        protected virtual async Task SendAsync(WebSocketSession session, string message, CancellationToken token)
         {
             if (message == null)
             {
@@ -65,17 +65,17 @@ namespace Everest.WebSockets
             }
 
             var buffer = Encoding.UTF8.GetBytes(message);
-            await session.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, CancellationToken.None);
+            await session.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, token);
         }
 
-        protected virtual async Task CloseAsync(WebSocketSession session)
+        protected virtual async Task CloseAsync(WebSocketSession session, CancellationToken token)
         {
             if (session == null)
             {
                 throw new ArgumentNullException(nameof(session));
             }
 
-            await session.CloseAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None);
+            await session.CloseAsync(WebSocketCloseStatus.NormalClosure, "", token);
         }
 
         protected virtual async Task ReceiveAsync(WebSocketSession session, CancellationToken token)
@@ -104,7 +104,7 @@ namespace Everest.WebSockets
                         // We'll give the queued frame some amount of time to go out on the wire, and if a
                         // timeout occurs we'll give up and abort the connection.
                         await Task
-                            .WhenAny(CloseAsync(session), Task.Delay(CloseTimeout, token))
+                            .WhenAny(CloseAsync(session, token), Task.Delay(CloseTimeout, token))
                             .ContinueWith(_ => { }, TaskContinuationOptions.ExecuteSynchronously); // swallow exceptions occurring from sending the CLOSE
                         break;
                     }
@@ -152,7 +152,7 @@ namespace Everest.WebSockets
             {
                 try
                 {
-                    await CloseAsync(session);
+                    await CloseAsync(session, token);
                 }
                 finally
                 {
@@ -162,21 +162,21 @@ namespace Everest.WebSockets
             }
         }
 
-        protected async Task BroadcastAsync(string text)
+        protected async Task BroadcastAsync(string text, CancellationToken token)
         {
             try
             {
-                await locker.WaitAsync();
+                await locker.WaitAsync(token);
 
 #if NET5_0_OR_GREATER
-                await Parallel.ForEachAsync(sessions, async (session, _) =>
+                await Parallel.ForEachAsync(sessions, token, async (session, _) =>
                 {
-                    await SendAsync(session, text);
+                    await SendAsync(session, text, token);
                 });
 #else
                 await sessions.ParallelForEachAsync(sessions.Count, async session =>
                 {
-                    await SendAsync(session, text);
+                    await SendAsync(session, text, token);
                 });
 #endif
             }
@@ -186,21 +186,21 @@ namespace Everest.WebSockets
             }
         }
 
-        protected async Task BroadcastAsync(byte[] bytes)
+        protected async Task BroadcastAsync(byte[] bytes, CancellationToken token)
         {
             try
             {
-                await locker.WaitAsync();
+                await locker.WaitAsync(token);
 
 #if NET5_0_OR_GREATER
-                await Parallel.ForEachAsync(sessions, async (session, _) =>
+                await Parallel.ForEachAsync(sessions, token, async (session, _) =>
                 {
-                    await SendAsync(session, bytes);
+                    await SendAsync(session, bytes, token);
                 });
 #else
                 await sessions.ParallelForEachAsync(sessions.Count, async session =>
                 {
-                    await SendAsync(session, bytes);
+                    await SendAsync(session, bytes, token);
                 });
 #endif
             }
@@ -210,14 +210,14 @@ namespace Everest.WebSockets
             }
         }
 
-        protected async Task CloseAsync()
+        protected async Task CloseAsync(CancellationToken token)
         {
             try
             {
                 await locker.WaitAsync();
                 foreach (var session in sessions)
                 {
-                    await CloseAsync(session);
+                    await CloseAsync(session, token);
                 }
             }
             finally

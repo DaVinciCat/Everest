@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Everest.Authentication;
 using Everest.Http;
@@ -375,7 +376,8 @@ namespace Everest.Shell
 
             async Task Echo()
             {
-                await BroadcastAsync(message);
+                await SendAsync(session, $"session {session.Id}", CancellationToken.None);
+                await BroadcastAsync(message, CancellationToken.None);
             }
         }
 
