@@ -199,13 +199,9 @@ namespace Everest.Files
 		public StaticFilesProvider(string physicalPath, ILogger<StaticFilesProvider> logger)
 		{
 			Logger = logger;
+			PhysicalPath = physicalPath;
 
-			if (Directory.Exists(physicalPath))
-			{
-				PhysicalPath = physicalPath;
-			}
-
-			Subscribe(true);
+            Subscribe(true);
 		}
 
 		#endregion

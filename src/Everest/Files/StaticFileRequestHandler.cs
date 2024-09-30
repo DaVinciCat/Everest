@@ -76,7 +76,7 @@ namespace Everest.Files
 
 			if (result)
 			{
-                Logger.LogWarningIfEnabled(() => $"{context.TraceIdentifier} - Successfully served requested file: {new { RequestPath = context.Request.Path, PhysicalPath = file.FullName, Size = file.Length.ToReadableSize() }}");
+                Logger.LogTraceIfEnabled(() => $"{context.TraceIdentifier} - Successfully served requested file: {new { RequestPath = context.Request.Path, PhysicalPath = file.FullName, Size = file.Length.ToReadableSize() }}");
                 return true;
 			}
 

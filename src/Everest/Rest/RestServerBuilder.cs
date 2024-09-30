@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -15,6 +16,7 @@ using Everest.Mime;
 using Everest.OpenApi;
 using Everest.OpenApi.Swagger;
 using Everest.Routing;
+using Everest.Utils;
 using Everest.WebSockets;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -58,9 +60,14 @@ namespace Everest.Rest
 			});
 
 			services.TryAddSingleton<IStaticFilesProvider>(provider =>
-			{
-				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
-				return new StaticFilesProvider("public", loggerFactory.CreateLogger<StaticFilesProvider>());
+            {
+                var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
+
+                const string path = "public";
+                var di = new DirectoryInfo(path);
+				di.CreateDirectory();
+				
+                return new StaticFilesProvider(path, loggerFactory.CreateLogger<StaticFilesProvider>());
 			});
 
 			services.TryAddSingleton<IMimeTypesProvider>(_ => new MimeTypesProvider());
@@ -186,7 +193,12 @@ namespace Everest.Rest
 			services.AddSingleton<IStaticFilesProvider>(provider =>
 			{
 				var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
-				var staticFilesProvider = new StaticFilesProvider("public", loggerFactory.CreateLogger<StaticFilesProvider>());
+
+                const string path = "public";
+                var di = new DirectoryInfo(path);
+                di.CreateDirectory();
+
+                var staticFilesProvider = new StaticFilesProvider(path, loggerFactory.CreateLogger<StaticFilesProvider>());
 				configurator(new StaticFilesProviderConfigurator(staticFilesProvider, provider));
 
 				return staticFilesProvider;

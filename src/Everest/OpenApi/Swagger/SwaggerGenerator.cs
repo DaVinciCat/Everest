@@ -21,10 +21,10 @@ namespace Everest.OpenApi.Swagger
         public string SwaggerUiPath { get; set; } = "swagger";
 
         public string PhysicalPath { get; set; } = "public";
-        
-        private static string SwaggerDistPath = $"{Assembly.GetExecutingAssembly().GetName().Name}.OpenApi.Swagger.Dist";
 
-        private static string SwaggerInitializerFileName = "swagger-initializer.js";
+        public static string SwaggerDistPath = $"{Assembly.GetExecutingAssembly().GetName().Name}.OpenApi.Swagger.Dist";
+
+        public static string SwaggerInitializerFileName = "swagger-initializer.js";
 
         private readonly IOpenApiDocumentGenerator generator;
 
@@ -85,7 +85,6 @@ namespace Everest.OpenApi.Swagger
             }
             
             var document = generator.Generate(info, routes);
-            var swagger = new FileInfo(Path.Combine(PhysicalPath, endPointFilePath));
             fi.CreateFile();
             using (var sw = new StreamWriter(fi.FullName))
             {
