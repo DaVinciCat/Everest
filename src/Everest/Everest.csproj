@@ -1,100 +1,97 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>net6.0;net472</TargetFrameworks>
-	  
-	  <id>Everest</id>
-	  <title>Everest</title>
-	  <description>Lite embeddable REST-server</description>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFrameworks>net6.0;net472</TargetFrameworks>
 
-  <ItemGroup>
-    <None Remove="OpenApi\Swagger\Dist\favicon-16x16.png" />
-    <None Remove="OpenApi\Swagger\Dist\favicon-32x32.png" />
-    <None Remove="OpenApi\Swagger\Dist\index.css" />
-    <None Remove="OpenApi\Swagger\Dist\index.html" />
-    <None Remove="OpenApi\Swagger\Dist\oauth2-redirect.html" />
-    <None Remove="OpenApi\Swagger\Dist\swagger-initializer.js" />
-    <None Remove="OpenApi\Swagger\Dist\swagger-ui-bundle.js" />
-    <None Remove="OpenApi\Swagger\Dist\swagger-ui-bundle.js.map" />
-    <None Remove="OpenApi\Swagger\Dist\swagger-ui-es-bundle-core.js" />
-    <None Remove="OpenApi\Swagger\Dist\swagger-ui-es-bundle-core.js.map" />
-    <None Remove="OpenApi\Swagger\Dist\swagger-ui-es-bundle.js" />
-    <None Remove="OpenApi\Swagger\Dist\swagger-ui-es-bundle.js.map" />
-    <None Remove="OpenApi\Swagger\Dist\swagger-ui-standalone-preset.js" />
-    <None Remove="OpenApi\Swagger\Dist\swagger-ui-standalone-preset.js.map" />
-    <None Remove="OpenApi\Swagger\Dist\swagger-ui.css" />
-    <None Remove="OpenApi\Swagger\Dist\swagger-ui.css.map" />
-    <None Remove="OpenApi\Swagger\Dist\swagger-ui.js" />
-    <None Remove="OpenApi\Swagger\Dist\swagger-ui.js.map" />
-  </ItemGroup>
+		<id>Everest</id>
+		<title>Everest</title>
+		<description>Lite embeddable REST-server</description>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Include="OpenApi\Swagger\Dist\favicon-16x16.png">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="OpenApi\Swagger\Dist\favicon-32x32.png">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="OpenApi\Swagger\Dist\index.css">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="OpenApi\Swagger\Dist\index.html">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="OpenApi\Swagger\Dist\oauth2-redirect.html">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="OpenApi\Swagger\Dist\swagger-initializer.js">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="OpenApi\Swagger\Dist\swagger-ui-bundle.js">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="OpenApi\Swagger\Dist\swagger-ui-bundle.js.map">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="OpenApi\Swagger\Dist\swagger-ui-es-bundle-core.js">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="OpenApi\Swagger\Dist\swagger-ui-es-bundle-core.js.map">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="OpenApi\Swagger\Dist\swagger-ui-es-bundle.js">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="OpenApi\Swagger\Dist\swagger-ui-es-bundle.js.map">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="OpenApi\Swagger\Dist\swagger-ui-standalone-preset.js">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="OpenApi\Swagger\Dist\swagger-ui-standalone-preset.js.map">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="OpenApi\Swagger\Dist\swagger-ui.css">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="OpenApi\Swagger\Dist\swagger-ui.css.map">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="OpenApi\Swagger\Dist\swagger-ui.js">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="OpenApi\Swagger\Dist\swagger-ui.js.map">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </EmbeddedResource>
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
+		<PackageReference Include="Microsoft.OpenApi" Version="1.6.9" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.32.2" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
-    <PackageReference Include="Microsoft.OpenApi" Version="1.6.9" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.32.2" />
-  </ItemGroup>
+	<ItemGroup>
+		<Reference Condition=" '$(TargetFramework)' != 'net6.0'" Include="System.Web" />
+	</ItemGroup>
 
-  <ItemGroup>
-	<Reference Condition=" '$(TargetFramework)' != 'net6.0'" Include="System.Web" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Update="Swagger\Dist\favicon-16x16.png">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<TargetPath>swagger-ui-dist\%(Filename)%(Extension)</TargetPath>
+		</None>
+		<None Update="Swagger\Dist\favicon-32x32.png">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<TargetPath>swagger-ui-dist\%(Filename)%(Extension)</TargetPath>
+		</None>
+		<None Update="Swagger\Dist\index.css">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<TargetPath>swagger-ui-dist\%(Filename)%(Extension)</TargetPath>
+		</None>
+		<None Update="Swagger\Dist\index.html">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<TargetPath>swagger-ui-dist\%(Filename)%(Extension)</TargetPath>
+		</None>
+		<None Update="Swagger\Dist\oauth2-redirect.html">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<TargetPath>swagger-ui-dist\%(Filename)%(Extension)</TargetPath>
+		</None>
+		<None Update="Swagger\Dist\swagger-initializer.js">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<TargetPath>swagger-ui-dist\%(Filename)%(Extension)</TargetPath>
+		</None>
+		<None Update="Swagger\Dist\swagger-ui-bundle.js">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<TargetPath>swagger-ui-dist\%(Filename)%(Extension)</TargetPath>
+		</None>
+		<None Update="Swagger\Dist\swagger-ui-bundle.js.map">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<TargetPath>swagger-ui-dist\%(Filename)%(Extension)</TargetPath>
+		</None>
+		<None Update="Swagger\Dist\swagger-ui-es-bundle-core.js">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<TargetPath>swagger-ui-dist\%(Filename)%(Extension)</TargetPath>
+		</None>
+		<None Update="Swagger\Dist\swagger-ui-es-bundle-core.js.map">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<TargetPath>swagger-ui-dist\%(Filename)%(Extension)</TargetPath>
+		</None>
+		<None Update="Swagger\Dist\swagger-ui-es-bundle.js">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<TargetPath>swagger-ui-dist\%(Filename)%(Extension)</TargetPath>
+		</None>
+		<None Update="Swagger\Dist\swagger-ui-es-bundle.js.map">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<TargetPath>swagger-ui-dist\%(Filename)%(Extension)</TargetPath>
+		</None>
+		<None Update="Swagger\Dist\swagger-ui-standalone-preset.js">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<TargetPath>swagger-ui-dist\%(Filename)%(Extension)</TargetPath>
+		</None>
+		<None Update="Swagger\Dist\swagger-ui-standalone-preset.js.map">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<TargetPath>swagger-ui-dist\%(Filename)%(Extension)</TargetPath>
+		</None>
+		<None Update="Swagger\Dist\swagger-ui.css">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<TargetPath>swagger-ui-dist\%(Filename)%(Extension)</TargetPath>
+		</None>
+		<None Update="Swagger\Dist\swagger-ui.css.map">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<TargetPath>swagger-ui-dist\%(Filename)%(Extension)</TargetPath>
+		</None>
+		<None Update="Swagger\Dist\swagger-ui.js">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<TargetPath>swagger-ui-dist\%(Filename)%(Extension)</TargetPath>
+		</None>
+		<None Update="Swagger\Dist\swagger-ui.js.map">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<TargetPath>swagger-ui-dist\%(Filename)%(Extension)</TargetPath>
+		</None>
+	</ItemGroup>
 
 </Project>

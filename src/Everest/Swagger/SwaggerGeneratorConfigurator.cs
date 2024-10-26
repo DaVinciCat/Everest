@@ -2,7 +2,7 @@
 using Everest.Services;
 using Microsoft.OpenApi.Models;
 
-namespace Everest.OpenApi.Swagger
+namespace Everest.Swagger
 {
     public class SwaggerGeneratorConfigurator : ServiceConfigurator<SwaggerGenerator>
     {
@@ -10,7 +10,7 @@ namespace Everest.OpenApi.Swagger
 
         public OpenApiInfo OpenApiInfo { get; set; } = new OpenApiInfo();
 
-        public SwaggerGeneratorConfigurator(SwaggerGenerator service, IServiceProvider services) 
+        public SwaggerGeneratorConfigurator(SwaggerGenerator service, IServiceProvider services)
             : base(service, services)
         {
 
