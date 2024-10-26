@@ -7,8 +7,8 @@ namespace Everest.OpenApi
     {
         public OpenApiDocumentGenerator DocumentGenerator => Service;
 
-        public OpenApiDocumentGeneratorConfigurator(OpenApiDocumentGenerator exceptionHandler, IServiceProvider services)
-            : base(exceptionHandler, services)
+        public OpenApiDocumentGeneratorConfigurator(OpenApiDocumentGenerator generator, IServiceProvider services)
+            : base(generator, services)
         {
 
         }
