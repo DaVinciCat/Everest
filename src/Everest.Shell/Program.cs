@@ -212,6 +212,12 @@ namespace Everest.Shell
             services.AddAuthenticator(configurator => configurator.AddBasicAuthentication())
                     .AddCorsRequestHandler(configurator => configurator.AddDefaultCorsPolicy())
                     .AddWebSocketRequestHandler<EchoWebsocketRequestHandler>()
+                    .AddSwaggerEndPointGenerator(configurator => configurator.UseOpenApiInfo(info =>
+                    {
+                        info.Title = "Everest API";
+                        info.Description = "Some API description";
+                        info.Version = "V3";
+                    }))
                     .AddSingleton(_ => new GreetingsService())
                     .AddConsoleLoggerFactory();
 
@@ -225,17 +231,9 @@ namespace Everest.Shell
                 .UseRoutingMiddleware()
                 .UseCorsMiddleware()
                 .UseEndPointMiddleware()
-                .ScanRoutes(Assembly.GetExecutingAssembly(), configurator =>
-                {
-                    //configurator.UseSwaggerEndPoint("/api/my/swagger.json");
-                    //configurator.UseSwaggerUi("/my/swagger");
-                    configurator.UseOpenApiInfo(info =>
-                    {
-                        info.Title = "Everest API";
-                        info.Description = "Some API description";
-                        info.Version = "V3";
-                    });
-                })
+                .ScanRoutes(Assembly.GetExecutingAssembly())
+                .UseSwagger()
+                .UseSwaggerUi()
                 .Build();
 
             rest.Start();

@@ -97,7 +97,20 @@ namespace Everest.Rest
                 var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
                 return new OpenApiDocumentGenerator(loggerFactory.CreateLogger<OpenApiDocumentGenerator>());
             });
-			
+
+            services.TryAddSingleton<ISwaggerEndPointGenerator>(provider =>
+            {
+                var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
+                var openApiDocumentGenerator = provider.GetRequiredService<IOpenApiDocumentGenerator>();
+                return new SwaggerEndPointGenerator(openApiDocumentGenerator, loggerFactory.CreateLogger<SwaggerEndPointGenerator>());
+            });
+
+            services.TryAddSingleton<ISwaggerUiGenerator>(provider =>
+            {
+                var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
+                return new SwaggerUiGenerator(loggerFactory.CreateLogger<SwaggerUiGenerator>());
+            });
+
             Services = services.BuildServiceProvider();
 		}
 
@@ -330,7 +343,48 @@ namespace Everest.Rest
 
             return services;
         }
-		
+
+        public static IServiceCollection AddSwaggerEndPointGenerator(this IServiceCollection services, Func<IServiceProvider, ISwaggerEndPointGenerator> builder)
+        {
+            services.AddSingleton(builder);
+            return services;
+        }
+
+        public static IServiceCollection AddSwaggerEndPointGenerator(this IServiceCollection services, Action<SwaggerEndPointGeneratorConfigurator> configurator)
+        {
+            services.AddSingleton<ISwaggerEndPointGenerator>(provider =>
+            {
+                var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
+                var openApiDocumentGenerator = provider.GetRequiredService<IOpenApiDocumentGenerator>();
+                var generator = new SwaggerEndPointGenerator(openApiDocumentGenerator, loggerFactory.CreateLogger<SwaggerEndPointGenerator>());
+                configurator(new SwaggerEndPointGeneratorConfigurator(generator, provider));
+
+                return generator;
+            });
+
+            return services;
+        }
+
+        public static IServiceCollection AddSwaggerUiGenerator(this IServiceCollection services, Func<IServiceProvider, ISwaggerUiGenerator> builder)
+        {
+            services.AddSingleton(builder);
+            return services;
+        }
+
+        public static IServiceCollection AddSwaggerUiGenerator(this IServiceCollection services, Action<SwaggerUiGeneratorConfigurator> configurator)
+        {
+            services.AddSingleton<ISwaggerUiGenerator>(provider =>
+            {
+                var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
+                var generator = new SwaggerUiGenerator(loggerFactory.CreateLogger<SwaggerUiGenerator>());
+                configurator(new SwaggerUiGeneratorConfigurator(generator, provider));
+
+                return generator;
+            });
+
+            return services;
+        }
+
         public static IServiceCollection AddConsoleLoggerFactory(this IServiceCollection services, Action<ILoggingBuilder> configurator = null)
 		{
 			var factory = LoggerFactory.Create(config =>
@@ -440,25 +494,20 @@ namespace Everest.Rest
 			return builder;
 		}
 
-        public static RestServerBuilder ScanRoutes(this RestServerBuilder builder, Assembly assembly, Action<SwaggerGeneratorConfigurator> options)
+        public static RestServerBuilder UseSwagger(this RestServerBuilder builder)
         {
-            var scanner = builder.Services.GetRequiredService<IRouteScanner>();
+            var generator = builder.Services.GetRequiredService<ISwaggerEndPointGenerator>();
             var router = builder.Services.GetRequiredService<IRouter>();
-            var documentGenerator = builder.Services.GetRequiredService<IOpenApiDocumentGenerator>();
-            var loggerFactory = builder.Services.GetRequiredService<ILoggerFactory>();
-
-            var generator = new SwaggerGenerator(documentGenerator, loggerFactory.CreateLogger<SwaggerGenerator>());
-			var configurator = new SwaggerGeneratorConfigurator(generator, builder.Services);
-            options(configurator);
-
-            var routes = scanner.Scan(assembly).ToArray();
-            foreach (var route in routes)
-            {
-                router.RegisterRoute(route);
-            }
-
-            generator.Generate(configurator.OpenApiInfo, routes);
+       
+            generator.Generate(router.Routes);
 			
+            return builder;
+        }
+        public static RestServerBuilder UseSwaggerUi(this RestServerBuilder builder)
+        {
+            var generator = builder.Services.GetRequiredService<ISwaggerUiGenerator>();
+            generator.Generate();
+
             return builder;
         }
     }
