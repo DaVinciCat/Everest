@@ -22,7 +22,9 @@ namespace Everest.Swagger
         public string PhysicalPath { get; set; } = "public";
 
         public string SwaggerInitializerFileName { get; set; } = "swagger-initializer.js";
-        
+
+        public string SwaggerUiDistPath { get; set; } = "swagger-ui-dist";
+
         private readonly IOpenApiDocumentGenerator generator;
         
         public SwaggerGenerator(IOpenApiDocumentGenerator generator, ILogger<SwaggerGenerator> logger)
@@ -33,6 +35,9 @@ namespace Everest.Swagger
         
         public void Generate(OpenApiInfo info, RouteDescriptor[] routes)
         {
+            if (info == null)
+                throw new ArgumentNullException(nameof(info));
+
             if (routes == null)
                 throw new ArgumentNullException(nameof(routes));
 
@@ -52,10 +57,9 @@ namespace Everest.Swagger
                 sw.Close();
             }
             
-            var swaggerUiSourceDir = "swagger-ui-dist";
             var di = new DirectoryInfo(swaggerUiPath);
             di.CreateDirectory();
-            foreach (var file in Directory.GetFiles(swaggerUiSourceDir))
+            foreach (var file in Directory.GetFiles(SwaggerUiDistPath))
             {
                 var destFile = Path.Combine(swaggerUiPath, Path.GetFileName(file));
                 File.Copy(file, destFile, true); 
