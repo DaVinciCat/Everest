@@ -7,7 +7,7 @@ namespace Everest.Tests
 		[Test]
         public void Test()
         {
-            Assert.True(true);
+            //Assert.True(true);
         }
 
 	//	[Fact]
