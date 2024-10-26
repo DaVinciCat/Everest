@@ -19,77 +19,80 @@
 		<Reference Condition=" '$(TargetFramework)' != 'net6.0'" Include="System.Web" />
 	</ItemGroup>
 
+	<PropertyGroup>
+		<CopySwaggerUiDistFiles Condition="'$(CopySwaggerUiDistFiles)' == ''">true</CopySwaggerUiDistFiles>
+	</PropertyGroup>
 	<ItemGroup>
 		<None Update="Swagger\Dist\favicon-16x16.png">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToOutputDirectory Condition="'$(CopySwaggerUiDistFiles)' == 'true'">PreserveNewest</CopyToOutputDirectory>
 			<TargetPath>swagger-ui-dist\%(Filename)%(Extension)</TargetPath>
 		</None>
 		<None Update="Swagger\Dist\favicon-32x32.png">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToOutputDirectory Condition="'$(CopySwaggerUiDistFiles)' == 'true'">PreserveNewest</CopyToOutputDirectory>
 			<TargetPath>swagger-ui-dist\%(Filename)%(Extension)</TargetPath>
 		</None>
 		<None Update="Swagger\Dist\index.css">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToOutputDirectory Condition="'$(CopySwaggerUiDistFiles)' == 'true'">PreserveNewest</CopyToOutputDirectory>
 			<TargetPath>swagger-ui-dist\%(Filename)%(Extension)</TargetPath>
 		</None>
 		<None Update="Swagger\Dist\index.html">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToOutputDirectory Condition="'$(CopySwaggerUiDistFiles)' == 'true'">PreserveNewest</CopyToOutputDirectory>
 			<TargetPath>swagger-ui-dist\%(Filename)%(Extension)</TargetPath>
 		</None>
 		<None Update="Swagger\Dist\oauth2-redirect.html">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToOutputDirectory Condition="'$(CopySwaggerUiDistFiles)' == 'true'">PreserveNewest</CopyToOutputDirectory>
 			<TargetPath>swagger-ui-dist\%(Filename)%(Extension)</TargetPath>
 		</None>
 		<None Update="Swagger\Dist\swagger-initializer.js">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToOutputDirectory Condition="'$(CopySwaggerUiDistFiles)' == 'true'">PreserveNewest</CopyToOutputDirectory>
 			<TargetPath>swagger-ui-dist\%(Filename)%(Extension)</TargetPath>
 		</None>
 		<None Update="Swagger\Dist\swagger-ui-bundle.js">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToOutputDirectory Condition="'$(CopySwaggerUiDistFiles)' == 'true'">PreserveNewest</CopyToOutputDirectory>
 			<TargetPath>swagger-ui-dist\%(Filename)%(Extension)</TargetPath>
 		</None>
 		<None Update="Swagger\Dist\swagger-ui-bundle.js.map">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToOutputDirectory Condition="'$(CopySwaggerUiDistFiles)' == 'true'">PreserveNewest</CopyToOutputDirectory>
 			<TargetPath>swagger-ui-dist\%(Filename)%(Extension)</TargetPath>
 		</None>
 		<None Update="Swagger\Dist\swagger-ui-es-bundle-core.js">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToOutputDirectory Condition="'$(CopySwaggerUiDistFiles)' == 'true'">PreserveNewest</CopyToOutputDirectory>
 			<TargetPath>swagger-ui-dist\%(Filename)%(Extension)</TargetPath>
 		</None>
 		<None Update="Swagger\Dist\swagger-ui-es-bundle-core.js.map">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToOutputDirectory Condition="'$(CopySwaggerUiDistFiles)' == 'true'">PreserveNewest</CopyToOutputDirectory>
 			<TargetPath>swagger-ui-dist\%(Filename)%(Extension)</TargetPath>
 		</None>
 		<None Update="Swagger\Dist\swagger-ui-es-bundle.js">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToOutputDirectory Condition="'$(CopySwaggerUiDistFiles)' == 'true'">PreserveNewest</CopyToOutputDirectory>
 			<TargetPath>swagger-ui-dist\%(Filename)%(Extension)</TargetPath>
 		</None>
 		<None Update="Swagger\Dist\swagger-ui-es-bundle.js.map">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToOutputDirectory Condition="'$(CopySwaggerUiDistFiles)' == 'true'">PreserveNewest</CopyToOutputDirectory>
 			<TargetPath>swagger-ui-dist\%(Filename)%(Extension)</TargetPath>
 		</None>
 		<None Update="Swagger\Dist\swagger-ui-standalone-preset.js">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToOutputDirectory Condition="'$(CopySwaggerUiDistFiles)' == 'true'">PreserveNewest</CopyToOutputDirectory>
 			<TargetPath>swagger-ui-dist\%(Filename)%(Extension)</TargetPath>
 		</None>
 		<None Update="Swagger\Dist\swagger-ui-standalone-preset.js.map">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToOutputDirectory Condition="'$(CopySwaggerUiDistFiles)' == 'true'">PreserveNewest</CopyToOutputDirectory>
 			<TargetPath>swagger-ui-dist\%(Filename)%(Extension)</TargetPath>
 		</None>
 		<None Update="Swagger\Dist\swagger-ui.css">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToOutputDirectory Condition="'$(CopySwaggerUiDistFiles)' == 'true'">PreserveNewest</CopyToOutputDirectory>
 			<TargetPath>swagger-ui-dist\%(Filename)%(Extension)</TargetPath>
 		</None>
 		<None Update="Swagger\Dist\swagger-ui.css.map">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToOutputDirectory Condition="'$(CopySwaggerUiDistFiles)' == 'true'">PreserveNewest</CopyToOutputDirectory>
 			<TargetPath>swagger-ui-dist\%(Filename)%(Extension)</TargetPath>
 		</None>
 		<None Update="Swagger\Dist\swagger-ui.js">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToOutputDirectory Condition="'$(CopySwaggerUiDistFiles)' == 'true'">PreserveNewest</CopyToOutputDirectory>
 			<TargetPath>swagger-ui-dist\%(Filename)%(Extension)</TargetPath>
 		</None>
 		<None Update="Swagger\Dist\swagger-ui.js.map">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToOutputDirectory Condition="'$(CopySwaggerUiDistFiles)' == 'true'">PreserveNewest</CopyToOutputDirectory>
 			<TargetPath>swagger-ui-dist\%(Filename)%(Extension)</TargetPath>
 		</None>
 	</ItemGroup>
