@@ -43,19 +43,19 @@ namespace Everest.Builder
                 return new Router(loggerFactory.CreateLogger<Router>());
             });
 
-            services.TryAddSingleton<IStaticFilesProvider>(provider =>
-                     {
-                         var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
-
-                         const string path = "public";
-                         var di = new DirectoryInfo(path);
-                         di.CreateDirectory();
-
-                         return new StaticFilesProvider(path, loggerFactory.CreateLogger<StaticFilesProvider>());
-                     });
-
             services.TryAddSingleton<IMimeTypesProvider>(_ => new MimeTypesProvider());
 
+            services.TryAddSingleton<IStaticFilesProvider>(provider =>
+            {
+                var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
+
+                const string path = "public";
+                var di = new DirectoryInfo(path);
+                di.CreateDirectory();
+
+                return new StaticFilesProvider(path, loggerFactory.CreateLogger<StaticFilesProvider>());
+            });
+            
             services.TryAddSingleton<IStaticFileRequestHandler>(provider =>
             {
                 var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
