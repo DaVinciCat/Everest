@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net6.0;net472</TargetFrameworks>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Everest.Core\Everest.Core.csproj" />
+    <ProjectReference Include="..\Everest.OpenApi\Everest.OpenApi.csproj" />
+    <ProjectReference Include="..\Everest.Routing\Everest.Routing.csproj" />
+  </ItemGroup>
+
+</Project>

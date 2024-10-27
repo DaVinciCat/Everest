@@ -6,12 +6,21 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Everest.Authentication;
-using Everest.Http;
+using Everest.Builder;
+using Everest.Compression;
+using Everest.Core.Http;
+using Everest.Core.Rest;
+using Everest.Core.WebSockets;
+using Everest.Cors;
+using Everest.EndPoints;
+using Everest.Exceptions;
+using Everest.Logging;
 using Everest.OpenApi.Annotations;
 using Everest.OpenApi.Examples;
-using Everest.Rest;
 using Everest.Routing;
+using Everest.StaticFiles;
 using Everest.Swagger;
+using Everest.SwaggerUi;
 using Everest.WebSockets;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -221,7 +230,7 @@ namespace Everest.Shell
                     .AddSingleton(_ => new GreetingsService())
                     .AddConsoleLoggerFactory();
 
-            using var rest = new RestServerBuilder(services)
+            var rest = RestServerBuilderFactory.CreateBuilder(services)
                 .UsePrefixes("http://localhost:8080/")
                 .UseExceptionHandlerMiddleware()
                 .UseResponseCompressionMiddleware()

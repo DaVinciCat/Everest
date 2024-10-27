@@ -1,0 +1,91 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net6.0;net472</TargetFrameworks>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="dist\favicon-16x16.png" />
+    <None Remove="dist\favicon-32x32.png" />
+    <None Remove="dist\index.css" />
+    <None Remove="dist\index.html" />
+    <None Remove="dist\oauth2-redirect.html" />
+    <None Remove="dist\swagger-initializer.js" />
+    <None Remove="dist\swagger-ui-bundle.js" />
+    <None Remove="dist\swagger-ui-bundle.js.map" />
+    <None Remove="dist\swagger-ui-es-bundle-core.js" />
+    <None Remove="dist\swagger-ui-es-bundle-core.js.map" />
+    <None Remove="dist\swagger-ui-es-bundle.js" />
+    <None Remove="dist\swagger-ui-es-bundle.js.map" />
+    <None Remove="dist\swagger-ui-standalone-preset.js" />
+    <None Remove="dist\swagger-ui-standalone-preset.js.map" />
+    <None Remove="dist\swagger-ui.css" />
+    <None Remove="dist\swagger-ui.css.map" />
+    <None Remove="dist\swagger-ui.js" />
+    <None Remove="dist\swagger-ui.js.map" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="dist\favicon-16x16.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="dist\favicon-32x32.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="dist\index.css">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="dist\index.html">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="dist\oauth2-redirect.html">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="dist\swagger-initializer.js">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="dist\swagger-ui-bundle.js">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="dist\swagger-ui-bundle.js.map">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="dist\swagger-ui-es-bundle-core.js">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="dist\swagger-ui-es-bundle-core.js.map">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="dist\swagger-ui-es-bundle.js">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="dist\swagger-ui-es-bundle.js.map">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="dist\swagger-ui-standalone-preset.js">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="dist\swagger-ui-standalone-preset.js.map">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="dist\swagger-ui.css">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="dist\swagger-ui.css.map">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="dist\swagger-ui.js">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="dist\swagger-ui.js.map">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Everest.Core\Everest.Core.csproj" />
+  </ItemGroup>
+
+</Project>
