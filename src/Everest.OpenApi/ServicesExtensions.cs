@@ -12,6 +12,17 @@ namespace Everest.OpenApi
             return services;
         }
 
+        public static IServiceCollection AddOpenApiDocumentGenerator(this IServiceCollection services)
+        {
+            services.AddSingleton<IOpenApiDocumentGenerator>(provider =>
+            {
+                var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
+                return new OpenApiDocumentGenerator(loggerFactory.CreateLogger<OpenApiDocumentGenerator>());
+            });
+
+            return services;
+        }
+
         public static IServiceCollection AddOpenApiDocumentGenerator(this IServiceCollection services, Action<OpenApiDocumentGeneratorConfigurator> configurator)
         {
             services.AddSingleton<IOpenApiDocumentGenerator>(provider =>

@@ -5,11 +5,8 @@ using Everest.Core.Rest;
 using Everest.EndPoints;
 using Everest.Exceptions;
 using Everest.Mime;
-using Everest.OpenApi;
 using Everest.Routing;
 using Everest.StaticFiles;
-using Everest.Swagger;
-using Everest.SwaggerUi;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
@@ -66,7 +63,7 @@ namespace Everest.Builder
                 var mimeTypesProvider = provider.GetRequiredService<IMimeTypesProvider>();
                 return new StaticFileRequestHandler(staticFilesProvider, mimeTypesProvider, loggerFactory.CreateLogger<StaticFileRequestHandler>());
             });
-
+            
             services.TryAddSingleton<IResponseCompressor>(provider =>
             {
                 var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
@@ -78,26 +75,7 @@ namespace Everest.Builder
                 var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
                 return new EndPointInvoker(loggerFactory.CreateLogger<EndPointInvoker>());
             });
-
-            services.TryAddSingleton<IOpenApiDocumentGenerator>(provider =>
-                     {
-                         var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
-                         return new OpenApiDocumentGenerator(loggerFactory.CreateLogger<OpenApiDocumentGenerator>());
-                     });
-
-            services.TryAddSingleton<ISwaggerEndPointGenerator>(provider =>
-            {
-                var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
-                var openApiDocumentGenerator = provider.GetRequiredService<IOpenApiDocumentGenerator>();
-                return new SwaggerEndPointGenerator(openApiDocumentGenerator, loggerFactory.CreateLogger<SwaggerEndPointGenerator>());
-            });
-
-            services.TryAddSingleton<ISwaggerUiGenerator>(provider =>
-            {
-                var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
-                return new SwaggerUiGenerator(loggerFactory.CreateLogger<SwaggerUiGenerator>());
-            });
-
+            
             return new RestServerBuilder(services);
         }
     }

@@ -15,6 +15,19 @@ namespace Everest.StaticFiles
             return services;
         }
 
+        public static IServiceCollection AddStaticFileRequestHandler(this IServiceCollection services)
+        {
+            services.AddSingleton<IStaticFileRequestHandler>(provider =>
+            {
+                var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
+                var staticFilesProvider = provider.GetRequiredService<IStaticFilesProvider>();
+                var mimeTypesProvider = provider.GetRequiredService<IMimeTypesProvider>();
+                return new StaticFileRequestHandler(staticFilesProvider, mimeTypesProvider, loggerFactory.CreateLogger<StaticFileRequestHandler>());
+            });
+
+            return services;
+        }
+
         public static IServiceCollection AddStaticFileRequestHandler(this IServiceCollection services, Action<StaticFileRequestHandlerConfigurator> configurator)
         {
             services.AddSingleton<IStaticFileRequestHandler>(provider =>
@@ -34,6 +47,22 @@ namespace Everest.StaticFiles
         public static IServiceCollection AddStaticFilesProvider(this IServiceCollection services, Func<IServiceProvider, IStaticFilesProvider> builder)
         {
             services.AddSingleton(builder);
+            return services;
+        }
+
+        public static IServiceCollection AddStaticFilesProvider(this IServiceCollection services)
+        {
+            services.AddSingleton<IStaticFilesProvider>(provider =>
+            {
+                var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
+
+                const string path = "public";
+                var di = new DirectoryInfo(path);
+                di.CreateDirectory();
+
+                return new StaticFilesProvider(path, loggerFactory.CreateLogger<StaticFilesProvider>());
+            });
+
             return services;
         }
 

@@ -12,6 +12,17 @@ namespace Everest.Cors
             return services;
         }
 
+        public static IServiceCollection AddCorsRequestHandler(this IServiceCollection services)
+        {
+            services.AddSingleton<ICorsRequestHandler>(provider =>
+            {
+                var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
+                return new CorsRequestHandler(loggerFactory.CreateLogger<CorsRequestHandler>());
+            });
+
+            return services;
+        }
+
         public static IServiceCollection AddCorsRequestHandler(this IServiceCollection services, Action<CorsRequestHandlerConfigurator> configurator)
         {
             services.AddSingleton<ICorsRequestHandler>(provider =>

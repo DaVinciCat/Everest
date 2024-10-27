@@ -12,6 +12,17 @@ namespace Everest.Exceptions
             return services;
         }
 
+        public static IServiceCollection AddExceptionHandler(this IServiceCollection services)
+        {
+            services.AddSingleton<IExceptionHandler>(provider =>
+            {
+                var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
+                return new ExceptionHandler(loggerFactory.CreateLogger<ExceptionHandler>());
+            });
+
+            return services;
+        }
+
         public static IServiceCollection AddExceptionHandler(this IServiceCollection services, Action<ExceptionHandlerConfigurator> configurator)
         {
             services.AddSingleton<IExceptionHandler>(provider =>

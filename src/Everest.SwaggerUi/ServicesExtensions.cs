@@ -12,6 +12,17 @@ namespace Everest.SwaggerUi
             return services;
         }
 
+        public static IServiceCollection AddSwaggerUiGenerator(this IServiceCollection services)
+        {
+            services.AddSingleton<ISwaggerUiGenerator>(provider =>
+            {
+                var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
+                return new SwaggerUiGenerator(loggerFactory.CreateLogger<SwaggerUiGenerator>());
+            });
+
+            return services;
+        }
+
         public static IServiceCollection AddSwaggerUiGenerator(this IServiceCollection services, Action<SwaggerUiGeneratorConfigurator> configurator)
         {
             services.AddSingleton<ISwaggerUiGenerator>(provider =>

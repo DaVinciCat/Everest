@@ -12,6 +12,17 @@ namespace Everest.Compression
             return services;
         }
 
+        public static IServiceCollection AddResponseCompressor(this IServiceCollection services)
+        {
+            services.AddSingleton<IResponseCompressor>(provider =>
+            {
+                var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
+                return  new ResponseCompressor(loggerFactory.CreateLogger<ResponseCompressor>());
+            });
+
+            return services;
+        }
+
         public static IServiceCollection AddResponseCompressor(this IServiceCollection services, Action<ResponseCompressorConfigurator> configurator)
         {
             services.AddSingleton<IResponseCompressor>(provider =>

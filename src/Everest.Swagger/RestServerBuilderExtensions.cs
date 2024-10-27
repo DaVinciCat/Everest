@@ -6,7 +6,7 @@ namespace Everest.Swagger
 {
     public static class RestServerBuilderExtensions
     {
-        public static RestServerBuilder UseSwagger(this RestServerBuilder builder)
+        public static RestServerBuilder GenerateSwaggerEndPoint(this RestServerBuilder builder)
         {
             var generator = builder.Services.GetRequiredService<ISwaggerEndPointGenerator>();
             var router = builder.Services.GetRequiredService<IRouter>();

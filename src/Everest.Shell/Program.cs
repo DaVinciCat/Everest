@@ -15,6 +15,7 @@ using Everest.Cors;
 using Everest.EndPoints;
 using Everest.Exceptions;
 using Everest.Logging;
+using Everest.OpenApi;
 using Everest.OpenApi.Annotations;
 using Everest.OpenApi.Examples;
 using Everest.Routing;
@@ -221,12 +222,14 @@ namespace Everest.Shell
             services.AddAuthenticator(configurator => configurator.AddBasicAuthentication())
                     .AddCorsRequestHandler(configurator => configurator.AddDefaultCorsPolicy())
                     .AddWebSocketRequestHandler<EchoWebsocketRequestHandler>()
+                    .AddOpenApiDocumentGenerator()
                     .AddSwaggerEndPointGenerator(configurator => configurator.UseOpenApiInfo(info =>
                     {
                         info.Title = "Everest API";
                         info.Description = "Some API description";
                         info.Version = "V3";
                     }))
+                    .AddSwaggerUiGenerator()
                     .AddSingleton(_ => new GreetingsService())
                     .AddConsoleLoggerFactory();
 
@@ -241,8 +244,8 @@ namespace Everest.Shell
                 .UseCorsMiddleware()
                 .UseEndPointMiddleware()
                 .ScanRoutes(Assembly.GetExecutingAssembly())
-                .UseSwagger()
-                .UseSwaggerUi()
+                .GenerateSwaggerEndPoint()
+                .GenerateSwaggerUi()
                 .Build();
 
             rest.Start();

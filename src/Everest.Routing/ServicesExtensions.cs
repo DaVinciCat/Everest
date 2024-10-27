@@ -26,6 +26,17 @@ namespace Everest.Routing
             return services;
         }
 
+        public static IServiceCollection AddRouter(this IServiceCollection services)
+        {
+            services.AddSingleton<IRouter>(provider =>
+            {
+                var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
+                return new Router(loggerFactory.CreateLogger<Router>());
+            });
+
+            return services;
+        }
+
         public static IServiceCollection AddRouteScanner(this IServiceCollection services, Func<IServiceProvider, IRouteScanner> builder)
         {
             services.AddSingleton(builder);

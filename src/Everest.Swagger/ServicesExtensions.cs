@@ -13,6 +13,18 @@ namespace Everest.Swagger
             return services;
         }
 
+        public static IServiceCollection AddSwaggerEndPointGenerator(this IServiceCollection services)
+        {
+            services.AddSingleton<ISwaggerEndPointGenerator>(provider =>
+            {
+                var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
+                var openApiDocumentGenerator = provider.GetRequiredService<IOpenApiDocumentGenerator>();
+                return new SwaggerEndPointGenerator(openApiDocumentGenerator, loggerFactory.CreateLogger<SwaggerEndPointGenerator>());
+            });
+
+            return services;
+        }
+
         public static IServiceCollection AddSwaggerEndPointGenerator(this IServiceCollection services, Action<SwaggerEndPointGeneratorConfigurator> configurator)
         {
             services.AddSingleton<ISwaggerEndPointGenerator>(provider =>
