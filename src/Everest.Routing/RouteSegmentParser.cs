@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Text.RegularExpressions;
-using Everest.Common.Collections;
+using Everest.Collections;
 
 namespace Everest.Routing
 {

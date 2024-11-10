@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.Threading.Tasks;
-using Everest.Core.Http;
+using Everest.Http;
 
 namespace Everest.EndPoints
 {

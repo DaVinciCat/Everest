@@ -1,6 +1,6 @@
 ﻿using System;
-using Everest.Common.Collections;
-using Everest.Core.Http;
+using Everest.Collections;
+using Everest.Http;
 
 namespace Everest.EndPoints
 {
@@ -26,7 +26,7 @@ namespace Everest.EndPoints
 			if (context == null) 
 				throw new ArgumentNullException(nameof(context));
 
-			return context.Features.Get<IEndPointFeature>()?.EndPoint ?? throw new ArgumentNullException(nameof(IEndPointFeature));
+			return FeatureCollectionExtensions.Get<IEndPointFeature>(context.Features)?.EndPoint ?? throw new ArgumentNullException(nameof(IEndPointFeature));
 		}
 
 		public static bool TryGetEndPoint(this IHttpContext context, out EndPoint endPoint)
@@ -34,7 +34,7 @@ namespace Everest.EndPoints
 			if (context == null)
 				throw new ArgumentNullException(nameof(context));
 
-            endPoint = context.Features.Get<IEndPointFeature>()?.EndPoint;
+            endPoint = FeatureCollectionExtensions.Get<IEndPointFeature>(context.Features)?.EndPoint;
 			return endPoint != null;
 		}
 	}

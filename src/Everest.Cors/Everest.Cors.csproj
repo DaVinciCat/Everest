@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Everest.Core\Everest.Core.csproj" />
     <ProjectReference Include="..\Everest.EndPoints\Everest.EndPoints.csproj" />
+    <ProjectReference Include="..\Everest\Everest.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,11 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Reflection;
-using Everest.Common.Logging;
+using Everest.Utils;
 
 namespace Everest.Routing
 {
-	public interface IRouteScanner
+    public interface IRouteScanner
 	{
 		IEnumerable<RouteDescriptor> Scan(Assembly assembly);
 	}

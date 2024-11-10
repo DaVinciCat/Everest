@@ -2,8 +2,8 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Everest.Common.Logging;
-using Everest.Core.Http;
+using Everest.Http;
+using Everest.Utils;
 
 namespace Everest.WebSockets
 {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Everest.Common.Logging;
+using Everest.Utils;
 using Microsoft.Extensions.Logging;
 
 namespace Everest.StaticFiles

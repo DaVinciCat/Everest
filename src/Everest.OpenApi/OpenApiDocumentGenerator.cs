@@ -2,9 +2,9 @@
 using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
-using Everest.Common.Logging;
 using Everest.OpenApi.Filters;
 using Everest.Routing;
+using Everest.Utils;
 
 namespace Everest.OpenApi
 {

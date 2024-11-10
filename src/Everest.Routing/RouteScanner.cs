@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Everest.Common.Logging;
-using Everest.Core.Http;
+using Everest.Http;
 using Everest.EndPoints;
 using Microsoft.Extensions.Logging;
+using Everest.Utils;
 
 namespace Everest.Routing
 {
-	public class RouteScanner : IRouteScanner, IHasLogger
+    public class RouteScanner : IRouteScanner, IHasLogger
 	{
         ILogger IHasLogger.Logger => Logger;
 

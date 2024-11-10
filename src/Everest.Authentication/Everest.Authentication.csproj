@@ -8,9 +8,9 @@
   <ItemGroup>
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.1.2" />
   </ItemGroup>
-
+	
   <ItemGroup>
-    <ProjectReference Include="..\Everest.Core\Everest.Core.csproj" />
+    <ProjectReference Include="..\Everest\Everest.csproj" />
   </ItemGroup>
 
 </Project>

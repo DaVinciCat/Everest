@@ -1,16 +1,17 @@
 ﻿using System.IO;
-using Everest.Common.Io;
 using Everest.Compression;
-using Everest.Core.Rest;
+using Everest.Rest;
 using Everest.EndPoints;
 using Everest.Exceptions;
 using Everest.Mime;
 using Everest.Routing;
 using Everest.StaticFiles;
+using Everest.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+
 
 namespace Everest.Builder
 {

@@ -3,10 +3,9 @@ using Everest.Routing;
 using Microsoft.OpenApi.Models;
 using Microsoft.OpenApi.Writers;
 using System.IO;
-using Everest.Common.Io;
-using Everest.Common.Logging;
 using Microsoft.Extensions.Logging;
 using Everest.OpenApi;
+using Everest.Utils;
 
 namespace Everest.Swagger
 {

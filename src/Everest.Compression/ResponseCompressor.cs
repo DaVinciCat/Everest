@@ -2,10 +2,9 @@
 using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
-using Everest.Common.Logging;
-using Everest.Common.Readable;
-using Everest.Core.Http;
+using Everest.Http;
 using Everest.Mime;
+using Everest.Utils;
 using Microsoft.Extensions.Logging;
 
 namespace Everest.Compression

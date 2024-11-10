@@ -4,15 +4,15 @@ using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Everest.Common.Collections;
-using Everest.Common.Logging;
-using Everest.Core.Http;
+using Everest.Collections;
+using Everest.Http;
 using Everest.EndPoints;
 using Microsoft.Extensions.Logging;
+using Everest.Utils;
 
 namespace Everest.Routing
 {
-	public class Router : IRouter, IHasLogger
+    public class Router : IRouter, IHasLogger
 	{
         ILogger IHasLogger.Logger => Logger;
 
@@ -86,7 +86,7 @@ namespace Everest.Routing
 				if (result)
 				{
 					context.Request.PathParameters = parameters;
-					context.Features.Set<IEndPointFeature>(new EndPointFeature(descriptor.EndPoint));
+					FeatureCollectionExtensions.Set<IEndPointFeature>(context.Features, new EndPointFeature(descriptor.EndPoint));
 
                     Logger.LogTraceIfEnabled(() => $"{context.TraceIdentifier} - Successfully matched requested route: {new { Request = context.Request.Description, RoutePattern = descriptor.Route.Description, EndPoint = descriptor.EndPoint.Description }}");
                     return true;

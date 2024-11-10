@@ -1,14 +1,14 @@
 ﻿using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Threading.Tasks;
-using Everest.Common.Logging;
-using Everest.Core.Http;
+using Everest.Http;
+using Everest.Utils;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Everest.Authentication
 {
-	public class JwtAuthentication : IAuthentication, IHasLogger
+    public class JwtAuthentication : IAuthentication, IHasLogger
 	{
         ILogger IHasLogger.Logger => Logger;
 

@@ -1,4 +1,4 @@
-﻿using Everest.Core.Rest;
+﻿using Everest.Rest;
 using Everest.Routing;
 using Microsoft.Extensions.DependencyInjection;
 

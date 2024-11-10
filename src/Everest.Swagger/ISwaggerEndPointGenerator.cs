@@ -1,5 +1,5 @@
-﻿using Everest.Common.Logging;
-using Everest.Routing;
+﻿using Everest.Routing;
+using Everest.Utils;
 using Microsoft.Extensions.Logging;
 
 namespace Everest.Swagger

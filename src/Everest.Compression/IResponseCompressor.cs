@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
-using Everest.Common.Logging;
-using Everest.Core.Http;
+using Everest.Http;
+using Everest.Utils;
 using Microsoft.Extensions.Logging;
 
 namespace Everest.Compression

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Everest.Core.Http;
-using Everest.Core.Middlewares;
+using Everest.Http;
+using Everest.Middlewares;
 
 namespace Everest.Exceptions
 {

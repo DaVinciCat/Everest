@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Everest.Common.Collections;
-using Everest.Common.Reflection;
-using Everest.Core.Http;
+using Everest.Http;
 using Everest.Routing;
+using Everest.Utils;
 using Microsoft.OpenApi.Models;
 
 namespace Everest.OpenApi

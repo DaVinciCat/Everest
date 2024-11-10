@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.IO.Compression;
-using Everest.Common.Configuration;
+using Everest.Configuration;
 
 namespace Everest.Compression
 {

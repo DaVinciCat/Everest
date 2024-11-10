@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Everest.Common.Logging;
-using Everest.Core.Http;
+using Everest.Http;
+using Everest.Utils;
 using Microsoft.Extensions.Logging;
 
 namespace Everest.EndPoints
 {
-	public class EndPointInvoker : IEndPointInvoker, IHasLogger
+    public class EndPointInvoker : IEndPointInvoker, IHasLogger
 	{
         ILogger IHasLogger.Logger => Logger;
 

@@ -1,4 +1,4 @@
-﻿using Everest.Core.Rest;
+﻿using Everest.Rest;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Everest.SwaggerUi

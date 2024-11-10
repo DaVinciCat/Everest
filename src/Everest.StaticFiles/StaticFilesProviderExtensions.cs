@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using Everest.Core.Http;
+using Everest.Http;
 
 namespace Everest.StaticFiles
 {

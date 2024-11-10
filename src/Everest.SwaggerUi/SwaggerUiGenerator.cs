@@ -2,8 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Everest.Common.Io;
-using Everest.Common.Logging;
+using Everest.Utils;
 using Microsoft.Extensions.Logging;
 
 namespace Everest.SwaggerUi

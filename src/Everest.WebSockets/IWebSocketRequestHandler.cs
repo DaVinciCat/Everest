@@ -1,6 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using Everest.Core.Http;
+using Everest.Http;
 
 namespace Everest.WebSockets
 {

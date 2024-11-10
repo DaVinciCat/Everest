@@ -6,9 +6,9 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Everest.Core.WebSockets;
+
 #if !NET5_0_OR_GREATER
-using Everest.Common.Threading;
+using Everest.Utils;
 #endif
 
 namespace Everest.WebSockets

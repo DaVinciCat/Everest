@@ -1,5 +1,5 @@
 ﻿using System;
-using Everest.Common.Configuration;
+using Everest.Configuration;
 
 namespace Everest.Exceptions
 {

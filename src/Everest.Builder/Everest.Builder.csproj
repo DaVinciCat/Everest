@@ -8,10 +8,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Everest.Compression\Everest.Compression.csproj" />
-    <ProjectReference Include="..\Everest.Core\Everest.Core.csproj" />
     <ProjectReference Include="..\Everest.Exceptions\Everest.Exceptions.csproj" />
     <ProjectReference Include="..\Everest.Routing\Everest.Routing.csproj" />
     <ProjectReference Include="..\Everest.StaticFiles\Everest.StaticFiles.csproj" />
+    <ProjectReference Include="..\Everest\Everest.csproj" />
   </ItemGroup>
 
 </Project>

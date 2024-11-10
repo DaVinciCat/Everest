@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.IO;
-using Everest.Common.Io;
 using Everest.Mime;
+using Everest.Utils;
 using Microsoft.Extensions.Logging;
 
 namespace Everest.StaticFiles

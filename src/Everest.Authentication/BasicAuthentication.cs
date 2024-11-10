@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Text;
 using System.Threading.Tasks;
-using Everest.Common.Logging;
-using Everest.Core.Http;
+using Everest.Http;
+using Everest.Utils;
 using Microsoft.Extensions.Logging;
 
 namespace Everest.Authentication
 {
-	public class BasicAuthentication : IAuthentication, IHasLogger
+    public class BasicAuthentication : IAuthentication, IHasLogger
 	{
         ILogger IHasLogger.Logger => Logger;
 
