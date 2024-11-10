@@ -7,6 +7,7 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Everest.Collections;
+using Everest.Utils;
 
 namespace Everest.WebSockets
 {
@@ -40,7 +41,7 @@ namespace Everest.WebSockets
 
         public IEnumerable<string> SecWebSocketProtocols  => context.SecWebSocketProtocols;
 
-        public bool IsAuthenticated => User.Identity != null && User.Identity.IsAuthenticated;
+        public bool IsAuthenticated => User.IsAuthenticated();
 
         public IPEndPoint RemoteEndPoint => request.RemoteEndPoint;
 

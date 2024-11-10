@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Security.Claims;
 
-namespace Everest.Authentication
+namespace Everest.Utils
 {
     public static class ClaimsExtensions
     {
