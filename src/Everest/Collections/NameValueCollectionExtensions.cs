@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Globalization;
-using Everest.Utils;
 
 namespace Everest.Collections
 {
-	public static class NameValueCollectionExtensions
+    public delegate bool TryParse<T>(string str, out T value);
+
+    public static class NameValueCollectionExtensions
 	{
 		public static T GetValue<T>(this NameValueCollection collection, string key)
 		{

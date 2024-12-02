@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Security.Claims;
 using System.Threading;
 using Everest.Collections;
 using Everest.WebSockets;
+using Microsoft.Extensions.Logging;
 
 namespace Everest.Http
 {

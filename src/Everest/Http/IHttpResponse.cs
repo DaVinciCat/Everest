@@ -1,11 +1,11 @@
-﻿using Everest.Utils;
-using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Collections.Specialized;
 using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Everest.Utils;
+using Microsoft.Extensions.Logging;
 
 namespace Everest.Http
 {

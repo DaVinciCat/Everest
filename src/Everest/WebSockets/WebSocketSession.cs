@@ -7,7 +7,7 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Everest.Collections;
-using Everest.Security;
+using Everest.Utils;
 
 namespace Everest.WebSockets
 {

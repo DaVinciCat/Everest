@@ -6,13 +6,22 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Everest.Authentication;
+using Everest.Builder;
+using Everest.Compression;
 using Everest.Http;
+using Everest.Rest;
+using Everest.WebSockets;
+using Everest.Cors;
+using Everest.EndPoints;
+using Everest.Exceptions;
+using Everest.Logging;
+using Everest.OpenApi;
 using Everest.OpenApi.Annotations;
 using Everest.OpenApi.Examples;
-using Everest.Rest;
 using Everest.Routing;
+using Everest.StaticFiles;
 using Everest.Swagger;
-using Everest.WebSockets;
+using Everest.SwaggerUi;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -212,16 +221,18 @@ namespace Everest.Shell
             services.AddAuthenticator(configurator => configurator.AddBasicAuthentication())
                     .AddCorsRequestHandler(configurator => configurator.AddDefaultCorsPolicy())
                     .AddWebSocketRequestHandler<EchoWebsocketRequestHandler>()
+                    .AddOpenApiDocumentGenerator()
                     .AddSwaggerEndPointGenerator(configurator => configurator.UseOpenApiInfo(info =>
                     {
                         info.Title = "Everest API";
                         info.Description = "Some API description";
                         info.Version = "V3";
                     }))
+                    .AddSwaggerUiGenerator()
                     .AddSingleton(_ => new GreetingsService())
                     .AddConsoleLoggerFactory();
 
-            using var rest = new RestServerBuilder(services)
+            var rest = RestServerBuilderFactory.CreateBuilder(services)
                 .UsePrefixes("http://localhost:8080/")
                 .UseExceptionHandlerMiddleware()
                 .UseResponseCompressionMiddleware()
@@ -232,8 +243,8 @@ namespace Everest.Shell
                 .UseCorsMiddleware()
                 .UseEndPointMiddleware()
                 .ScanRoutes(Assembly.GetExecutingAssembly())
-                .UseSwagger()
-                .UseSwaggerUi()
+                .GenerateSwaggerEndPoint()
+                .GenerateSwaggerUi()
                 .Build();
 
             rest.Start();

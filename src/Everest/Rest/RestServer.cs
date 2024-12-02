@@ -1,8 +1,8 @@
-﻿using Everest.Http;
-using System;
+﻿using System;
 using System.Net;
 using System.Threading;
 using Everest.Collections;
+using Everest.Http;
 using Everest.Middlewares;
 using Everest.Utils;
 using Microsoft.Extensions.DependencyInjection;

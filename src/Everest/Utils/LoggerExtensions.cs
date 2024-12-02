@@ -265,10 +265,10 @@ namespace Everest.Utils
 
     #region IHasLogger
 
-    internal interface IHasLogger
+    public interface IHasLogger
     {
         ILogger Logger { get; }
     }
-    
+
     #endregion
 }

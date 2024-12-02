@@ -55,6 +55,6 @@ namespace Everest.Utils
             {
                 File.Copy(filePath, filePath.Replace(sourceDir, destinationDir));
             }
-        }   
+        }
     }
 }
