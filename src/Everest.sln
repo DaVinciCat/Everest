@@ -35,6 +35,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Everest.Logging", "Everest.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Everest", "Everest\Everest.csproj", "{24FD52FA-68BE-4015-B2E1-561B534092F4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Everest.Targets", "Everest.Targets\Everest.Targets.csproj", "{7E079672-DDC5-4D56-9040-B213820E1B66}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -105,6 +107,10 @@ Global
 		{24FD52FA-68BE-4015-B2E1-561B534092F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{24FD52FA-68BE-4015-B2E1-561B534092F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{24FD52FA-68BE-4015-B2E1-561B534092F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E079672-DDC5-4D56-9040-B213820E1B66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E079672-DDC5-4D56-9040-B213820E1B66}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E079672-DDC5-4D56-9040-B213820E1B66}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E079672-DDC5-4D56-9040-B213820E1B66}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

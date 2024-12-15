@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Everest.Authentication\Everest.Authentication.csproj" />
+    <ProjectReference Include="..\Everest.Builder\Everest.Builder.csproj" />
+    <ProjectReference Include="..\Everest.Compression\Everest.Compression.csproj" />
+    <ProjectReference Include="..\Everest.Cors\Everest.Cors.csproj" />
+    <ProjectReference Include="..\Everest.EndPoints\Everest.EndPoints.csproj" />
+    <ProjectReference Include="..\Everest.Exceptions\Everest.Exceptions.csproj" />
+    <ProjectReference Include="..\Everest.Logging\Everest.Logging.csproj" />
+    <ProjectReference Include="..\Everest.Mime\Everest.Mime.csproj" />
+    <ProjectReference Include="..\Everest.OpenApi\Everest.OpenApi.csproj" />
+    <ProjectReference Include="..\Everest.Routing\Everest.Routing.csproj" />
+    <ProjectReference Include="..\Everest.StaticFiles\Everest.StaticFiles.csproj" />
+    <ProjectReference Include="..\Everest.SwaggerUi\Everest.SwaggerUi.csproj" />
+    <ProjectReference Include="..\Everest.Swagger\Everest.Swagger.csproj" />
+    <ProjectReference Include="..\Everest.WebSockets\Everest.WebSockets.csproj" />
+    <ProjectReference Include="..\Everest\Everest.csproj" />
+  </ItemGroup>
+
+</Project>
