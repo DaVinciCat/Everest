@@ -1,7 +1,6 @@
 @echo off
 setlocal
 
-set "outputDir=binaries" 
 set "targetProject=src/Everest.Targets/Everest.Targets.csproj" 
 
 if not exist "%outputDir%" (
@@ -9,16 +8,15 @@ if not exist "%outputDir%" (
 )
 
 echo Building...
-    dotnet build %targetProject% -p:TargetFramework=net6.0 --configuration Release -p:Platform=x64 -p:DebugType=None --output "%outputDir%"
 
-    if errorlevel 1 (
-        echo Build failed for Everest.Targets Exiting...
-        pause    
-        exit /b 1
-    )  
+dotnet build %targetProject% -p:TargetFramework=net6.0 --configuration Release
+dotnet build %targetProject% -p:TargetFramework=net472 --configuration Release
 
-del %outputDir%\*.deps.json
-del %outputDir%\*Everest.Targets.dll
+if errorlevel 1 (
+    echo Build failed for Everest.Targets Exiting...
+    pause    
+    exit /b 1
+)  
 
 echo.
 echo Build completed.
