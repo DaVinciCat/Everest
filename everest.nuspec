@@ -5,7 +5,7 @@
     <version>1.0.0</version>
     <authors>Da Vinci's Cat</authors>
     <description>REST server</description>
-    <copyright>Free-to-use</copyright>
+    <copyright>free-to-use</copyright>
     <tags>rest http web</tags>
     <dependencies>
       <group targetFramework="net472">
