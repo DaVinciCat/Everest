@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Everest</id>
+    <version>1.0.0</version>
+    <authors>Da Vinci's Cat</authors>
+    <description>REST server</description>
+    <copyright>Free-to-use</copyright>
+    <tags>rest http web</tags>
+    <dependencies>
+      <group targetFramework="net472">
+        <dependency id="Microsoft.Bcl.AsyncInterfaces" version="8.0.0" exclude="Build,Analyzers" />
+	<dependency id="Microsoft.Bcl.TimeProvider" version="8.0.1" exclude="Build,Analyzers" />
+	<dependency id="Microsoft.Extensions.Configuration" version="8.0.0" exclude="Build,Analyzers" />
+	<dependency id="Microsoft.Extensions.Configuration.Abstractions" version="8.0.0" exclude="Build,Analyzers" />
+	<dependency id="Microsoft.Extensions.Configuration.Binder" version="8.0.2" exclude="Build,Analyzers" />
+	<dependency id="Microsoft.Extensions.DependencyInjection" version="8.0.1" exclude="Build,Analyzers" />
+	<dependency id="Microsoft.Extensions.DependencyInjection.Abstractions" version="8.0.2" exclude="Build,Analyzers" />
+	<dependency id="Microsoft.Extensions.Logging" version="8.0.1" exclude="Build,Analyzers" />
+	<dependency id="Microsoft.Extensions.Logging.Abstractions" version="8.0.2" exclude="Build,Analyzers" />
+	<dependency id="Microsoft.Extensions.Logging.Configuration" version="8.0.1" exclude="Build,Analyzers" />
+	<dependency id="Microsoft.Extensions.Logging.Console" version="8.0.1" exclude="Build,Analyzers" />
+	<dependency id="Microsoft.Extensions.Options" version="8.0.2" exclude="Build,Analyzers" />
+	<dependency id="Microsoft.Extensions.Options.ConfigurationExtensions" version="8.0.0" exclude="Build,Analyzers" />
+	<dependency id="Microsoft.Extensions.Primitives" version="8.0.0" exclude="Build,Analyzers" />
+	<dependency id="Microsoft.IdentityModel.Abstractions" version="8.1.2" exclude="Build,Analyzers" />
+	<dependency id="Microsoft.IdentityModel.JsonWebTokens" version="8.1.2" exclude="Build,Analyzers" />
+	<dependency id="Microsoft.IdentityModel.Logging" version="8.1.2" exclude="Build,Analyzers" />
+	<dependency id="Microsoft.IdentityModel.Tokens" version="8.1.2" exclude="Build,Analyzers" />
+	<dependency id="Microsoft.OpenApi" version="1.6.22" exclude="Build,Analyzers" />
+	<dependency id="System.Buffers" version="4.5.1" exclude="Build,Analyzers" />
+	<dependency id="System.Diagnostics.DiagnosticSource" version="8.0.1" exclude="Build,Analyzers" />
+	<dependency id="System.IdentityModel.Tokens.Jwt" version="8.1.2" exclude="Build,Analyzers" />
+	<dependency id="System.Memory" version="4.5.5" exclude="Build,Analyzers" />
+	<dependency id="System.Numerics.Vectors" version="4.5.0" exclude="Build,Analyzers" />
+	<dependency id="System.Runtime.CompilerServices.Unsafe" version="6.0.0" exclude="Build,Analyzers" />
+	<dependency id="System.Text.Encodings.Web" version="8.0.0" exclude="Build,Analyzers" />
+	<dependency id="System.Text.Json" version="8.0.5" exclude="Build,Analyzers" />
+	<dependency id="System.Threading.Tasks.Extensions" version="4.5.4" exclude="Build,Analyzers" />
+	<dependency id="System.ValueTuple" version="4.5.0" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework="net6.0">
+        <dependency id="Microsoft.Bcl.AsyncInterfaces" version="8.0.0" exclude="Build,Analyzers" />
+	<dependency id="Microsoft.Bcl.TimeProvider" version="8.0.1" exclude="Build,Analyzers" />
+	<dependency id="Microsoft.Extensions.Configuration" version="8.0.0" exclude="Build,Analyzers" />
+	<dependency id="Microsoft.Extensions.Configuration.Abstractions" version="8.0.0" exclude="Build,Analyzers" />
+	<dependency id="Microsoft.Extensions.Configuration.Binder" version="8.0.2" exclude="Build,Analyzers" />
+	<dependency id="Microsoft.Extensions.DependencyInjection" version="8.0.1" exclude="Build,Analyzers" />
+	<dependency id="Microsoft.Extensions.DependencyInjection.Abstractions" version="8.0.2" exclude="Build,Analyzers" />
+	<dependency id="Microsoft.Extensions.Logging" version="8.0.1" exclude="Build,Analyzers" />
+	<dependency id="Microsoft.Extensions.Logging.Abstractions" version="8.0.2" exclude="Build,Analyzers" />
+	<dependency id="Microsoft.Extensions.Logging.Configuration" version="8.0.1" exclude="Build,Analyzers" />
+	<dependency id="Microsoft.Extensions.Logging.Console" version="8.0.1" exclude="Build,Analyzers" />
+	<dependency id="Microsoft.Extensions.Options" version="8.0.2" exclude="Build,Analyzers" />
+	<dependency id="Microsoft.Extensions.Options.ConfigurationExtensions" version="8.0.0" exclude="Build,Analyzers" />
+	<dependency id="Microsoft.Extensions.Primitives" version="8.0.0" exclude="Build,Analyzers" />
+	<dependency id="Microsoft.IdentityModel.Abstractions" version="8.1.2" exclude="Build,Analyzers" />
+	<dependency id="Microsoft.IdentityModel.JsonWebTokens" version="8.1.2" exclude="Build,Analyzers" />
+	<dependency id="Microsoft.IdentityModel.Logging" version="8.1.2" exclude="Build,Analyzers" />
+	<dependency id="Microsoft.IdentityModel.Tokens" version="8.1.2" exclude="Build,Analyzers" />
+	<dependency id="Microsoft.OpenApi" version="1.6.22" exclude="Build,Analyzers" />
+	<dependency id="System.Diagnostics.DiagnosticSource" version="8.0.1" exclude="Build,Analyzers" />
+	<dependency id="System.IdentityModel.Tokens.Jwt" version="8.1.2" exclude="Build,Analyzers" />
+	<dependency id="System.Runtime.CompilerServices.Unsafe" version="6.0.0" exclude="Build,Analyzers" />
+	<dependency id="System.Text.Encodings.Web" version="8.0.0" exclude="Build,Analyzers" />
+	<dependency id="System.Text.Json" version="8.0.5" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="src\Everest.Targets\bin\Release\net472\Everest.dll" target="lib\net472" />
+    <file src="src\Everest.Targets\bin\Release\net472\Everest.Authentication.dll" target="lib\net472" />
+    <file src="src\Everest.Targets\bin\Release\net472\Everest.Builder.dll" target="lib\net472" />
+    <file src="src\Everest.Targets\bin\Release\net472\Everest.Compression.dll" target="lib\net472" />
+    <file src="src\Everest.Targets\bin\Release\net472\Everest.Cors.dll" target="lib\net472" />
+    <file src="src\Everest.Targets\bin\Release\net472\Everest.EndPoints.dll" target="lib\net472" />
+    <file src="src\Everest.Targets\bin\Release\net472\Everest.Exceptions.dll" target="lib\net472" />
+    <file src="src\Everest.Targets\bin\Release\net472\Everest.Logging.dll" target="lib\net472" />
+    <file src="src\Everest.Targets\bin\Release\net472\Everest.Mime.dll" target="lib\net472" />
+    <file src="src\Everest.Targets\bin\Release\net472\Everest.OpenApi.dll" target="lib\net472" />
+    <file src="src\Everest.Targets\bin\Release\net472\Everest.Routing.dll" target="lib\net472" />
+    <file src="src\Everest.Targets\bin\Release\net472\Everest.StaticFiles.dll" target="lib\net472" />
+    <file src="src\Everest.Targets\bin\Release\net472\Everest.Swagger.dll" target="lib\net472" />	
+    <file src="src\Everest.Targets\bin\Release\net472\Everest.SwaggerUi.dll" target="lib\net472" />
+    <file src="src\Everest.Targets\bin\Release\net472\Everest.WebSockets.dll" target="lib\net472" />	
+	
+    <file src="src\Everest.Targets\bin\Release\net6.0\Everest.dll" target="lib\net6.0" />
+    <file src="src\Everest.Targets\bin\Release\net6.0\Everest.Authentication.dll" target="lib\net6.0" />
+    <file src="src\Everest.Targets\bin\Release\net6.0\Everest.Builder.dll" target="lib\net6.0" />
+    <file src="src\Everest.Targets\bin\Release\net6.0\Everest.Compression.dll" target="lib\net6.0" />
+    <file src="src\Everest.Targets\bin\Release\net6.0\Everest.Cors.dll" target="lib\net6.0" />
+    <file src="src\Everest.Targets\bin\Release\net6.0\Everest.EndPoints.dll" target="lib\net6.0" />
+    <file src="src\Everest.Targets\bin\Release\net6.0\Everest.Exceptions.dll" target="lib\net6.0" />
+    <file src="src\Everest.Targets\bin\Release\net6.0\Everest.Logging.dll" target="lib\net6.0" />
+    <file src="src\Everest.Targets\bin\Release\net6.0\Everest.Mime.dll" target="lib\net6.0" />
+    <file src="src\Everest.Targets\bin\Release\net6.0\Everest.OpenApi.dll" target="lib\net6.0" />
+    <file src="src\Everest.Targets\bin\Release\net6.0\Everest.Routing.dll" target="lib\net6.0" />
+    <file src="src\Everest.Targets\bin\Release\net6.0\Everest.StaticFiles.dll" target="lib\net6.0" />
+    <file src="src\Everest.Targets\bin\Release\net6.0\Everest.Swagger.dll" target="lib\net6.0" />	
+    <file src="src\Everest.Targets\bin\Release\net6.0\Everest.SwaggerUi.dll" target="lib\net6.0" />
+    <file src="src\Everest.Targets\bin\Release\net6.0\Everest.WebSockets.dll" target="lib\net6.0" />	
+  </files>
+</package>
